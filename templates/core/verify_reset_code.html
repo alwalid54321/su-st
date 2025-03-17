@@ -1,0 +1,271 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Verify Reset Code - SudaStock{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="auth-form-container">
+                <div class="auth-header">
+                    <div class="auth-logo">
+                        <span style="color: var(--primary-dark);">Suda</span><span style="color: var(--accent);">Stock</span>
+                    </div>
+                    <p class="auth-subtitle">Verify Reset Code</p>
+                </div>
+                
+                {% if messages %}
+                <div id="messages-container">
+                    {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show">
+                        <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' or message.tags == 'danger' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <div class="alert alert-info mb-4">
+                    <i class="fas fa-info-circle me-2"></i>
+                    A verification code has been sent to your email. Please enter it below to continue with password reset.
+                </div>
+                
+                <form method="post" action="{% url 'verify_reset_code' %}" class="needs-validation" novalidate id="verifyResetForm">
+                    {% csrf_token %}
+                    
+                    <div class="form-floating mb-4">
+                        <input type="text" class="form-control" id="code" name="code" placeholder="Verification Code" required maxlength="6">
+                        <label for="code"><i class="fas fa-key me-2"></i>Verification Code</label>
+                        <div class="invalid-feedback">
+                            Please enter the verification code.
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mb-4">
+                        <button type="button" class="btn btn-outline-secondary" id="resend-code-btn">
+                            <i class="fas fa-redo-alt me-2"></i>Resend Code
+                        </button>
+                        <div id="code-timer" class="text-muted">
+                            Code expires in: <span id="timer-count">10:00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary" id="verifyButton">
+                            <i class="fas fa-check-circle me-2"></i>Verify Code
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="auth-footer">
+                    <p>Back to <a href="{% url 'forgot_password' %}">Forgot Password</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+<style>
+    :root {
+        --primary-dark: #1B1464;  /* Dark blue from logo */
+        --accent: #786D3C;  /* Gold accent from logo */
+    }
+    
+    .auth-form-container {
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        padding: 2.5rem;
+        margin-top: 6rem;
+        margin-bottom: 3rem;
+        border-top: 4px solid var(--primary-dark);
+    }
+    
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .auth-logo {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .auth-subtitle {
+        color: #666;
+        font-size: 1.1rem;
+    }
+    
+    .btn-primary {
+        background-color: var(--primary-dark);
+        border-color: var(--primary-dark);
+    }
+    
+    .btn-primary:hover, .btn-primary:focus {
+        background-color: #13104d;
+        border-color: #13104d;
+    }
+    
+    .btn-outline-secondary {
+        color: var(--accent);
+        border-color: var(--accent);
+    }
+    
+    .btn-outline-secondary:hover, .btn-outline-secondary:focus {
+        background-color: var(--accent);
+        color: white;
+    }
+    
+    .auth-footer {
+        text-align: center;
+        margin-top: 2rem;
+        color: #666;
+    }
+    
+    .auth-footer a {
+        color: var(--primary-dark);
+        text-decoration: none;
+    }
+    
+    .auth-footer a:hover {
+        text-decoration: underline;
+    }
+    
+    @media (max-width: 768px) {
+        .auth-form-container {
+            padding: 1.5rem;
+            margin-top: 3rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Form validation
+        const form = document.getElementById('verifyResetForm');
+        
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        });
+        
+        // Timer functionality
+        let timeLeft = 600; // 10 minutes in seconds
+        const timerElement = document.getElementById('timer-count');
+        const resendButton = document.getElementById('resend-code-btn');
+        
+        // Disable resend button initially
+        resendButton.disabled = true;
+        
+        const timer = setInterval(function() {
+            timeLeft--;
+            
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            
+            timerElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                timerElement.textContent = 'Expired';
+                resendButton.disabled = false;
+            }
+            
+            // Enable resend button after 1 minute
+            if (timeLeft <= 540) { // 9 minutes left (after 1 minute)
+                resendButton.disabled = false;
+            }
+        }, 1000);
+        
+        // Resend code functionality
+        resendButton.addEventListener('click', function() {
+            const email = '{{ request.session.reset_email }}';
+            
+            // Show loading state
+            resendButton.disabled = true;
+            resendButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...';
+            
+            // Make API call to resend code
+            fetch('/api/resend-otp/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({
+                    email: email,
+                    purpose: 'password_reset'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    const messagesContainer = document.getElementById('messages-container');
+                    if (messagesContainer) {
+                        messagesContainer.innerHTML = `
+                            <div class="alert alert-success alert-dismissible fade show">
+                                <i class="fas fa-check-circle me-2"></i>
+                                Verification code resent successfully.
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        `;
+                    }
+                    
+                    // Reset timer
+                    timeLeft = 600;
+                    timerElement.textContent = '10:00';
+                    
+                    // Disable resend button again
+                    resendButton.disabled = true;
+                } else {
+                    // Show error message
+                    const messagesContainer = document.getElementById('messages-container');
+                    if (messagesContainer) {
+                        messagesContainer.innerHTML = `
+                            <div class="alert alert-danger alert-dismissible fade show">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                ${data.message || 'Failed to resend verification code. Please try again.'}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        `;
+                    }
+                }
+                
+                // Reset button state
+                resendButton.innerHTML = '<i class="fas fa-redo-alt me-2"></i>Resend Code';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                
+                // Show error message
+                const messagesContainer = document.getElementById('messages-container');
+                if (messagesContainer) {
+                    messagesContainer.innerHTML = `
+                        <div class="alert alert-danger alert-dismissible fade show">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            An error occurred. Please try again later.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    `;
+                }
+                
+                // Reset button state
+                resendButton.innerHTML = '<i class="fas fa-redo-alt me-2"></i>Resend Code';
+                resendButton.disabled = false;
+            });
+        });
+    });
+</script>
+{% endblock %}

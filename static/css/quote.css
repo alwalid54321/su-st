@@ -1,0 +1,149 @@
+:root {
+  --accent: #786D3C;  /* Gold accent from logo */
+  --primary-dark: #1B1464;  /* Dark blue from logo */
+  --text-color: #333;
+  --background-color: #f8f9fa;
+  --card-background: #fff;
+  --border-color: #e0e0e0;
+}
+
+.quote-container {
+  background-color: var(--background-color);
+  padding: 50px 0;
+  min-height: calc(100vh - 100px);
+}
+
+.quote-content {
+  display: flex;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.quote-form-section {
+  flex: 2;
+  padding: 40px;
+}
+
+.quote-form-section h1 {
+  color: var(--primary-dark);
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+.subtitle {
+  color: var(--accent);
+  font-size: 1.1rem;
+  margin-bottom: 5px;
+}
+
+.quote-form {
+  margin-top: 30px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+.submit-btn {
+  background-color: var(--primary-dark);
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+.submit-btn:hover {
+  background-color: var(--accent);
+}
+
+.info-section {
+  flex: 1;
+  background-color: var(--primary-dark);
+  color: white;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.info-box {
+  text-align: center;
+}
+
+.info-box h3 {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+}
+
+.info-box p {
+  font-size: 1.1rem;
+  margin-bottom: 30px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.contact-btn {
+  background-color: var(--accent);
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.contact-btn:hover {
+  background-color: white;
+  color: var(--primary-dark);
+}
+
+@media (max-width: 768px) {
+  .quote-content {
+    flex-direction: column;
+  }
+  
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+}

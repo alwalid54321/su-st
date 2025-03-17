@@ -1,0 +1,256 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}SudaStock - Login{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+<style>
+    .login-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 140vh;
+        background-color: #1B1464;
+        z-index: -1;
+    }
+    
+    .particles {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        overflow: hidden;
+    }
+    
+    .particle {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: #786D3C;
+        opacity: 0.5;
+        animation: float 10s linear infinite;
+    }
+    
+    @keyframes float {
+        0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 0.5;
+        }
+        50% {
+            transform: translateY(-20px) rotate(180deg);
+            opacity: 0.8;
+        }
+        100% {
+            transform: translateY(0) rotate(360deg);
+            opacity: 0.5;
+        }
+    }
+    
+    .particle:nth-child(1) {
+        top: 20%;
+        left: 30%;
+        animation-delay: 2s;
+    }
+    
+    .particle:nth-child(2) {
+        top: 40%;
+        left: 50%;
+        animation-delay: 4s;
+    }
+    
+    .particle:nth-child(3) {
+        top: 60%;
+        left: 20%;
+        animation-delay: 6s;
+    }
+    
+    .particle:nth-child(4) {
+        top: 80%;
+        left: 70%;
+        animation-delay: 8s;
+    }
+    
+    .particle:nth-child(5) {
+        top: 10%;
+        left: 40%;
+        animation-delay: 1s;
+    }
+    
+    .particle:nth-child(6) {
+        top: 50%;
+        left: 60%;
+        animation-delay: 3s;
+    }
+    
+    .btn-primary {
+        background-color: #1B1464;
+        border-color: #1B1464;
+    }
+    
+    .btn-primary:hover, .btn-primary:focus {
+        background-color: #786D3C;
+        border-color: #786D3C;
+    }
+    
+    .form-control:focus {
+        border-color: #786D3C;
+        box-shadow: 0 0 0 0.25rem rgba(120, 109, 60, 0.25);
+    }
+    
+    .form-check-input:checked {
+        background-color: #786D3C;
+        border-color: #786D3C;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Animated Background -->
+<div class="login-bg">
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+</div>
+
+<div class="container h-100">
+    <div class="row justify-content-center align-items-center h-100">
+        <div class="col-md-6 col-lg-5">
+            <div class="auth-form-container">
+                <div class="auth-form-content">
+                    <div class="auth-header text-center">
+                        <div class="auth-logo mb-3">
+                            <span style="color: #1B1464; font-size: 2rem; font-weight: 700;">Suda</span><span style="color: #786D3C; font-size: 2rem; font-weight: 700;">Stock</span>
+                        </div>
+                        <p class="auth-subtitle">Sign in to your account</p>
+                    </div>
+                    
+                    {% if messages %}
+                    <div id="messages-container">
+                        {% for message in messages %}
+                        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show">
+                            <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' or message.tags == 'danger' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="alert alert-danger" id="loginError" style="display: none;">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <span id="loginErrorMessage"></span>
+                    </div>
+                    
+                    <form method="post" action="{% url 'login' %}" class="needs-validation" novalidate id="loginForm">
+                        {% csrf_token %}
+                        
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
+                            <label for="username"><i class="fas fa-user me-2"></i>Username</label>
+                            <div class="invalid-feedback">
+                                Please enter your username.
+                            </div>
+                        </div>
+                        
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                            <label for="password"><i class="fas fa-lock me-2"></i>Password</label>
+                            <div class="invalid-feedback">
+                                Please enter your password.
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                                <label class="form-check-label" for="remember">Remember me</label>
+                            </div>
+                            <a href="{% url 'forgot_password' %}" class="text-decoration-none" style="color: #786D3C; font-weight: 500;">Forgot password?</a>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" id="loginButton">
+                                <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <!-- Social Login Section -->
+                    <div class="social-login-section mt-4 text-center">
+                        <div class="separator">
+                            <span class="separator-text">or sign in with</span>
+                        </div>
+                        
+                        <div class="social-buttons d-flex justify-content-center">
+                            <a href="{% url 'social:begin' 'google-oauth2' %}" class="social-btn google" title="Sign in with Google">
+                                <i class="fab fa-google"></i>
+                            </a>
+                            <a href="{% url 'social:begin' 'facebook' %}" class="social-btn facebook" title="Sign in with Facebook">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="{% url 'social:begin' 'apple-id' %}" class="social-btn apple" title="Sign in with Apple">
+                                <i class="fab fa-apple"></i>
+                            </a>
+                            <a href="{% url 'social:begin' 'microsoft-graph' %}" class="social-btn microsoft" title="Sign in with Microsoft">
+                                <i class="fab fa-microsoft"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="auth-footer text-center mt-4">
+                        <p>Don't have an account? <a href="{% url 'register' %}" style="color: #786D3C; font-weight: 500;">Register here</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Form validation
+        const form = document.getElementById('loginForm');
+        const username = document.getElementById('username');
+        const password = document.getElementById('password');
+        const loginError = document.getElementById('loginError');
+        const loginErrorMessage = document.getElementById('loginErrorMessage');
+        
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            form.classList.add('was-validated');
+        });
+        
+        // Show error message function
+        function showError(message) {
+            loginErrorMessage.textContent = message;
+            loginError.style.display = 'block';
+            
+            setTimeout(function() {
+                loginError.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert-dismissible');
+            alerts.forEach(function(alert) {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    });
+</script>
+{% endblock %}

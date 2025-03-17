@@ -1,0 +1,261 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}SudaStock - Social Connections{% endblock %}
+
+{% block styles %}
+<style>
+    .social-connections-container {
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        padding: 2.5rem;
+        margin-top: 2rem;
+        margin-bottom: 3rem;
+        border-top: 4px solid var(--primary-dark);
+    }
+    
+    .section-title {
+        color: var(--primary-dark);
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .social-account-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+        transition: all 0.3s ease;
+    }
+    
+    .social-account-item:hover {
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        transform: translateY(-2px);
+    }
+    
+    .social-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-right: 1rem;
+    }
+    
+    .social-icon.google {
+        color: white;
+        background-color: #DB4437;
+    }
+    
+    .social-icon.facebook {
+        color: white;
+        background-color: #4267B2;
+    }
+    
+    .social-icon.apple {
+        color: white;
+        background-color: #000;
+    }
+    
+    .social-icon.microsoft {
+        color: white;
+        background-color: #00A4EF;
+    }
+    
+    .social-account-info {
+        flex: 1;
+    }
+    
+    .social-account-name {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.25rem;
+    }
+    
+    .social-account-email {
+        color: #666;
+        font-size: 0.9rem;
+    }
+    
+    .social-account-actions {
+        display: flex;
+        align-items: center;
+    }
+    
+    .disconnect-btn {
+        color: #dc3545;
+        background: none;
+        border: none;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+    }
+    
+    .disconnect-btn:hover {
+        background-color: rgba(220, 53, 69, 0.1);
+    }
+    
+    .connect-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        margin-bottom: 1rem;
+        color: white;
+    }
+    
+    .connect-btn.google {
+        background-color: #DB4437;
+    }
+    
+    .connect-btn.facebook {
+        background-color: #4267B2;
+    }
+    
+    .connect-btn.apple {
+        background-color: #000;
+    }
+    
+    .connect-btn.microsoft {
+        background-color: #00A4EF;
+    }
+    
+    .connect-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        color: white;
+    }
+    
+    .no-accounts-message {
+        text-align: center;
+        padding: 2rem;
+        color: #666;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .social-connections-container {
+            padding: 1.5rem;
+        }
+        
+        .social-account-item {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .social-icon {
+            margin-right: 0;
+            margin-bottom: 1rem;
+        }
+        
+        .social-account-actions {
+            margin-top: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="social-connections-container">
+                <h2 class="section-title">Social Account Connections</h2>
+                
+                {% if social_accounts %}
+                    <div class="connected-accounts mb-4">
+                        <h4 class="mb-3" style="color: var(--accent);">Connected Accounts</h4>
+                        
+                        {% for account in social_accounts %}
+                            <div class="social-account-item">
+                                <div class="social-icon {{ account.provider }}">
+                                    <i class="fab fa-{{ account.provider }}"></i>
+                                </div>
+                                <div class="social-account-info">
+                                    <div class="social-account-name">{{ account.provider|title }} Account</div>
+                                    <div class="social-account-email">{{ account.email }}</div>
+                                </div>
+                                <div class="social-account-actions">
+                                    <form method="post" action="{% url 'disconnect_social_account' account.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="disconnect-btn">
+                                            <i class="fas fa-unlink me-1"></i> Disconnect
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="no-accounts-message">
+                        <i class="fas fa-info-circle fa-2x mb-3" style="color: var(--accent);"></i>
+                        <p>You don't have any connected social accounts yet.</p>
+                    </div>
+                {% endif %}
+                
+                <h4 class="mb-3" style="color: var(--accent);">Connect New Accounts</h4>
+                
+                <div class="available-connections">
+                    {% if not has_google %}
+                        <a href="{% url 'socialaccount_login' 'google' %}" class="btn connect-btn google">
+                            <i class="fab fa-google"></i> Connect Google
+                        </a>
+                    {% endif %}
+                    
+                    {% if not has_facebook %}
+                        <a href="{% url 'socialaccount_login' 'facebook' %}" class="btn connect-btn facebook">
+                            <i class="fab fa-facebook-f"></i> Connect Facebook
+                        </a>
+                    {% endif %}
+                    
+                    {% if not has_apple %}
+                        <a href="{% url 'socialaccount_login' 'apple' %}" class="btn connect-btn apple">
+                            <i class="fab fa-apple"></i> Connect Apple
+                        </a>
+                    {% endif %}
+                    
+                    {% if not has_microsoft %}
+                        <a href="{% url 'socialaccount_login' 'microsoft' %}" class="btn connect-btn microsoft">
+                            <i class="fab fa-microsoft"></i> Connect Microsoft
+                        </a>
+                    {% endif %}
+                </div>
+                
+                <div class="mt-4 text-center">
+                    <a href="{% url 'profile' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i> Back to Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    });
+</script>
+{% endblock %}

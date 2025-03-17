@@ -1,0 +1,453 @@
+/**
+ * Market Data Table Styles
+ * Styling for market data tables with animations for updates
+ * Using brand colors: --accent: #786D3C (Gold) and --primary-dark: #1B1464 (Dark blue)
+ */
+
+:root {
+    --accent: #786D3C;  /* Gold accent from logo */
+    --primary-dark: #1B1464;  /* Dark blue from logo */
+    --gray-dark: #495057;
+    --gray-light: #e0e0e0;
+}
+
+/* Table Container */
+.market-table-container {
+    overflow-x: auto;
+    margin: 20px 0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Market Table */
+.market-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    font-size: 14px;
+}
+
+.market-table th {
+    background-color: var(--primary-dark);
+    color: #fff;
+    padding: 12px 15px;
+    text-align: left;
+    font-weight: 600;
+    position: relative;
+    border-bottom: 2px solid var(--accent);
+}
+
+.market-table th:hover {
+    background-color: #2a2378;
+}
+
+.market-table th .sort-icon {
+    margin-left: 5px;
+    font-size: 12px;
+}
+
+.market-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--gray-light);
+    vertical-align: middle;
+}
+
+/* Row Styles */
+.market-table tbody tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.market-table tbody tr.row-hover {
+    background-color: rgba(27, 20, 100, 0.05);
+}
+
+/* Product Name Cell */
+.product-name-cell {
+    display: flex;
+    flex-direction: column;
+}
+
+.product-name {
+    font-weight: 600;
+    color: var(--primary-dark);
+}
+
+.base-currency {
+    font-size: 12px;
+    color: var(--gray-dark);
+    margin-top: 2px;
+}
+
+/* Price Cell */
+.price-cell {
+    position: relative;
+    font-weight: 500;
+}
+
+.currency-symbol {
+    color: var(--gray-dark);
+    margin-right: 2px;
+}
+
+/* Status Badge */
+.status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-badge.active {
+    background-color: rgba(25, 135, 84, 0.1);
+    color: #198754;
+}
+
+.status-badge.limited {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: #856404;
+}
+
+.status-badge.inactive {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #721c24;
+}
+
+/* Forecast Cell */
+.forecast-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.forecast-trend {
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background-color: rgba(108, 117, 125, 0.1);
+    color: #6c757d;
+}
+
+.forecast-trend.up {
+    background-color: rgba(25, 135, 84, 0.1);
+    color: #198754;
+}
+
+.forecast-trend.down {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+/* Action Buttons */
+.action-column {
+    white-space: nowrap;
+    text-align: center;
+}
+
+.action-btn {
+    display: inline-block;
+    padding: 5px 10px;
+    margin: 2px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+}
+
+.sample-btn {
+    background-color: var(--primary-dark);
+    color: #fff;
+}
+
+.sample-btn:hover {
+    background-color: #2a2378;
+    color: #fff;
+}
+
+.quote-btn {
+    background-color: var(--accent);
+    color: #fff;
+}
+
+.quote-btn:hover {
+    background-color: #8a7f4a;
+    color: #fff;
+}
+
+/* Price Change Indicators */
+.price-change-indicator {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    animation: fadeOut 3s forwards;
+}
+
+.price-change-indicator.increase {
+    color: #198754;
+}
+
+.price-change-indicator.decrease {
+    color: #dc3545;
+}
+
+/* Row Update Animation */
+.row-updated {
+    animation: highlightRow 3s;
+}
+
+/* Currency Toggle */
+.currency-toggle-container {
+    display: flex;
+    justify-content: flex-end;
+    margin: 0 15px 15px;
+}
+
+.currency-toggle {
+    display: flex;
+    align-items: center;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 8px 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.currency-toggle span {
+    margin-right: 10px;
+    font-weight: 500;
+    color: var(--gray-dark);
+}
+
+.currency-options {
+    display: flex;
+    gap: 8px;
+}
+
+.currency-option {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.currency-option:hover {
+    background-color: rgba(120, 109, 60, 0.1);
+}
+
+.currency-option.active {
+    background-color: var(--accent);
+    color: #fff;
+}
+
+.currency-flag {
+
+    object-fit: cover;
+}
+
+/* Refresh Button */
+.refresh-button {
+    margin-left: 15px;
+}
+
+.refresh-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    background-color: var(--primary-dark);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.refresh-btn:hover {
+    background-color: #2a2378;
+}
+
+.refresh-btn.loading {
+    opacity: 0.8;
+    cursor: wait;
+}
+
+/* Section Header */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 0 15px;
+}
+
+.section-header h2 {
+    color: var(--primary-dark);
+    font-size: 2rem;
+    font-weight: 700;
+    position: relative;
+    padding-bottom: 10px;
+    margin: 0;
+}
+
+.section-header h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background-color: var(--accent);
+}
+
+.update-time {
+    font-size: 0.9rem;
+    color: #6c757d;
+    font-style: italic;
+}
+
+.time-updated {
+    animation: highlight-time 2s ease;
+}
+
+/* Animations */
+@keyframes fadeOut {
+    0% { opacity: 1; }
+    70% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+@keyframes highlightRow {
+    0% { background-color: rgba(120, 109, 60, 0.2); }
+    70% { background-color: rgba(120, 109, 60, 0.2); }
+    100% { background-color: transparent; }
+}
+
+@keyframes highlight-time {
+    0%, 100% { color: #6c757d; }
+    50% { color: var(--accent); font-weight: bold; }
+}
+
+/* Responsive Styles */
+@media (max-width: 1200px) {
+    .market-table {
+        font-size: 13px;
+    }
+    
+    .market-table th,
+    .market-table td {
+        padding: 10px 12px;
+    }
+    
+    .action-btn {
+        padding: 4px 8px;
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 992px) {
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .update-time {
+        margin-top: 5px;
+    }
+    
+    .refresh-button {
+        margin-left: 0;
+        margin-top: 10px;
+    }
+    
+    .currency-toggle-container {
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 768px) {
+    .market-table th,
+    .market-table td {
+        padding: 8px 10px;
+    }
+    
+    .market-table {
+        font-size: 12px;
+    }
+    
+    .action-column {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .action-btn {
+        margin: 2px 0;
+    }
+    
+    .forecast-cell {
+        flex-direction: row;
+        gap: 8px;
+        align-items: center;
+    }
+}
+
+/* Dark Mode Support */
+.dark-mode .market-table {
+    background-color: #2d2d2d;
+    color: #e0e0e0;
+}
+
+.dark-mode .market-table th {
+    background-color: #1a1a1a;
+    border-bottom: 2px solid var(--accent);
+}
+
+.dark-mode .market-table td {
+    border-bottom: 1px solid #3d3d3d;
+}
+
+.dark-mode .market-table tbody tr:nth-child(even) {
+    background-color: #333333;
+}
+
+.dark-mode .market-table tbody tr.row-hover {
+    background-color: rgba(120, 109, 60, 0.2);
+}
+
+.dark-mode .product-name {
+    color: #e0e0e0;
+}
+
+.dark-mode .base-currency {
+    color: #a0a0a0;
+}
+
+.dark-mode .currency-toggle {
+    background-color: #333333;
+}
+
+.dark-mode .currency-toggle span {
+    color: #a0a0a0;
+}
+
+.dark-mode .currency-option:hover {
+    background-color: rgba(120, 109, 60, 0.3);
+}
+
+.dark-mode .section-header h2 {
+    color: #e0e0e0;
+}
+
+.dark-mode .update-time {
+    color: #a0a0a0;
+}

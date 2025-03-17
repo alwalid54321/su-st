@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="0 0 200 100">
+  <style>
+    text { font-family: Arial, sans-serif; font-weight: bold; }
+    .logo-text { fill: #333; font-size: 12px; }
+    .company { fill: #666; font-size: 10px; }
+  </style>
+  <rect x="10" y="10" width="180" height="80" rx="5" fill="#f9f9f9" stroke="#ddd" stroke-width="1"/>
+  <polygon points="50,30 70,30 90,50 70,70 50,70 30,50" fill="#1B1464" opacity="0.8"/>
+  <polygon points="150,30 130,30 110,50 130,70 150,70 170,50" fill="#786D3C" opacity="0.8"/>
+  <text x="100" y="85" text-anchor="middle" class="company">SHABOUR SONS LOGISTICS</text>
+</svg>

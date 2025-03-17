@@ -1,0 +1,278 @@
+{% load static %}
+<!-- Vertical Products Section -->
+<section class="vertical-products-section" id="products">
+    <div class="container">
+        <div class="section-header">
+            <h2>OUR PREMIUM PRODUCTS</h2>
+            <p>Explore Sudan's finest agricultural commodities</p>
+        </div>
+        
+        <div class="vertical-products-container">
+            <!-- Sesame Product -->
+            <div class="vertical-product-card" data-product="sesame">
+                <img src="{% static 'images/sesame-gad.jpg' %}" alt="Sesame" class="vertical-product-image">
+                <div class="vertical-product-overlay">
+                    <h3 class="vertical-product-title">Premium Sesame</h3>
+                    <p class="vertical-product-description">Sudan's high-quality sesame seeds, known for exceptional oil content and flavor.</p>
+                    <button class="vertical-product-button">View Details</button>
+                </div>
+            </div>
+            
+            <!-- Cotton Product -->
+            <div class="vertical-product-card" data-product="cotton">
+                <img src="{% static 'images/cotton.jpg' %}" alt="Cotton" class="vertical-product-image">
+                <div class="vertical-product-overlay">
+                    <h3 class="vertical-product-title">High-Grade Cotton</h3>
+                    <p class="vertical-product-description">Sudanese cotton renowned for its exceptional quality and long staple length.</p>
+                    <button class="vertical-product-button">View Details</button>
+                </div>
+            </div>
+            
+            <!-- Gum Arabic Product -->
+            <div class="vertical-product-card" data-product="gum-arabic">
+                <img src="{% static 'images/acacia-sen.jpg' %}" alt="Gum Arabic" class="vertical-product-image">
+                <div class="vertical-product-overlay">
+                    <h3 class="vertical-product-title">Premium Gum Arabic</h3>
+                    <p class="vertical-product-description">The world's finest gum arabic, used in food, pharmaceuticals, and industrial applications.</p>
+                    <button class="vertical-product-button">View Details</button>
+                </div>
+            </div>
+            
+            <!-- Peanuts Product -->
+            <div class="vertical-product-card" data-product="peanuts">
+                <img src="{% static 'images/peanuts.jpg' %}" alt="Peanuts" class="vertical-product-image">
+                <div class="vertical-product-overlay">
+                    <h3 class="vertical-product-title">Sudanese Peanuts</h3>
+                    <p class="vertical-product-description">High-quality peanuts with excellent flavor and nutritional profile.</p>
+                    <button class="vertical-product-button">View Details</button>
+                </div>
+            </div>
+            
+            <!-- Watermelon Seeds Product -->
+            <div class="vertical-product-card" data-product="watermelon-seeds">
+                <img src="{% static 'images/watermelon.jpg' %}" alt="Watermelon Seeds" class="vertical-product-image">
+                <div class="vertical-product-overlay">
+                    <h3 class="vertical-product-title">Watermelon Seeds</h3>
+                    <p class="vertical-product-description">Premium quality watermelon seeds, perfect for snacking and culinary applications.</p>
+                    <button class="vertical-product-button">View Details</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Product Popups -->
+<div class="product-popup-overlay" id="sesamePopup">
+    <div class="product-popup">
+        <div class="product-popup-header">
+            <img src="{% static 'images/sesame-gad.jpg' %}" alt="Sesame" class="product-popup-image">
+            <div class="product-popup-close">&times;</div>
+        </div>
+        <div class="product-popup-content">
+            <h2 class="product-popup-title">Premium Sesame</h2>
+            <div class="product-popup-details">
+                <p class="product-popup-description">
+                    Sudan is one of the world's largest producers of sesame, known for its exceptional quality and oil content. Our premium sesame seeds are carefully selected and processed to meet the highest international standards. Sudanese sesame is highly sought after in global markets for its distinctive flavor, high oil content, and nutritional value.
+                </p>
+                <div class="product-popup-specs">
+                    <div class="product-popup-spec">
+                        <h4>Origin</h4>
+                        <p>Gadaref, Sudan</p>
+                    </div>
+                    <div class="product-popup-spec">
+                        <h4>Oil Content</h4>
+                        <p>48-52%</p>
+                    </div>
+                    <div class="product-popup-spec">
+                        <h4>Purity</h4>
+                        <p>99.5% min</p>
+                    </div>
+                    <div class="product-popup-spec">
+                        <h4>Moisture</h4>
+                        <p>6% max</p>
+                    </div>
+                </div>
+            </div>
+            <div class="product-popup-actions">
+                <a href="/products/#sesame-gad" class="product-popup-button">
+                    <i class="fas fa-info-circle"></i> More Information
+                </a>
+                <a href="/contact" class="product-popup-button">
+                    <i class="fas fa-envelope"></i> Inquire Now
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="product-popup-overlay" id="cottonPopup">
+    <div class="product-popup">
+        <div class="product-popup-header">
+            <img src="{% static 'images/cotton.jpg' %}" alt="Cotton" class="product-popup-image">
+            <div class="product-popup-close">&times;</div>
+        </div>
+        <div class="product-popup-content">
+            <h2 class="product-popup-title">High-Grade Cotton</h2>
+            <div class="product-popup-details">
+                <p class="product-popup-description">
+                    Sudanese cotton is renowned worldwide for its exceptional quality and long staple length. Our cotton is grown in the fertile regions of Sudan, where the climate and soil conditions are ideal for producing premium cotton fibers. The long staple length and strength of Sudanese cotton make it perfect for high-quality textiles and luxury fabrics.
+                </p>
+                <div class="product-popup-specs">
+                    <div class="product-popup-spec">
+                        <h4>Staple Length</h4>
+                        <p>1.3-1.4 inches (33-36mm)</p>
+                    </div>
+                    <div class="product-popup-spec">
+                        <h4>Micronaire</h4>
+                        <p>3.8-4.2</p>
+                    </div>
+                    <div class="product-popup-spec">
+                        <h4>Strength</h4>
+                        <p>30-32 g/tex</p>
+                    </div>
+                    <div class="product-popup-spec">
+                        <h4>Grade</h4>
+                        <p>Premium (Middling and above)</p>
+                    </div>
+                </div>
+            </div>
+            <div class="product-popup-actions">
+                <a href="/products/#cotton" class="product-popup-button">
+                    <i class="fas fa-info-circle"></i> More Information
+                </a>
+                <a href="/contact" class="product-popup-button">
+                    <i class="fas fa-envelope"></i> Inquire Now
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="product-popup-overlay" id="gum-arabicPopup">
+    <div class="product-popup">
+        <div class="product-popup-header">
+            <img src="{% static 'images/acacia-sen.jpg' %}" alt="Gum Arabic" class="product-popup-image">
+            <div class="product-popup-close">&times;</div>
+        </div>
+        <div class="product-popup-content">
+            <h2 class="product-popup-title">Premium Gum Arabic</h2>
+            <div class="product-popup-details">
+                <p class="product-popup-description">
+                    Sudan produces the world's finest gum arabic, harvested from Acacia Senegal and Acacia Seyal trees. This natural gum is widely used in food, pharmaceuticals, cosmetics, and various industrial applications. Sudanese gum arabic is prized for its excellent emulsifying, stabilizing, and thickening properties, making it an essential ingredient in many products worldwide.
+                </p>
+                <div class="product-popup-specs">
+                    <div class="product-popup-spec">
+                        <h4>Type</h4>
+                        <p>Acacia Senegal (Hashab)</p>
+                    </div>
+                    <div class="product-popup-spec">
+                        <h4>Color</h4>
+                        <p>Pale white to amber</p>
+                    </div>
+                    <div class="product-popup-spec">
+                        <h4>Moisture</h4>
+                        <p>13% max</p>
+                    </div>
+                    <div class="product-popup-spec">
+                        <h4>Solubility</h4>
+                        <p>Highly soluble in water</p>
+                    </div>
+                </div>
+            </div>
+            <div class="product-popup-actions">
+                <a href="/products/#acacia-sen" class="product-popup-button">
+                    <i class="fas fa-info-circle"></i> More Information
+                </a>
+                <a href="/contact" class="product-popup-button">
+                    <i class="fas fa-envelope"></i> Inquire Now
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="product-popup-overlay" id="peanutsPopup">
+    <div class="product-popup">
+        <div class="product-popup-header">
+            <img src="{% static 'images/peanuts.jpg' %}" alt="Peanuts" class="product-popup-image">
+            <div class="product-popup-close">&times;</div>
+        </div>
+        <div class="product-popup-content">
+            <h2 class="product-popup-title">Sudanese Peanuts</h2>
+            <div class="product-popup-details">
+                <p class="product-popup-description">
+                    Sudanese peanuts are known for their excellent flavor, high oil content, and nutritional value. Grown in the fertile soils of Sudan, our peanuts are carefully harvested and processed to maintain their quality and freshness. They are widely used in food production, oil extraction, and direct consumption as a nutritious snack.
+                </p>
+                <div class="product-popup-specs">
+                    <div class="product-popup-spec">
+                        <h4>Type</h4>
+                        <p>Bold Runner</p>
+                    </div>
+                    <div class="product-popup-spec">
+                        <h4>Oil Content</h4>
+                        <p>45-50%</p>
+                    </div>
+                    <div class="product-popup-spec">
+                        <h4>Aflatoxin</h4>
+                        <p>Below 4 ppb</p>
+                    </div>
+                    <div class="product-popup-spec">
+                        <h4>Moisture</h4>
+                        <p>8% max</p>
+                    </div>
+                </div>
+            </div>
+            <div class="product-popup-actions">
+                <a href="/products/#peanuts" class="product-popup-button">
+                    <i class="fas fa-info-circle"></i> More Information
+                </a>
+                <a href="/contact" class="product-popup-button">
+                    <i class="fas fa-envelope"></i> Inquire Now
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="product-popup-overlay" id="watermelon-seedsPopup">
+    <div class="product-popup">
+        <div class="product-popup-header">
+            <img src="{% static 'images/watermelon.jpg' %}" alt="Watermelon Seeds" class="product-popup-image">
+            <div class="product-popup-close">&times;</div>
+        </div>
+        <div class="product-popup-content">
+            <h2 class="product-popup-title">Watermelon Seeds</h2>
+            <div class="product-popup-details">
+                <p class="product-popup-description">
+                    Sudanese watermelon seeds are highly valued for their size, taste, and nutritional benefits. These premium seeds are carefully selected and processed to ensure the highest quality. They are rich in protein, healthy fats, and various nutrients, making them a popular snack and ingredient in many cuisines around the world.
+                </p>
+                <div class="product-popup-specs">
+                    <div class="product-popup-spec">
+                        <h4>Size</h4>
+                        <p>Large (8-10mm)</p>
+                    </div>
+                    <div class="product-popup-spec">
+                        <h4>Protein Content</h4>
+                        <p>28-34%</p>
+                    </div>
+                    <div class="product-popup-spec">
+                        <h4>Oil Content</h4>
+                        <p>45-50%</p>
+                    </div>
+                    <div class="product-popup-spec">
+                        <h4>Purity</h4>
+                        <p>99% min</p>
+                    </div>
+                </div>
+            </div>
+            <div class="product-popup-actions">
+                <a href="/products/#watermelon" class="product-popup-button">
+                    <i class="fas fa-info-circle"></i> More Information
+                </a>
+                <a href="/contact" class="product-popup-button">
+                    <i class="fas fa-envelope"></i> Inquire Now
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

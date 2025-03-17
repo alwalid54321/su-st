@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Authentication Test{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card" style="border-color: #786D3C; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                <div class="card-header" style="background-color: #1B1464; color: white;">
+                    <h3>API Authentication Test</h3>
+                </div>
+                <div class="card-body">
+                    <div id="status-container" class="mb-4">
+                        <h4>Status: <span id="status-text">Checking...</span></h4>
+                    </div>
+                    
+                    <div id="auth-info" class="mb-4">
+                        <h5>Authentication Information:</h5>
+                        <pre id="auth-details" style="background-color: #f8f9fa; padding: 15px; border-radius: 5px;">Loading...</pre>
+                    </div>
+                    
+                    <div id="test-buttons" class="mb-4">
+                        <button id="test-session" class="btn mr-2" style="background-color: #1B1464; color: white;">
+                            Test Session Auth
+                        </button>
+                        <button id="test-token" class="btn" style="background-color: #786D3C; color: white;">
+                            Test Token Auth
+                        </button>
+                        <button id="get-new-token" class="btn ml-2" style="background-color: #28a745; color: white;">
+                            Get New Token
+                        </button>
+                    </div>
+                    
+                    <div id="response-container">
+                        <h5>API Response:</h5>
+                        <pre id="response-data" style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; max-height: 300px; overflow-y: auto;">No data yet</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const statusText = document.getElementById('status-text');
+        const authDetails = document.getElementById('auth-details');
+        const responseData = document.getElementById('response-data');
+        const testSessionBtn = document.getElementById('test-session');
+        const testTokenBtn = document.getElementById('test-token');
+        const getNewTokenBtn = document.getElementById('get-new-token');
+        
+        // Check authentication status
+        function checkAuthStatus() {
+            // Get CSRF token
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            
+            // Check if user is authenticated
+            const isAuthenticated = {% if request.user.is_authenticated %}true{% else %}false{% endif %};
+            
+            // Check for token in localStorage
+            const storedToken = localStorage.getItem('auth_token');
+            
+            // Update auth details
+            let authInfo = `User authenticated: ${isAuthenticated}\n`;
+            authInfo += `Token in localStorage: ${storedToken ? 'Yes' : 'No'}\n`;
+            
+            if (storedToken) {
+                authInfo += `Token: ${storedToken}\n`;
+            }
+            
+            authInfo += `CSRF Token available: ${csrftoken ? 'Yes' : 'No'}\n`;
+            
+            authDetails.textContent = authInfo;
+            
+            // Update status
+            if (isAuthenticated) {
+                statusText.textContent = 'Logged In';
+                statusText.style.color = '#28a745';
+            } else {
+                statusText.textContent = 'Not Logged In';
+                statusText.style.color = '#dc3545';
+            }
+        }
+        
+        // Test session-based authentication
+        testSessionBtn.addEventListener('click', function() {
+            responseData.textContent = 'Loading...';
+            
+            // Get CSRF token
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            
+            // Make API request with session authentication
+            fetch('/api/market-data/', {
+                method: 'GET',
+                credentials: 'same-origin',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                responseData.textContent = JSON.stringify(data, null, 2);
+                showNotification('Session auth test successful!', 'success');
+            })
+            .catch(error => {
+                responseData.textContent = `Error: ${error.message}`;
+                showNotification('Session auth test failed!', 'error');
+            });
+        });
+        
+        // Test token-based authentication
+        testTokenBtn.addEventListener('click', function() {
+            responseData.textContent = 'Loading...';
+            
+            // Get token from localStorage
+            const token = localStorage.getItem('auth_token');
+            
+            if (!token) {
+                responseData.textContent = 'Error: No token found in localStorage';
+                showNotification('No token found!', 'error');
+                return;
+            }
+            
+            // Make API request with token authentication
+            fetch('/api/market-data/', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Token ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                responseData.textContent = JSON.stringify(data, null, 2);
+                showNotification('Token auth test successful!', 'success');
+            })
+            .catch(error => {
+                responseData.textContent = `Error: ${error.message}`;
+                showNotification('Token auth test failed!', 'error');
+            });
+        });
+        
+        // Get new token
+        getNewTokenBtn.addEventListener('click', function() {
+            responseData.textContent = 'Requesting new token...';
+            
+            // Get CSRF token
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            
+            // Get username from current user
+            const username = '{{ request.user.username }}';
+            
+            if (!username) {
+                responseData.textContent = 'Error: Not logged in';
+                showNotification('You must be logged in to get a token', 'error');
+                return;
+            }
+            
+            // Request new token
+            fetch('/api/auth/token/', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: username
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.token) {
+                    localStorage.setItem('auth_token', data.token);
+                    responseData.textContent = JSON.stringify(data, null, 2);
+                    showNotification('New token generated and stored!', 'success');
+                    checkAuthStatus(); // Refresh auth status display
+                } else {
+                    throw new Error('No token in response');
+                }
+            })
+            .catch(error => {
+                responseData.textContent = `Error: ${error.message}`;
+                showNotification('Failed to get new token', 'error');
+            });
+        });
+        
+        // Show notification
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.padding = '15px 20px';
+            notification.style.borderRadius = '5px';
+            notification.style.color = 'white';
+            notification.style.zIndex = '9999';
+            notification.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+            
+            // Set background color based on type
+            if (type === 'success') {
+                notification.style.backgroundColor = '#28a745';
+            } else if (type === 'error') {
+                notification.style.backgroundColor = '#dc3545';
+            } else if (type === 'warning') {
+                notification.style.backgroundColor = '#ffc107';
+                notification.style.color = '#212529';
+            } else {
+                notification.style.backgroundColor = '#1B1464';
+            }
+            
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => {
+                    notification.remove();
+                }, 500);
+            }, 3000);
+        }
+        
+        // Initialize
+        checkAuthStatus();
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,986 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Data Insights - SudaStock{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/market_data.css' %}">
+<link rel="stylesheet" href="{% static 'css/market_data_table.css' %}">
+<style>
+    /* Data Insights specific styles */
+    .data-insights-section {
+        background-image: linear-gradient(rgba(27, 20, 100, 0.537), rgba(27, 20, 100, 0.8)), url('{% static "images/data-hero-bg.jpg" %}');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        padding: 120px 0 100px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .data-insights-content {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+    
+    .data-insights-title {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        color: white;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        animation: fadeInDown 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    
+    .data-insights-subtitle {
+        font-size: 1.4rem;
+        max-width: 800px;
+        margin: 0 auto 30px;
+        opacity: 0.9;
+        line-height: 1.6;
+        animation: fadeInUp 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s;
+        animation-fill-mode: both;
+    }
+    
+    .data-insights-description {
+        font-size: 1.1rem;
+        max-width: 900px;
+        margin: 0 auto 40px;
+        opacity: 0.85;
+        line-height: 1.7;
+        animation: fadeInUp 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.4s;
+        animation-fill-mode: both;
+    }
+    
+    .data-insights-cta {
+        display: inline-block;
+        background-color: var(--accent);
+        color: white;
+        padding: 14px 34px;
+        border-radius: 30px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        animation: fadeInUp 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.6s;
+        animation-fill-mode: both;
+        margin-top: 10px;
+    }
+    
+    .data-insights-cta:hover {
+        background-color: #8a7f4a;
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    }
+ 
+    /* Floating data elements */
+    .floating-data-elements {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        opacity: 0.15;
+    }
+    
+    .data-element {
+        position: absolute;
+        font-size: 1.2rem;
+        color: white;
+        opacity: 0.7;
+        animation: floatData 15s infinite linear;
+    }
+    
+    @keyframes floatData {
+        0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 0;
+        }
+        10% {
+            opacity: 0.7;
+        }
+        90% {
+            opacity: 0.7;
+        }
+        100% {
+            transform: translateY(-100vh) rotate(360deg);
+            opacity: 0;
+        }
+    }
+    
+    /* Data form styles */
+    .market-data-container {
+        background-color: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        margin-bottom: 40px;
+    }
+    
+    .data-request-form {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .form-group {
+        flex: 1;
+        min-width: 200px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: var(--primary-dark);
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(120, 109, 60, 0.2);
+        outline: none;
+    }
+    
+    .submit-btn {
+        background-color: var(--primary-dark);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(27, 20, 100, 0.2);
+    }
+    
+    .submit-btn:hover {
+        background-color: #2c2178;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(27, 20, 100, 0.3);
+    }
+    
+    /* Results section */
+    .results-section {
+        background-color: #f8f9fa;
+        border-radius: 15px;
+        padding: 30px;
+        margin-top: 40px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    }
+    
+    .results-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    
+    .product-title {
+        font-size: 2rem;
+        color: var(--primary-dark);
+        margin: 0;
+    }
+    
+    .product-status-container {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .status-badge.active {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    
+    .status-badge.inactive {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    
+    .status-badge.pending {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    
+    .forecast-container {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .forecast-label {
+        font-weight: 600;
+        color: #6c757d;
+    }
+    
+    .forecast-value {
+        color: var(--primary-dark);
+        font-weight: 600;
+    }
+    
+    .trend-value {
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 15px;
+    }
+    
+    .trend-value.up {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    
+    .trend-value.down {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    
+    .trend-value.stable {
+        background-color: #e2e3e5;
+        color: #383d41;
+    }
+    
+    /* Dashboard card styles */
+    .dashboard-card {
+        background-color: white;
+        border-radius: 10px;
+        padding: 0;
+        margin-bottom: 1.5rem;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    }
+    
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.2rem 1.5rem;
+        background-color: var(--primary-dark);
+        color: white;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-title {
+        font-weight: 600;
+        font-size: 1.2rem;
+        color: white;
+        margin: 0;
+    }
+    
+    .card-icon {
+        font-size: 1.5rem;
+        color: var(--accent);
+    }
+    
+    .chart-container {
+        position: relative;
+        height: 400px;
+        padding: 1.5rem;
+    }
+    
+    /* Charts styles */
+    .charts-container {
+        margin-bottom: 30px;
+        width: 100%;
+    }
+    
+    .chart-card {
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        padding: 0;
+        margin-bottom: 20px;
+        width: 100%;
+        overflow: hidden;
+    }
+    
+    /* Current prices grid */
+    .current-prices-title {
+        color: var(--primary-dark);
+        margin-bottom: 20px;
+        font-size: 1.6rem;
+    }
+    
+    .price-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+    }
+    
+    .price-card {
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        padding: 20px;
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+    
+    .price-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    .price-destination {
+        font-weight: 600;
+        color: var(--primary-dark);
+        margin-bottom: 10px;
+    }
+    
+    .price-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--accent);
+        margin-bottom: 10px;
+    }
+    
+    .price-trend {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 15px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .price-trend.up {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    
+    .price-trend.down {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    
+    .price-trend.stable {
+        background-color: #e2e3e5;
+        color: #383d41;
+    }
+    
+    /* Loading indicator */
+    .loading-indicator {
+        display: none;
+        text-align: center;
+        margin: 20px 0;
+    }
+    
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(120, 109, 60, 0.2);
+        border-top: 4px solid var(--accent);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 10px;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    /* Error message */
+    .error-message {
+        display: none;
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+        text-align: center;
+        font-weight: 600;
+    }
+    
+    /* Responsive styles */
+    @media (max-width: 768px) {
+        .data-insights-title {
+            font-size: 2.5rem;
+        }
+        
+        .data-insights-subtitle {
+            font-size: 1.2rem;
+        }
+        
+        .stats-container {
+            gap: 20px;
+        }
+        
+        .stat-item {
+            min-width: 150px;
+        }
+        
+        .results-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .product-status-container {
+            margin-top: 10px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Data Insights Hero Section -->
+<section class="data-insights-section">
+    <div class="floating-data-elements"></div>
+    <div class="data-insights-content">
+        <h1 class="data-insights-title">Market Data Insights</h1>
+        <p class="data-insights-subtitle">Comprehensive analytics and real-time market data for informed decision-making</p>
+        
+      <a href="#data-form" class="data-insights-cta">Explore Market Data</a>
+    </div>
+</section>
+
+<div class="container" id="data-form">
+    <!-- Market Data Container with Professional Background -->
+    <div class="market-data-container">
+        <!-- Data Request Form -->
+        <div class="data-request-form">
+            <h2 style="color: var(--primary-dark); margin-bottom: 25px; font-size: 1.8rem;">Customize Your Market Data View</h2>
+            
+            <!-- Error message display -->
+            <div id="errorMessage" class="error-message"></div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="productSelect">Select Product</label>
+                    <select id="productSelect" class="form-control">
+                        <option value="">-- Select a Product --</option>
+                        {% for product in products %}
+                        <option value="{{ product.id }}">{{ product.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="startDate">Start Date</label>
+                    <input type="date" id="startDate" class="form-control" value="{{ default_start_date|date:'Y-m-d' }}">
+                </div>
+                <div class="form-group">
+                    <label for="endDate">End Date</label>
+                    <input type="date" id="endDate" class="form-control" value="{{ default_end_date|date:'Y-m-d' }}">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <button id="submitBtn" class="submit-btn">
+                        <i class="fas fa-search"></i> View Data
+                    </button>
+                </div>
+                <div class="form-group">
+                    <button id="refreshMarketData" class="submit-btn" style="background-color: var(--accent);">
+                        <i class="fas fa-sync"></i> Refresh Data
+                    </button>
+                </div>
+                <div class="form-group text-right">
+                    <span class="update-time">Last update: {% if latest_update_time %}{{ latest_update_time|date:"F d, Y H:i" }}{% else %}No data{% endif %}</span>
+                </div>
+            </div>
+            
+            <!-- Loading indicator -->
+            <div id="loadingIndicator" class="loading-indicator" style="display: none;">
+                <div class="spinner"></div>
+                <p>Loading market data...</p>
+            </div>
+        </div>
+        
+        <!-- Results Section -->
+        <div id="resultsSection" class="results-section" style="display: none;">
+            <div class="results-header">
+                <h2 id="productTitle" class="product-title">Product Name</h2>
+                <div class="product-status-container">
+                    <div id="productStatus" class="status-badge">Active</div>
+                    <div class="forecast-container">
+                        <span class="forecast-label">Forecast:</span>
+                        <span id="productForecast" class="forecast-value">Stable</span>
+                    </div>
+                    <div id="productTrend" class="trend-value stable">→ 0%</div>
+                </div>
+            </div>
+            
+            <div class="charts-container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="dashboard-card">
+                            <div class="card-header">
+                                <h2 class="card-title">Price Trends</h2>
+                                <i class="fas fa-chart-line card-icon"></i>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="priceChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3 class="current-prices-title">Current Prices by Destination</h3>
+            <div class="price-grid">
+                <div class="price-card">
+                    <div class="price-destination">Port Sudan</div>
+                    <div id="currentPortSudan" class="price-value">$0.00</div>
+                    <div class="price-trend" id="trendPortSudan"></div>
+                </div>
+                <div class="price-card">
+                    <div class="price-destination">China</div>
+                    <div id="currentChina" class="price-value">$0.00</div>
+                    <div class="price-trend" id="trendChina"></div>
+                </div>
+                <div class="price-card">
+                    <div class="price-destination">UAE</div>
+                    <div id="currentUAE" class="price-value">$0.00</div>
+                    <div class="price-trend" id="trendUAE"></div>
+                </div>
+                <div class="price-card">
+                    <div class="price-destination">Mersing</div>
+                    <div id="currentMersing" class="price-value">$0.00</div>
+                    <div class="price-trend" id="trendMersing"></div>
+                </div>
+                <div class="price-card">
+                    <div class="price-destination">India</div>
+                    <div id="currentIndia" class="price-value">$0.00</div>
+                    <div class="price-trend" id="trendIndia"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script>
+    // Set CSS variables for brand colors
+    document.documentElement.style.setProperty('--primary-dark', '#1B1464');
+    document.documentElement.style.setProperty('--accent', '#786D3C');
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize variables
+        let priceChart = null;
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const resultsSection = document.getElementById('resultsSection');
+        const errorMessage = document.getElementById('errorMessage');
+        
+        // Function to format currency
+        function formatCurrency(value) {
+            return '$' + parseFloat(value).toFixed(2);
+        }
+        
+        // Function to set trend indicator
+        function setTrendIndicator(element, value) {
+            if (!element) return;
+            
+            element.innerHTML = '';
+            let icon, text, className;
+            
+            if (value > 0) {
+                icon = '<i class="fas fa-arrow-up"></i>';
+                text = `+${value}%`;
+                className = 'rising';
+            } else if (value < 0) {
+                icon = '<i class="fas fa-arrow-down"></i>';
+                text = `${value}%`;
+                className = 'falling';
+            } else {
+                icon = '<i class="fas fa-arrows-alt-h"></i>';
+                text = `${value}%`;
+                className = 'stable';
+            }
+            
+            element.innerHTML = `${icon} ${text}`;
+            element.className = 'price-trend ' + className;
+        }
+        
+        // Function to fetch historical data from API
+        async function fetchHistoricalData(productId, startDate, endDate) {
+            try {
+                // Show loading indicator
+                loadingIndicator.style.display = 'flex';
+                errorMessage.style.display = 'none';
+                
+                // Build API URL
+                let url = `/api/market-data/${productId}/history/`;
+                const params = [];
+                
+                if (startDate) {
+                    params.push(`start_date=${startDate}`);
+                }
+                
+                if (endDate) {
+                    params.push(`end_date=${endDate}`);
+                }
+                
+                if (params.length > 0) {
+                    url += '?' + params.join('&');
+                }
+                
+                // Fetch data from API
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                
+                const data = await response.json();
+                
+                // Hide loading indicator
+                loadingIndicator.style.display = 'none';
+                
+                // Show results section
+                resultsSection.style.display = 'block';
+                
+                return data;
+            } catch (error) {
+                // Hide loading indicator
+                loadingIndicator.style.display = 'none';
+                
+                // Show error message
+                errorMessage.textContent = error.message || 'An error occurred while fetching data';
+                errorMessage.style.display = 'block';
+                
+                return null;
+            }
+        }
+        
+        // Function to update the UI with product data
+        function updateProductUI(productData) {
+            // Update product title and status
+            document.getElementById('productTitle').textContent = productData.name;
+            
+            const statusElement = document.getElementById('productStatus');
+            statusElement.textContent = productData.status;
+            
+            // Set status badge color
+            if (productData.status === 'Active') {
+                statusElement.className = 'status-badge active';
+            } else if (productData.status === 'Limited') {
+                statusElement.className = 'status-badge limited';
+            } else {
+                statusElement.className = 'status-badge inactive';
+            }
+            
+            // Update forecast
+            document.getElementById('productForecast').textContent = productData.forecast;
+            
+            // Update trend
+            const trendElement = document.getElementById('productTrend');
+            if (productData.trend > 0) {
+                trendElement.innerHTML = `<i class="fas fa-arrow-up"></i> +${productData.trend}%`;
+                trendElement.className = 'trend-value rising';
+            } else if (productData.trend < 0) {
+                trendElement.innerHTML = `<i class="fas fa-arrow-down"></i> ${productData.trend}%`;
+                trendElement.className = 'trend-value falling';
+            } else {
+                trendElement.innerHTML = `<i class="fas fa-arrows-alt-h"></i> ${productData.trend}%`;
+                trendElement.className = 'trend-value stable';
+            }
+            
+            // Update current prices
+            document.getElementById('currentPortSudan').textContent = formatCurrency(productData.current_port_sudan);
+            document.getElementById('currentChina').textContent = formatCurrency(productData.current_dmt_china);
+            document.getElementById('currentUAE').textContent = formatCurrency(productData.current_dmt_uae);
+            document.getElementById('currentMersing').textContent = formatCurrency(productData.current_dmt_mersing);
+            document.getElementById('currentIndia').textContent = formatCurrency(productData.current_dmt_india);
+            
+            // Set trend indicators (using a default 5% change for demonstration)
+            setTrendIndicator(document.getElementById('trendPortSudan'), productData.trend);
+            setTrendIndicator(document.getElementById('trendChina'), productData.trend);
+            setTrendIndicator(document.getElementById('trendUAE'), productData.trend);
+            setTrendIndicator(document.getElementById('trendMersing'), productData.trend);
+            setTrendIndicator(document.getElementById('trendIndia'), productData.trend);
+        }
+        
+        // Function to update the chart with historical data
+        function updateChart(historyData) {
+            const ctx = document.getElementById('priceChart').getContext('2d');
+            
+            // Extract data from history
+            const dates = historyData.map(item => item.date);
+            const values = historyData.map(item => item.value);
+            const portSudan = historyData.map(item => item.port_sudan);
+            const dmtChina = historyData.map(item => item.dmt_china);
+            const dmtUae = historyData.map(item => item.dmt_uae);
+            const dmtMersing = historyData.map(item => item.dmt_mersing);
+            const dmtIndia = historyData.map(item => item.dmt_india);
+            
+            // Destroy existing chart if it exists
+            if (priceChart) {
+                priceChart.destroy();
+            }
+            
+            // Create new chart
+            priceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [
+                        {
+                            label: 'Value',
+                            data: values,
+                            borderColor: '#1B1464',
+                            backgroundColor: 'rgba(27, 20, 100, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            borderWidth: 3,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#1B1464',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointHoverRadius: 7,
+                            pointHoverBackgroundColor: '#1B1464',
+                            pointHoverBorderColor: '#fff',
+                            pointHoverBorderWidth: 2,
+                            order: 1
+                        },
+                        {
+                            label: 'Port Sudan',
+                            data: portSudan,
+                            borderColor: '#786D3C',
+                            backgroundColor: 'rgba(120, 109, 60, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            borderWidth: 3,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#786D3C',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointHoverRadius: 7,
+                            pointHoverBackgroundColor: '#786D3C',
+                            pointHoverBorderColor: '#fff',
+                            pointHoverBorderWidth: 2,
+                            order: 2
+                        },
+                        {
+                            label: 'DMT China',
+                            data: dmtChina,
+                            borderColor: '#2c239a',
+                            backgroundColor: 'rgba(44, 35, 154, 0.05)',
+                            tension: 0.4,
+                            borderWidth: 2,
+                            pointRadius: 3,
+                            pointBackgroundColor: '#2c239a',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 1,
+                            hidden: true,
+                            order: 3
+                        },
+                        {
+                            label: 'DMT UAE',
+                            data: dmtUae,
+                            borderColor: '#8a7f4c',
+                            backgroundColor: 'rgba(138, 127, 76, 0.05)',
+                            tension: 0.4,
+                            borderWidth: 2,
+                            pointRadius: 3,
+                            pointBackgroundColor: '#8a7f4c',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 1,
+                            hidden: true,
+                            order: 4
+                        },
+                        {
+                            label: 'DMT Mersing',
+                            data: dmtMersing,
+                            borderColor: '#3730a3',
+                            backgroundColor: 'rgba(55, 48, 163, 0.05)',
+                            tension: 0.4,
+                            borderWidth: 2,
+                            pointRadius: 3,
+                            pointBackgroundColor: '#3730a3',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 1,
+                            hidden: true,
+                            order: 5
+                        },
+                        {
+                            label: 'DMT India',
+                            data: dmtIndia,
+                            borderColor: '#9c8f5a',
+                            backgroundColor: 'rgba(156, 143, 90, 0.05)',
+                            tension: 0.4,
+                            borderWidth: 2,
+                            pointRadius: 3,
+                            pointBackgroundColor: '#9c8f5a',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 1,
+                            hidden: true,
+                            order: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeOutQuart'
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            align: 'center',
+                            labels: {
+                                boxWidth: 15,
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                padding: 20,
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                }
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'rgba(27, 20, 100, 0.9)',
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            borderColor: '#786D3C',
+                            borderWidth: 1,
+                            cornerRadius: 6,
+                            padding: 12,
+                            titleFont: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            displayColors: true,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += '$' + context.parsed.y.toFixed(2);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    hover: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 45,
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value;
+                                },
+                                font: {
+                                    size: 11
+                                }
+                            },
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Handle form submission
+        document.getElementById('submitBtn').addEventListener('click', async function() {
+            const productId = document.getElementById('productSelect').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            if (!productId) {
+                errorMessage.textContent = 'Please select a product';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            const data = await fetchHistoricalData(productId, startDate, endDate);
+            
+            if (data) {
+                updateProductUI(data.product);
+                updateChart(data.history);
+            }
+        });
+        
+        // Handle refresh button click
+        document.getElementById('refreshMarketData').addEventListener('click', async function() {
+            const productId = document.getElementById('productSelect').value;
+            
+            if (!productId) {
+                errorMessage.textContent = 'Please select a product first';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            const data = await fetchHistoricalData(productId, startDate, endDate);
+            
+            if (data) {
+                updateProductUI(data.product);
+                updateChart(data.history);
+            }
+        });
+    });
+</script>
+{% endblock %}

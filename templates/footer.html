@@ -1,0 +1,90 @@
+{% load static %}
+<!-- Modern Footer -->
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-section">
+            <h3>COMPANY NAME</h3>
+            <div class="company-info">
+                <p>PURE AGRI</p>
+                <p>FOODSTUFF TRADING</p>
+                <p>LLC</p>
+            </div>
+            <div class="social-links">
+                <a href="https://wa.me/971502330481" target="_blank" rel="noopener noreferrer" class="social-link whatsapp">
+                    <i class="fab fa-whatsapp"></i>
+                </a>
+                <a href="https://facebook.com/company" target="_blank" rel="noopener noreferrer" class="social-link facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="https://instagram.com/company" target="_blank" rel="noopener noreferrer" class="social-link instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://linkedin.com/company" target="_blank" rel="noopener noreferrer" class="social-link linkedin">
+                    <i class="fab fa-linkedin-in"></i>
+                </a>
+                <a href="mailto:info@sudanstock.com" class="social-link email">
+                    <i class="fas fa-envelope"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="footer-section">
+            <h3>OFFICE ADDRESS</h3>
+            <p>Office No.7, 12th Floor</p>
+            <p>The Bayswater Tower</p>
+            <p>Business Bay, Dubai</p>
+            <p>United Arab Emirates</p>
+            <a href="https://maps.app.goo.gl/fppfaTVeCBNeZ6Vc8" target="_blank" rel="noopener noreferrer" class="view-location-btn">
+                <i class="fas fa-map-marker-alt"></i>
+                VIEW LOCATION
+            </a>
+        </div>
+
+        <div class="footer-section">
+            <h3>CONTACT US</h3>
+            <a href="tel:+971502330481" class="contact-link">
+                <i class="fas fa-phone contact-icon"></i>
+                +971 502 330 481
+            </a>
+            <h3 class="mt-3">LAND LINE</h3>
+            <a href="tel:+97142294897" class="contact-link">
+                <i class="fas fa-phone contact-icon"></i>
+                +971 (0)422 948 97
+            </a>
+        </div>
+
+        <div class="footer-section">
+            <h3>EMAIL</h3>
+            <a href="mailto:info@sudanstock.com" class="contact-link">
+                <i class="fas fa-envelope contact-icon"></i>
+                info@sudanstock.com
+            </a>
+            <a href="mailto:Sudanstock249@gmail.com" class="contact-link">
+                <i class="fas fa-envelope contact-icon"></i>
+                Sudanstock249@gmail.com
+            </a>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <div class="access-links">
+            <a href="/privacy/" class="access-link">
+                <i class="fas fa-shield-alt access-icon"></i>
+                Privacy Policy
+            </a>
+            <a href="/cookie/" class="access-link">
+                <i class="fas fa-cookie-bite access-icon"></i>
+                Cookie Policy
+            </a>
+            <a href="/disclaimer/" class="access-link">
+                <i class="fas fa-file-contract access-icon"></i>
+                Disclaimer
+            </a>
+            <a href="/terms/" class="access-link">
+                <i class="fas fa-handshake access-icon"></i>
+                Our Terms
+            </a>
+        </div>
+        <p class="copyright">© {{ request.now.year|default:2025 }} SudaStock. All rights reserved.</p>
+    </div>
+</footer>

@@ -1,0 +1,249 @@
+/* CNF Calculator CSS */
+
+:root {
+    --accent: #786D3C;  /* Gold accent from logo */
+    --primary-dark: #1B1464;  /* Dark blue from logo */
+    --accent-light: #a19669;
+    --primary-light: #3a33a3;
+    --accent-hover: #5e5630;
+    --primary-hover: #13104a;
+}
+
+/* Card styling */
+.card {
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1) !important;
+}
+
+.card-header {
+    padding: 15px 20px;
+    font-weight: 600;
+}
+
+.bg-primary-dark {
+    background-color: var(--primary-dark);
+}
+
+.bg-accent {
+    background-color: var(--accent);
+}
+
+.text-accent {
+    color: var(--accent);
+}
+
+/* Form styling */
+.form-control {
+    border-radius: 4px;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 0.2rem rgba(120, 109, 60, 0.25);
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+/* Button styling */
+.btn-accent {
+    background-color: var(--accent);
+    border-color: var(--accent);
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-accent:hover {
+    background-color: var(--accent-hover);
+    border-color: var(--accent-hover);
+    color: white;
+}
+
+.btn-primary-dark {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary-dark:hover {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+    color: white;
+}
+
+.btn-outline-accent {
+    color: var(--accent);
+    border-color: var(--accent);
+    background-color: transparent;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-accent:hover {
+    background-color: var(--accent);
+    color: white;
+}
+
+/* Table styling */
+.table {
+    margin-bottom: 0;
+}
+
+.thead-accent {
+    background-color: var(--accent);
+    color: white;
+}
+
+.table-primary {
+    background-color: rgba(27, 20, 100, 0.1);
+}
+
+.table th {
+    font-weight: 600;
+    vertical-align: middle;
+}
+
+/* Calculation steps styling */
+.calculation-steps {
+    counter-reset: step;
+    padding-left: 0;
+    list-style-type: none;
+}
+
+.calculation-steps li {
+    position: relative;
+    padding: 15px 0 15px 50px;
+    border-bottom: 1px solid #eee;
+}
+
+.calculation-steps li:last-child {
+    border-bottom: none;
+}
+
+.calculation-steps li::before {
+    content: counter(step);
+    counter-increment: step;
+    position: absolute;
+    left: 0;
+    top: 15px;
+    width: 35px;
+    height: 35px;
+    background-color: var(--accent);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.calculation-steps li strong {
+    display: block;
+    color: var(--primary-dark);
+    margin-bottom: 5px;
+}
+
+.calculation-steps li p {
+    margin-bottom: 0;
+    color: #666;
+}
+
+/* Impact list styling */
+.impact-list {
+    padding-left: 0;
+    list-style-type: none;
+}
+
+.impact-list li {
+    padding: 15px;
+    margin-bottom: 10px;
+    background-color: #f8f9fa;
+    border-left: 4px solid var(--accent);
+    border-radius: 4px;
+}
+
+.impact-list li strong {
+    display: block;
+    color: var(--primary-dark);
+    margin-bottom: 5px;
+}
+
+.impact-list li p {
+    margin-bottom: 0;
+    color: #666;
+}
+
+/* Alert styling */
+.alert {
+    border-radius: 4px;
+    border: none;
+}
+
+.alert-info {
+    background-color: rgba(27, 20, 100, 0.1);
+    color: var(--primary-dark);
+}
+
+.alert-warning {
+    background-color: rgba(120, 109, 60, 0.1);
+    color: var(--accent);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 15px;
+    }
+    
+    .calculation-steps li {
+        padding: 15px 0 15px 40px;
+    }
+    
+    .calculation-steps li::before {
+        width: 30px;
+        height: 30px;
+    }
+}
+
+/* Print styles */
+@media print {
+    .btn, .form-group, .alert, .card-header {
+        display: none !important;
+    }
+    
+    .d-none {
+        display: block !important;
+    }
+    
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+    }
+    
+    .card-body {
+        padding: 0 !important;
+    }
+    
+    .container {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+}

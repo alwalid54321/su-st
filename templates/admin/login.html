@@ -1,0 +1,185 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    :root {
+        --primary-dark: #1B1464;  /* Dark blue from logo */
+        --accent: #786D3C;  /* Gold accent from logo */
+    }
+    
+    body {
+        background-color: #f8f9fa;
+    }
+    
+    #header {
+        background-color: var(--primary-dark);
+        color: white;
+    }
+    
+    .login {
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        padding: 2.5rem;
+        margin-top: 6rem;
+        border-top: 4px solid var(--accent);
+    }
+    
+    .login #content {
+        padding: 20px;
+    }
+    
+    .login .form-row {
+        padding: 10px 0;
+    }
+    
+    .login .form-row label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    
+    .login .form-row input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+    
+    .login .form-row input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 0.25rem rgba(120, 109, 60, 0.25);
+        outline: none;
+    }
+    
+    .submit-row input {
+        background-color: var(--primary-dark);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .submit-row input:hover {
+        background-color: var(--accent);
+        transform: translateY(-2px);
+    }
+    
+    .errornote {
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .login {
+            margin: 2rem;
+            padding: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block bodyclass %}login{% endblock %}
+
+{% block usertools %}{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block nav-sidebar %}{% endblock %}
+
+{% block content_title %}{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    {% if form.errors and not form.non_field_errors %}
+    <p class="errornote">
+        {% if form.errors.items|length == 1 %}{% translate "Please correct the error below." %}{% else %}{% translate "Please correct the errors below." %}{% endif %}
+    </p>
+    {% endif %}
+
+    {% if form.non_field_errors %}
+    {% for error in form.non_field_errors %}
+    <p class="errornote">
+        {{ error }}
+    </p>
+    {% endfor %}
+    {% endif %}
+
+    <div id="content-main">
+        {% if user.is_authenticated %}
+        <p class="errornote">
+            {% blocktranslate trimmed %}
+            You are authenticated as {{ username }}, but are not authorized to
+            access this page. Would you like to login to a different account?
+            {% endblocktranslate %}
+        </p>
+        {% endif %}
+
+        <form action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
+            <div class="form-row">
+                {{ form.username.errors }}
+                <label for="id_username">{{ form.username.label }}:</label>
+                {{ form.username }}
+            </div>
+            <div class="form-row">
+                {{ form.password.errors }}
+                <label for="id_password">{{ form.password.label }}:</label>
+                {{ form.password }}
+                <input type="hidden" name="next" value="{{ next }}">
+            </div>
+            {% url 'admin_password_reset' as password_reset_url %}
+            {% if password_reset_url %}
+            <div class="password-reset-link">
+                <a href="{{ password_reset_url }}">{% translate 'Forgotten your password or username?' %}</a>
+            </div>
+            {% endif %}
+            <div class="submit-row">
+                <input type="submit" value="{% translate 'Log in' %}">
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add security feature: disable autocomplete for username and password
+        document.getElementById('id_username').setAttribute('autocomplete', 'off');
+        document.getElementById('id_password').setAttribute('autocomplete', 'off');
+        
+        // Focus on username field
+        document.getElementById('id_username').focus();
+        
+        // Add CSRF token to all AJAX requests
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        // Set timeout for inactivity
+        let inactivityTimeout;
+        
+        function resetInactivityTimer() {
+            clearTimeout(inactivityTimeout);
+            inactivityTimeout = setTimeout(function() {
+                window.location.href = '{% url "admin:logout" %}';
+            }, 900000); // 15 minutes
+        }
+        
+        // Reset timer on user activity
+        ['mousemove', 'mousedown', 'keypress', 'touchstart', 'scroll'].forEach(function(evt) {
+            document.addEventListener(evt, resetInactivityTimer, false);
+        });
+        
+        // Start the timer
+        resetInactivityTimer();
+    });
+</script>
+{% endblock %}

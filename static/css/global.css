@@ -1,0 +1,242 @@
+/* Global CSS Variables and Styles */
+:root {
+  --primary-dark: #1B1464;  /* Dark blue from logo */
+  --accent: #786D3C;  /* Gold accent from logo */
+  --primary-light: #e8e6f2;  /* Light version of primary */
+  --accent-light: #f2f0e8;  /* Light version of accent */
+  --text-dark: #333333;
+  --text-light: #ffffff;
+  --gray-100: #f8f9fa;
+  --gray-200: #e9ecef;
+  --gray-300: #dee2e6;
+  --gray-400: #ced4da;
+  --gray-500: #adb5bd;
+  --gray-600: #6c757d;
+  --gray-700: #495057;
+  --gray-800: #343a40;
+  --gray-900: #212529;
+  --success: #28a745;
+  --danger: #dc3545;
+  --warning: #ffc107;
+  --info: #17a2b8;
+}
+
+/* Typography */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-dark);
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--primary-dark);
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+/* SudaStock Highlight */
+.sudastock-highlight {
+  color: var(--primary-dark);
+  font-weight: 600;
+  position: relative;
+  display: inline-block;
+}
+
+.sudastock-highlight::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--accent);
+  transform: scaleX(0.8);
+  transform-origin: bottom left;
+  transition: transform 0.3s ease;
+}
+
+.sudastock-highlight:hover::after {
+  transform: scaleX(1);
+}
+
+a {
+  color: var(--primary-dark);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.5rem;
+  font-weight: 600;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 2px solid transparent;
+  text-align: center;
+  text-decoration: none;
+  line-height: 1.5;
+  font-size: 0.95rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  border-color: var(--primary-dark);
+  color: var(--primary-dark);
+}
+
+.btn-secondary:hover {
+  background-color: var(--primary-dark);
+  color: white;
+}
+
+.btn-accent {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+.btn-accent:hover {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+
+/* Form Controls */
+.form-control:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 0.25rem rgba(120, 109, 60, 0.25);
+}
+
+/* Alerts */
+.alert {
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border: none;
+  font-weight: 500;
+}
+
+.alert-success {
+  background-color: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+  border-left: 4px solid #28a745;
+}
+
+.alert-danger {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+  border-left: 4px solid #dc3545;
+}
+
+.alert-primary {
+  background-color: rgba(27, 20, 100, 0.1);
+  color: var(--primary-dark);
+  border-left: 4px solid var(--primary-dark);
+}
+
+.alert-accent {
+  background-color: rgba(120, 109, 60, 0.1);
+  color: var(--accent);
+  border-left: 4px solid var(--accent);
+}
+
+.alert-info {
+  background-color: rgba(23, 162, 184, 0.1);
+  color: #17a2b8;
+  border-left: 4px solid #17a2b8;
+}
+
+.alert-warning {
+  background-color: rgba(255, 193, 7, 0.1);
+  color: #ffc107;
+  border-left: 4px solid #ffc107;
+}
+
+/* Cards */
+.card {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  border: none;
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  background-color: var(--primary-dark);
+  color: var(--text-light);
+  font-weight: 600;
+  padding: 1rem 1.5rem;
+}
+
+.card-accent .card-header {
+  background-color: var(--accent);
+}
+
+/* Responsive Utilities */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  h1 {
+    font-size: 1.8rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+  }
+}
+
+/* Accessibility */
+:focus {
+  outline: 3px solid rgba(120, 109, 60, 0.5);
+  outline-offset: 2px;
+}
+
+/* Animation */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

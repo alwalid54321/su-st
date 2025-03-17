@@ -1,0 +1,296 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Account - SudaStock{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container auth-page">
+    <div class="row justify-content-center w-100">
+        <div class="col-md-8 col-lg-6">
+            <div class="auth-form-container">
+                <div class="auth-form-content">
+                    <div class="auth-header">
+                        <div class="auth-logo">
+                            <span style="color: var(--primary-dark);">Suda</span><span style="color: var(--accent);">Stock</span>
+                        </div>
+                        <p class="auth-subtitle">Create Your Account</p>
+                    </div>
+                    
+                    {% if messages %}
+                    <div id="messages-container">
+                        {% for message in messages %}
+                        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show">
+                            <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' or message.tags == 'danger' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post" class="needs-validation" novalidate id="registerForm">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="first_name" name="first_name" placeholder="First Name" required>
+                                    <label for="first_name"><i class="fas fa-user me-2"></i>First Name</label>
+                                    <div class="invalid-feedback">
+                                        Please enter your first name.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Last Name" required>
+                                    <label for="last_name"><i class="fas fa-user me-2"></i>Last Name</label>
+                                    <div class="invalid-feedback">
+                                        Please enter your last name.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="email" name="email" placeholder="Email Address" required>
+                            <label for="email"><i class="fas fa-envelope me-2"></i>Email Address</label>
+                            <div class="invalid-feedback">
+                                Please enter a valid email address.
+                            </div>
+                        </div>
+                        
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Password" required minlength="8">
+                            <label for="password"><i class="fas fa-lock me-2"></i>Password</label>
+                            <div class="invalid-feedback">
+                                Password must be at least 8 characters long.
+                            </div>
+                        </div>
+                        
+                        <div class="form-floating mb-4">
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm Password" required>
+                            <label for="confirm_password"><i class="fas fa-lock me-2"></i>Confirm Password</label>
+                            <div class="invalid-feedback">
+                                Passwords do not match.
+                            </div>
+                        </div>
+                        
+                        <div class="password-strength mb-4">
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <div class="password-feedback mt-2 text-muted">
+                                <small>Password strength: <span id="strength-text">Too weak</span></small>
+                            </div>
+                        </div>
+                        
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="terms" name="terms" required>
+                            <label class="form-check-label" for="terms">
+                                I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms of Service</a> and <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">Privacy Policy</a>
+                            </label>
+                            <div class="invalid-feedback">
+                                You must agree to the terms and conditions.
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary auth-btn">
+                                <i class="fas fa-user-plus me-2"></i>Create Account
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div class="separator mt-4">
+                        <span class="separator-text">OR</span>
+                    </div>
+                    
+                    <div class="social-login-section">
+                        <p class="text-center mb-3">Sign up with your social account</p>
+                        <div class="social-buttons">
+                            <a href="{% url 'social:begin' 'google-oauth2' %}" class="social-btn google">
+                                <i class="fab fa-google"></i>
+                            </a>
+                            <a href="{% url 'social:begin' 'facebook' %}" class="social-btn facebook">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="{% url 'social:begin' 'twitter' %}" class="social-btn twitter">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="auth-footer">
+                        <p>Already have an account? <a href="{% url 'login' %}">Log In</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Terms of Service Modal -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: var(--primary-dark); color: white;">
+                <h5 class="modal-title" id="termsModalLabel">Terms of Service</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6 style="color: var(--accent);">1. Acceptance of Terms</h6>
+                <p>By accessing and using SudaStock's services, you agree to be bound by these Terms of Service.</p>
+                
+                <h6 style="color: var(--accent);">2. User Accounts</h6>
+                <p>You are responsible for maintaining the confidentiality of your account information and for all activities that occur under your account.</p>
+                
+                <h6 style="color: var(--accent);">3. User Conduct</h6>
+                <p>You agree not to use the service for any illegal or unauthorized purpose.</p>
+                
+                <h6 style="color: var(--accent);">4. Intellectual Property</h6>
+                <p>All content included on the website is the property of SudaStock or its content suppliers and is protected by international copyright laws.</p>
+                
+                <h6 style="color: var(--accent);">5. Limitation of Liability</h6>
+                <p>SudaStock shall not be liable for any indirect, incidental, special, consequential or punitive damages resulting from your use of or inability to use the service.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Privacy Policy Modal -->
+<div class="modal fade" id="privacyModal" tabindex="-1" aria-labelledby="privacyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: var(--primary-dark); color: white;">
+                <h5 class="modal-title" id="privacyModalLabel">Privacy Policy</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6 style="color: var(--accent);">1. Information We Collect</h6>
+                <p>We collect information you provide directly to us, such as when you create an account, update your profile, or contact us for support.</p>
+                
+                <h6 style="color: var(--accent);">2. How We Use Your Information</h6>
+                <p>We use the information we collect to provide, maintain, and improve our services, and to communicate with you.</p>
+                
+                <h6 style="color: var(--accent);">3. Information Sharing</h6>
+                <p>We do not share your personal information with third parties except as described in this privacy policy.</p>
+                
+                <h6 style="color: var(--accent);">4. Security</h6>
+                <p>We take reasonable measures to help protect your personal information from loss, theft, misuse, unauthorized access, disclosure, alteration, and destruction.</p>
+                
+                <h6 style="color: var(--accent);">5. Your Choices</h6>
+                <p>You may update, correct, or delete your account information at any time by logging into your account or contacting us.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Form validation
+    (function() {
+        'use strict';
+        
+        // Fetch all forms we want to apply validation to
+        var forms = document.querySelectorAll('.needs-validation');
+        
+        // Loop over them and prevent submission
+        Array.prototype.slice.call(forms).forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                
+                // Check if passwords match
+                var password = document.getElementById('password');
+                var confirmPassword = document.getElementById('confirm_password');
+                
+                if (password && confirmPassword && password.value !== confirmPassword.value) {
+                    confirmPassword.setCustomValidity('Passwords do not match');
+                    event.preventDefault();
+                    event.stopPropagation();
+                } else if (confirmPassword) {
+                    confirmPassword.setCustomValidity('');
+                }
+                
+                form.classList.add('was-validated');
+            }, false);
+        });
+        
+        // Password strength meter
+        var passwordInput = document.getElementById('password');
+        var progressBar = document.querySelector('.password-strength .progress-bar');
+        var strengthText = document.getElementById('strength-text');
+        
+        if (passwordInput) {
+            passwordInput.addEventListener('input', function() {
+                var password = this.value;
+                var strength = 0;
+                
+                // Length check
+                if (password.length >= 8) {
+                    strength += 25;
+                }
+                
+                // Contains lowercase
+                if (/[a-z]/.test(password)) {
+                    strength += 25;
+                }
+                
+                // Contains uppercase
+                if (/[A-Z]/.test(password)) {
+                    strength += 25;
+                }
+                
+                // Contains number or special char
+                if (/[0-9!@#$%^&*(),.?":{}|<>]/.test(password)) {
+                    strength += 25;
+                }
+                
+                // Update progress bar
+                progressBar.style.width = strength + '%';
+                progressBar.setAttribute('aria-valuenow', strength);
+                
+                // Update color based on strength
+                if (strength <= 25) {
+                    progressBar.className = 'progress-bar bg-danger';
+                    strengthText.textContent = 'Too weak';
+                } else if (strength <= 50) {
+                    progressBar.className = 'progress-bar bg-warning';
+                    strengthText.textContent = 'Weak';
+                } else if (strength <= 75) {
+                    progressBar.className = 'progress-bar bg-info';
+                    strengthText.textContent = 'Medium';
+                } else {
+                    progressBar.className = 'progress-bar bg-success';
+                    strengthText.textContent = 'Strong';
+                }
+            });
+        }
+        
+        // Auto-hide alerts after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                var alerts = document.querySelectorAll('.alert:not(.alert-info)');
+                alerts.forEach(function(alert) {
+                    var bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                });
+            }, 5000);
+        });
+    })();
+</script>
+{% endblock %}

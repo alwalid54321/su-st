@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About Us - SudaStock{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/about.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Background Image -->
+<section class="about-hero">
+    <div class="about-hero-content">
+        <h1>ABOUT US</h1>
+        <p>We strive to be the leading provider of agricultural data and market insights in Sudan, connecting farmers, traders, and investors to create a more efficient and transparent market.</p>
+    </div>
+</section>
+
+<!-- Our Inspiration Section -->
+<section class="inspiration-section">
+    <div class="container">
+        <h2 class="section-title">OUR INSPIRATION</h2>
+        <div class="inspiration-content">
+            <p><span class="highlight">SudaStock</span> was founded with a vision to revolutionize Sudan's agricultural data sector by providing the most accurate, comprehensive, and accessible information on agricultural commodities, market trends, and trade opportunities.</p>
+            
+            <p>Sudan is uniquely positioned as a commercial gateway to the African continent. With vast agricultural resources and strategic location, we believe that reliable data is the foundation for sustainable growth in the agricultural sector.</p>
+            
+            <p>Our team combines expertise in agricultural economics, data science, and market analysis to deliver insights that empower stakeholders across the agricultural value chain. We are committed to transparency, accuracy, and innovation in everything we do.</p>
+            
+            <p>We're proud to serve as a bridge between traditional agricultural practices and modern data-driven decision making, helping to unlock the full potential of Sudan's agricultural economy and contribute to food security and economic prosperity.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose Us Section -->
+<section class="why-choose-section">
+    <div class="container">
+        <h2 class="why-choose-title">Why choose us?</h2>
+        
+        <div class="features-container">
+            <!-- Feature 1 -->
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <img src="{% static 'images/team.webp' %}" alt="Reliable Data">
+                </div>
+                <h3 class="feature-title">Reliable Data</h3>
+                <p class="feature-description">We collect and verify data from multiple sources to ensure accuracy and reliability you can trust.</p>
+            </div>
+            
+            <!-- Feature 2 -->
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <img src="{% static 'images/trust.webp' %}" alt="Market Expertise">
+                </div>
+                <h3 class="feature-title">Market Expertise</h3>
+                <p class="feature-description">Our team of experts provides valuable insights and analysis of agricultural market trends.</p>
+            </div>
+            
+            <!-- Feature 3 -->
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <img src="{% static 'images/growth.webp' %}" alt="Growth Opportunities">
+                </div>
+                <h3 class="feature-title">Growth Opportunities</h3>
+                <p class="feature-description">We connect stakeholders across the value chain, creating opportunities for collaboration and growth.</p>
+            </div>
+            
+            <!-- Feature 4 -->
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <img src="{% static 'images/market-data.webp' %}" alt="Comprehensive Coverage">
+                </div>
+                <h3 class="feature-title">Comprehensive Coverage</h3>
+                <p class="feature-description">Our platform covers a wide range of agricultural commodities and market indicators.</p>
+            </div>
+        </div>
+        
+        <a href="{% url 'contact' %}" class="contact-btn">Contact Us</a>
+    </div>
+</section>
+{% endblock %}

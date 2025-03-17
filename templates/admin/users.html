@@ -1,0 +1,223 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}SudaStock - User Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4 shadow-lg user-card">
+                <div class="card-header pb-0 d-flex justify-content-between align-items-center bg-primary-dark text-white">
+                    <h6 class="mb-0"><i class="fas fa-users me-2"></i>User Management</h6>
+                </div>
+                <div class="card-body px-0 pt-3 pb-2">
+                    <div class="table-responsive p-0">
+                        <table class="table align-items-center mb-0 table-hover">
+                            <thead class="thead-accent">
+                                <tr>
+                                    <th class="text-uppercase font-weight-bolder ps-3">User</th>
+                                    <th class="text-uppercase font-weight-bolder ps-2">Email</th>
+                                    <th class="text-uppercase font-weight-bolder ps-2">Status</th>
+                                    <th class="text-uppercase font-weight-bolder ps-2">Role</th>
+                                    <th class="text-uppercase font-weight-bolder ps-2">Date Joined</th>
+                                    <th class="text-uppercase font-weight-bolder ps-2">Last Login</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                <tr class="user-row">
+                                    <td>
+                                        <div class="d-flex px-3 py-2">
+                                            <div>
+                                                {% if user.profile_image %}
+                                                <img src="{{ user.profile_image.url }}" class="avatar avatar-sm me-3 border border-accent" alt="{{ user.username }}">
+                                                {% else %}
+                                                <div class="avatar avatar-sm me-3 bg-gradient-primary border border-accent">
+                                                    <span class="text-white">{{ user.username|slice:":1" }}</span>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            <div class="d-flex flex-column justify-content-center">
+                                                <h6 class="mb-0 user-name">{{ user.username }}</h6>
+                                                <p class="mb-0 user-fullname">{{ user.first_name }} {{ user.last_name }}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <p class="font-weight-bold mb-0 user-email"><i class="fas fa-envelope me-2" style="color: var(--accent);"></i>{{ user.email }}</p>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-gradient-{% if user.is_active %}success{% else %}secondary{% endif %} user-status">
+                                            {% if user.is_active %}<i class="fas fa-check-circle me-1"></i>Active{% else %}<i class="fas fa-times-circle me-1"></i>Inactive{% endif %}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-gradient-{% if user.is_superuser %}danger{% elif user.is_staff %}warning{% else %}info{% endif %} user-role">
+                                            {% if user.is_superuser %}<i class="fas fa-user-shield me-1"></i>Admin{% elif user.is_staff %}<i class="fas fa-user-tie me-1"></i>Staff{% else %}<i class="fas fa-user me-1"></i>User{% endif %}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="font-weight-bold user-date"><i class="far fa-calendar-plus me-2" style="color: var(--accent);"></i>{{ user.date_joined|date:"M d, Y" }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="font-weight-bold user-login">
+                                            <i class="far fa-clock me-2" style="color: var(--accent);"></i>
+                                            {% if user.last_login %}
+                                                {{ user.last_login|date:"M d, Y H:i" }}
+                                            {% else %}
+                                                Never
+                                            {% endif %}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">
+                                        <div class="empty-state">
+                                            <i class="fas fa-users fa-3x mb-3" style="color: var(--accent);"></i>
+                                            <p>No users available</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add animation to cards
+        const cards = document.querySelectorAll('.user-card');
+        cards.forEach((card, index) => {
+            setTimeout(() => {
+                card.classList.add('fade-in');
+            }, index * 100);
+        });
+        
+        // Add hover effect to table rows
+        const tableRows = document.querySelectorAll('.user-row');
+        tableRows.forEach(row => {
+            row.addEventListener('mouseenter', () => {
+                row.style.boxShadow = '0 0 15px rgba(120, 109, 60, 0.3)';
+                row.style.transform = 'translateX(5px)';
+            });
+            row.addEventListener('mouseleave', () => {
+                row.style.boxShadow = 'none';
+                row.style.transform = 'translateX(0)';
+            });
+        });
+    });
+</script>
+
+<style>
+    .user-card {
+        transition: all 0.3s ease;
+        border: 1px solid rgba(120, 109, 60, 0.2);
+        overflow: hidden;
+    }
+    
+    .user-card:hover {
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2), 0 0 15px rgba(120, 109, 60, 0.2);
+    }
+    
+    .card-header {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .card-header::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+    
+    .thead-accent {
+        background: linear-gradient(135deg, rgba(27, 20, 100, 0.9), rgba(27, 20, 100, 0.7));
+        color: var(--light-text);
+        border-bottom: 2px solid var(--accent);
+    }
+    
+    .thead-accent th {
+        font-weight: 600;
+        padding: 1rem;
+        text-shadow: 0 0 5px rgba(120, 109, 60, 0.5);
+    }
+    
+    .user-name {
+        color: var(--light-text);
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .user-fullname {
+        color: var(--light-text);
+        opacity: 0.8;
+        font-size: 0.75rem;
+    }
+    
+    .user-email, .user-date, .user-login {
+        color: var(--light-text);
+        font-size: 0.875rem;
+    }
+    
+    .user-status, .user-role {
+        font-size: 0.75rem;
+        padding: 0.35em 0.65em;
+        text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    }
+    
+    .empty-state {
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .bg-primary-dark {
+        background: linear-gradient(135deg, var(--primary-dark), rgba(27, 20, 100, 0.8));
+    }
+    
+    .bg-accent {
+        background: linear-gradient(135deg, var(--accent), rgba(120, 109, 60, 0.8));
+    }
+    
+    .border-accent {
+        border-color: var(--accent) !important;
+    }
+    
+    .avatar {
+        box-shadow: 0 0 10px rgba(120, 109, 60, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .avatar:hover {
+        transform: scale(1.1);
+    }
+    
+    .table-hover tbody tr {
+        transition: all 0.3s ease;
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: rgba(120, 109, 60, 0.1);
+    }
+    
+    .fade-in {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}

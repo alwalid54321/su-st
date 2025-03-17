@@ -1,0 +1,242 @@
+/* Custom Admin CSS for CNF Price Calculation System
+   Using color scheme:
+   - Gold accent: #786D3C
+   - Dark blue: #1B1464
+*/
+
+:root {
+  --accent: #786D3C;  /* Gold accent from logo */
+  --primary-dark: #1B1464;  /* Dark blue from logo */
+  --light-accent: #a99d6b;  /* Lighter gold for hover states */
+  --light-bg: #f8f8f8;
+  --border-color: #e0e0e0;
+}
+
+/* Admin header customization */
+#header {
+  background: var(--primary-dark);
+  color: white;
+}
+
+#header a:link, #header a:visited {
+  color: white;
+}
+
+#header a:hover {
+  color: var(--light-accent);
+}
+
+/* Sidebar customization */
+.sidebar-section h3 {
+  color: var(--primary-dark);
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 8px;
+}
+
+.sidebar-menu a {
+  color: var(--primary-dark);
+}
+
+.sidebar-menu a:hover {
+  color: var(--accent);
+  background-color: rgba(120, 109, 60, 0.1);
+}
+
+.sidebar-menu .active a {
+  background-color: var(--accent);
+  color: white;
+}
+
+/* Button styling */
+.button, input[type=submit], input[type=button], .submit-row input, a.button {
+  background: var(--accent);
+  color: white;
+  border-radius: 4px;
+  transition: background 0.3s;
+}
+
+.button:hover, input[type=submit]:hover, input[type=button]:hover, 
+.submit-row input:hover, a.button:hover {
+  background: var(--light-accent);
+}
+
+.button.default, input[type=submit].default, .submit-row input.default {
+  background: var(--primary-dark);
+}
+
+.button.default:hover, input[type=submit].default:hover, .submit-row input.default:hover {
+  background: #2a2080;
+}
+
+/* Table styling */
+table thead th {
+  background: var(--primary-dark);
+  color: white;
+}
+
+table tbody tr:nth-child(odd) {
+  background-color: rgba(120, 109, 60, 0.05);
+}
+
+table tbody tr:hover {
+  background-color: rgba(120, 109, 60, 0.1);
+}
+
+/* Form styling */
+.form-row {
+  padding: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.form-row label {
+  color: var(--primary-dark);
+  font-weight: bold;
+}
+
+.help {
+  color: #666;
+  font-style: italic;
+}
+
+/* Fieldset styling */
+fieldset.module h2 {
+  background: var(--primary-dark);
+  color: white;
+}
+
+.module {
+  border: 1px solid var(--border-color);
+  margin-bottom: 20px;
+  background: white;
+}
+
+/* Message styling */
+.messagelist .success {
+  background: #dfd;
+  border-left: 5px solid var(--accent);
+}
+
+.messagelist .error {
+  background: #fdd;
+  border-left: 5px solid #f00;
+}
+
+/* CNF Products specific styling */
+.product-card {
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  padding: 15px;
+  margin-bottom: 15px;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: all 0.3s;
+}
+
+.product-card:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  transform: translateY(-2px);
+}
+
+.product-card h3 {
+  color: var(--primary-dark);
+  margin-top: 0;
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 5px;
+}
+
+.product-info {
+  margin-bottom: 10px;
+}
+
+.product-info label {
+  font-weight: bold;
+  color: var(--primary-dark);
+  display: inline-block;
+  width: 150px;
+}
+
+.linked-market-data {
+  background: rgba(120, 109, 60, 0.1);
+  padding: 8px;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+.linked-market-data-title {
+  font-weight: bold;
+  color: var(--accent);
+}
+
+/* Responsive design */
+@media (max-width: 767px) {
+  .product-card {
+    padding: 10px;
+  }
+  
+  .product-info label {
+    width: 100%;
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  .form-row {
+    padding: 8px;
+  }
+  
+  .form-row input, .form-row select, .form-row textarea {
+    width: 100%;
+  }
+  
+  .submit-row {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .submit-row input {
+    margin-bottom: 10px;
+  }
+}
+
+/* Responsive tables */
+@media (max-width: 992px) {
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+  
+  thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+  
+  tr {
+    border: 1px solid var(--border-color);
+    margin-bottom: 15px;
+  }
+  
+  td {
+    border: none;
+    position: relative;
+    padding-left: 50%;
+    text-align: left;
+  }
+  
+  td:before {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    width: 45%;
+    padding-right: 10px;
+    white-space: nowrap;
+    font-weight: bold;
+    color: var(--primary-dark);
+  }
+  
+  /* Add data labels for responsive tables */
+  td:nth-of-type(1):before { content: "Name"; }
+  td:nth-of-type(2):before { content: "Cost"; }
+  td:nth-of-type(3):before { content: "Waste %"; }
+  td:nth-of-type(4):before { content: "Market Data"; }
+  td:nth-of-type(5):before { content: "Updated"; }
+  td:nth-of-type(6):before { content: "Actions"; }
+}

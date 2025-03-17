@@ -1,0 +1,496 @@
+{% extends 'admin/base_admin.html' %}
+{% load static %}
+
+{% block title %}CNF Products & Calculations{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/cnf_calculator.css' %}">
+<style>
+    :root {
+        --accent: #786D3C;  /* Gold accent from logo */
+        --primary-dark: #1B1464;  /* Dark blue from logo */
+    }
+    
+    .product-card {
+        transition: all 0.3s ease;
+        border: 1px solid rgba(120, 109, 60, 0.2);
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2), 0 0 15px rgba(120, 109, 60, 0.2);
+    }
+    
+    .card-header {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .card-header::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, var(--accent), var(--primary-dark));
+    }
+    
+    .bg-primary-dark {
+        background-color: var(--primary-dark);
+    }
+    
+    .bg-accent {
+        background-color: var(--accent);
+    }
+    
+    .text-primary-dark {
+        color: var(--primary-dark);
+    }
+    
+    .text-accent {
+        color: var(--accent);
+    }
+    
+    .btn-accent {
+        background-color: var(--accent);
+        color: white;
+    }
+    
+    .btn-accent:hover {
+        background-color: #8a7d45;
+        color: white;
+    }
+    
+    .btn-primary-dark {
+        background-color: var(--primary-dark);
+        color: white;
+    }
+    
+    .btn-primary-dark:hover {
+        background-color: #252091;
+        color: white;
+    }
+    
+    .thead-accent {
+        background-color: var(--accent);
+        color: white;
+    }
+    
+    .nav-tabs .nav-link {
+        color: var(--primary-dark);
+        border: 1px solid #dee2e6;
+        margin-right: 5px;
+        border-radius: 5px 5px 0 0;
+    }
+    
+    .nav-tabs .nav-link.active {
+        color: white;
+        background-color: var(--primary-dark);
+        border-color: var(--primary-dark);
+    }
+    
+    .tab-pane {
+        padding: 20px;
+        border: 1px solid #dee2e6;
+        border-top: none;
+        border-radius: 0 0 5px 5px;
+    }
+    
+    .form-control:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 0.25rem rgba(120, 109, 60, 0.25);
+    }
+    
+    .calculation-history {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    
+    .calculation-item {
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        border-left: 3px solid var(--accent);
+        background-color: #f8f9fa;
+        transition: all 0.3s ease;
+    }
+    
+    .calculation-item:hover {
+        background-color: #f1f1f1;
+        transform: translateX(5px);
+    }
+    
+    .calculation-item.current {
+        border-left: 3px solid var(--primary-dark);
+        background-color: #e9ecef;
+    }
+    
+    .override-checkbox {
+        margin-right: 10px;
+        transform: scale(1.2);
+        accent-color: var(--accent);
+    }
+    
+    .form-label {
+        font-weight: 500;
+        color: var(--primary-dark);
+    }
+    
+    .cost-component {
+        padding: 10px;
+        border-radius: 5px;
+        background-color: #f8f9fa;
+        margin-bottom: 10px;
+    }
+    
+    .cost-component h6 {
+        color: var(--primary-dark);
+        border-bottom: 1px solid var(--accent);
+        padding-bottom: 5px;
+        margin-bottom: 10px;
+    }
+    
+    /* Responsive styles */
+    @media (max-width: 768px) {
+        .calculation-history {
+            max-height: 200px;
+        }
+        
+        .nav-tabs .nav-link {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.9rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-lg product-card">
+                <div class="card-header bg-primary-dark text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">CNF Products & Calculations</h4>
+                    <a href="/admin/core/product/add/" class="btn btn-accent btn-sm">
+                        <i class="fas fa-plus me-2"></i> Add New Product
+                    </a>
+                </div>
+                <div class="card-body">
+                    <ul class="nav nav-tabs" id="productTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="products-tab" data-bs-toggle="tab" data-bs-target="#products" type="button" role="tab" aria-controls="products" aria-selected="true">
+                                <i class="fas fa-box me-2"></i>Products
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="calculations-tab" data-bs-toggle="tab" data-bs-target="#calculations" type="button" role="tab" aria-controls="calculations" aria-selected="false">
+                                <i class="fas fa-calculator me-2"></i>CNF Calculations
+                            </button>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="productTabsContent">
+                        <!-- Products Tab -->
+                        <div class="tab-pane fade show active" id="products" role="tabpanel" aria-labelledby="products-tab">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="thead-accent">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Product Name</th>
+                                            <th>Base Cost (SDG)</th>
+                                            <th>Waste %</th>
+                                            <th>Last Updated</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for product in products %}
+                                        <tr data-product-id="{{ product.id }}" class="product-row">
+                                            <td>{{ product.id }}</td>
+                                            <td>{{ product.name }}</td>
+                                            <td>{{ product.cost_per_unit_sdg }} SDG</td>
+                                            <td>{{ product.waste_percentage }}%</td>
+                                            <td>{{ product.updated_at|date:"Y-m-d H:i" }}</td>
+                                            <td>
+                                                <button class="btn btn-primary-dark btn-sm view-calculations" data-product-id="{{ product.id }}">
+                                                    <i class="fas fa-calculator me-1"></i> View Calculations
+                                                </button>
+                                                <a href="/admin/core/product/{{ product.id }}/change/" class="btn btn-accent btn-sm">
+                                                    <i class="fas fa-edit me-1"></i> Edit
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr>
+                                            <td colspan="6" class="text-center py-4">
+                                                <div class="empty-state">
+                                                    <i class="fas fa-box-open fa-3x mb-3" style="color: var(--accent);"></i>
+                                                    <p>No products available</p>
+                                                    <a href="/admin/core/product/add/" class="btn btn-accent btn-sm mt-2">
+                                                        <i class="fas fa-plus me-2"></i> Add First Product
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- Calculations Tab -->
+                        <div class="tab-pane fade" id="calculations" role="tabpanel" aria-labelledby="calculations-tab">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group mb-3">
+                                        <label for="productSelect" class="form-label">Select Product</label>
+                                        <select class="form-select" id="productSelect">
+                                            <option value="">-- Select a product --</option>
+                                            {% for product in products %}
+                                            <option value="{{ product.id }}">{{ product.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    
+                                    <div id="calculationHistory" class="calculation-history mt-4 d-none">
+                                        <h5 class="text-primary-dark mb-3">Calculation History</h5>
+                                        <div id="calculationItems">
+                                            <!-- Calculation history items will be loaded here -->
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-8">
+                                    <div id="calculationDetails" class="d-none">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h5 class="text-primary-dark mb-0">Calculation Details</h5>
+                                            <span class="badge bg-accent" id="calculationDate"></span>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="cost-component">
+                                                    <h6>Product Information</h6>
+                                                    <div class="row mb-2">
+                                                        <div class="col-6">Product:</div>
+                                                        <div class="col-6 fw-bold" id="productName"></div>
+                                                    </div>
+                                                    <div class="row mb-2">
+                                                        <div class="col-6">Destination:</div>
+                                                        <div class="col-6 fw-bold" id="destination"></div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-6">Exchange Rate:</div>
+                                                        <div class="col-6 fw-bold" id="exchangeRate"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="cost-component">
+                                                    <h6>Price Summary</h6>
+                                                    <div class="row mb-2">
+                                                        <div class="col-6">Total Cost (SDG):</div>
+                                                        <div class="col-6 fw-bold" id="totalCostSDG"></div>
+                                                    </div>
+                                                    <div class="row mb-2">
+                                                        <div class="col-6">Total Cost (USD):</div>
+                                                        <div class="col-6 fw-bold" id="totalCostUSD"></div>
+                                                    </div>
+                                                    <div class="row mb-2">
+                                                        <div class="col-6">FOB Price:</div>
+                                                        <div class="col-6 fw-bold" id="fobPrice"></div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-6">CNF Price:</div>
+                                                        <div class="col-6 fw-bold" id="cnfPrice"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-4">
+                                            <h6 class="text-primary-dark">Cost Components</h6>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="cost-component">
+                                                        <h6>Operation Costs</h6>
+                                                        <div class="row mb-2">
+                                                            <div class="col-6">Cleaning:</div>
+                                                            <div class="col-6" id="cleaningCost"></div>
+                                                        </div>
+                                                        <div class="row mb-2">
+                                                            <div class="col-6">Empty Bags:</div>
+                                                            <div class="col-6" id="emptyBagsCost"></div>
+                                                        </div>
+                                                        <div class="row mb-2">
+                                                            <div class="col-6">Printing:</div>
+                                                            <div class="col-6" id="printingCost"></div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-6">Handling:</div>
+                                                            <div class="col-6" id="handlingCost"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="cost-component">
+                                                        <h6>Government & Transport Costs</h6>
+                                                        <div class="row mb-2">
+                                                            <div class="col-6">Paperwork:</div>
+                                                            <div class="col-6" id="paperworkCost"></div>
+                                                        </div>
+                                                        <div class="row mb-2">
+                                                            <div class="col-6">Customs Duty:</div>
+                                                            <div class="col-6" id="customsDutyCost"></div>
+                                                        </div>
+                                                        <div class="row mb-2">
+                                                            <div class="col-6">Clearance:</div>
+                                                            <div class="col-6" id="clearanceCost"></div>
+                                                        </div>
+                                                        <div class="row mb-2">
+                                                            <div class="col-6">Local Transport:</div>
+                                                            <div class="col-6" id="localTransportCost"></div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-6">International Transport:</div>
+                                                            <div class="col-6" id="internationalTransportCost"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-4" id="overrideSection">
+                                            <h6 class="text-primary-dark">Override Values</h6>
+                                            <form id="overrideForm">
+                                                <input type="hidden" id="calculationId">
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-3">
+                                                        <div class="form-check mb-2">
+                                                            <input class="form-check-input override-checkbox" type="checkbox" id="overrideTotalCostSDG">
+                                                            <label class="form-check-label" for="overrideTotalCostSDG">
+                                                                Override Total Cost (SDG)
+                                                            </label>
+                                                        </div>
+                                                        <input type="number" class="form-control" id="overrideTotalCostSDGValue" disabled>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <div class="form-check mb-2">
+                                                            <input class="form-check-input override-checkbox" type="checkbox" id="overrideTotalCostUSD">
+                                                            <label class="form-check-label" for="overrideTotalCostUSD">
+                                                                Override Total Cost (USD)
+                                                            </label>
+                                                        </div>
+                                                        <input type="number" class="form-control" id="overrideTotalCostUSDValue" disabled>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <div class="form-check mb-2">
+                                                            <input class="form-check-input override-checkbox" type="checkbox" id="overrideFOBPrice">
+                                                            <label class="form-check-label" for="overrideFOBPrice">
+                                                                Override FOB Price
+                                                            </label>
+                                                        </div>
+                                                        <input type="number" class="form-control" id="overrideFOBPriceValue" disabled>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <div class="form-check mb-2">
+                                                            <input class="form-check-input override-checkbox" type="checkbox" id="overrideCNFPrice">
+                                                            <label class="form-check-label" for="overrideCNFPrice">
+                                                                Override CNF Price
+                                                            </label>
+                                                        </div>
+                                                        <input type="number" class="form-control" id="overrideCNFPriceValue" disabled>
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex justify-content-end mt-3">
+                                                    <button type="submit" class="btn btn-primary-dark" id="saveOverrides">
+                                                        <i class="fas fa-save me-2"></i> Save Overrides
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="noCalculationSelected" class="text-center py-5">
+                                        <i class="fas fa-calculator fa-3x mb-3" style="color: var(--accent);"></i>
+                                        <p>Select a product to view calculations</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- History Modal -->
+<div class="modal fade" id="history-modal" tabindex="-1" aria-labelledby="history-modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: var(--primary-dark); color: white;">
+                <h5 class="modal-title" id="history-modal-label">
+                    <i class="fas fa-history me-2"></i> CNF Calculation & Market Data History
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="history-modal-body">
+                <!-- Content will be loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Alerts Container -->
+<div id="alerts-container" class="position-fixed bottom-0 end-0 p-3" style="z-index: 5"></div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+<script src="{% static 'js/cnf_unified_admin.js' %}"></script>
+<style>
+    .history-chart-container {
+        height: 300px;
+        margin-bottom: 20px;
+    }
+    
+    .history-list {
+        max-height: 300px;
+        overflow-y: auto;
+        padding-right: 5px;
+    }
+    
+    .history-item {
+        border-radius: 4px;
+        background-color: #f8f9fa;
+    }
+    
+    .history-item.border-primary-dark {
+        border-left-width: 4px !important;
+        border-left-color: var(--primary-dark) !important;
+        background-color: rgba(27, 20, 100, 0.05);
+    }
+    
+    .border-accent {
+        border-color: var(--accent) !important;
+    }
+    
+    .bg-primary-dark {
+        background-color: var(--primary-dark) !important;
+        color: white;
+    }
+    
+    .bg-accent {
+        background-color: var(--accent) !important;
+        color: white;
+    }
+</style>
+{% endblock %}

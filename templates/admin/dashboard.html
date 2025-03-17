@@ -1,0 +1,383 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}SudaStock - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+            <div class="card stat-card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="numbers">
+                                <p class="text-sm mb-0 text-uppercase fw-bold">Market Data</p>
+                                <h5 class="font-weight-bolder mt-2 stat-value">
+                                    {{ market_data_count }}
+                                </h5>
+                                <p class="mb-0">
+                                    <span class="badge bg-gradient-success stat-badge">Items</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-4 text-end">
+                            <div class="icon icon-shape bg-gradient-primary shadow-primary text-center rounded-circle stat-icon">
+                                <i class="fas fa-chart-line text-lg opacity-10" style="color: white;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+            <div class="card stat-card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="numbers">
+                                <p class="text-sm mb-0 text-uppercase fw-bold">Currencies</p>
+                                <h5 class="font-weight-bolder mt-2 stat-value">
+                                    {{ currency_count }}
+                                </h5>
+                                <p class="mb-0">
+                                    <span class="badge bg-gradient-success stat-badge">Items</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-4 text-end">
+                            <div class="icon icon-shape bg-gradient-info shadow-info text-center rounded-circle stat-icon">
+                                <i class="fas fa-money-bill-wave text-lg opacity-10" style="color: white;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+            <div class="card stat-card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="numbers">
+                                <p class="text-sm mb-0 text-uppercase fw-bold">Announcements</p>
+                                <h5 class="font-weight-bolder mt-2 stat-value">
+                                    {{ announcement_count }}
+                                </h5>
+                                <p class="mb-0">
+                                    <span class="badge bg-gradient-success stat-badge">Items</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-4 text-end">
+                            <div class="icon icon-shape bg-gradient-warning shadow-warning text-center rounded-circle stat-icon">
+                                <i class="fas fa-bullhorn text-lg opacity-10" style="color: white;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-sm-6">
+            <div class="card stat-card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="numbers">
+                                <p class="text-sm mb-0 text-uppercase fw-bold">Users</p>
+                                <h5 class="font-weight-bolder mt-2 stat-value">
+                                    {{ user_count }}
+                                </h5>
+                                <p class="mb-0">
+                                    <span class="badge bg-gradient-success stat-badge">Registered</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-4 text-end">
+                            <div class="icon icon-shape bg-gradient-success shadow-success text-center rounded-circle stat-icon">
+                                <i class="fas fa-users text-lg opacity-10" style="color: white;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-lg-7 mb-lg-0 mb-4">
+            <div class="card data-card">
+                <div class="card-header pb-0 p-3 bg-primary-dark text-white">
+                    <div class="d-flex justify-content-between">
+                        <h6 class="mb-2"><i class="fas fa-history me-2"></i>Recent Market Data Updates</h6>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table align-items-center mb-0 table-hover">
+                        <thead class="thead-accent">
+                            <tr>
+                                <th class="text-uppercase font-weight-bolder ps-2">Name</th>
+                                <th class="text-uppercase font-weight-bolder ps-2">Value</th>
+                                <th class="text-uppercase font-weight-bolder ps-2">Trend</th>
+                                <th class="text-uppercase font-weight-bolder ps-2">Last Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in recent_market_data %}
+                            <tr class="data-row">
+                                <td>
+                                    <div class="d-flex px-2 py-1">
+                                        <div class="d-flex flex-column justify-content-center">
+                                            <h6 class="mb-0 data-name">{{ item.name }}</h6>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <p class="font-weight-bold mb-0 data-value"><i class="fas fa-dollar-sign me-1" style="color: var(--accent);"></i>{{ item.value }}</p>
+                                </td>
+                                <td>
+                                    {% if item.trend > 0 %}
+                                        <span class="trend-badge trend-up"><i class="fas fa-arrow-up me-1"></i>{{ item.trend }}%</span>
+                                    {% elif item.trend < 0 %}
+                                        <span class="trend-badge trend-down"><i class="fas fa-arrow-down me-1"></i>{{ item.trend }}%</span>
+                                    {% else %}
+                                        <span class="trend-badge trend-neutral"><i class="fas fa-equals me-1"></i>{{ item.trend }}%</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="font-weight-bold data-date"><i class="far fa-clock me-1" style="color: var(--accent);"></i>{{ item.updated_at|date:"M d, Y H:i" }}</span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-4">
+                                    <div class="empty-state">
+                                        <i class="fas fa-chart-line fa-3x mb-3" style="color: var(--accent);"></i>
+                                        <p>No market data available</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="card announcement-card">
+                <div class="card-header pb-0 p-3 bg-primary-dark text-white">
+                    <h6 class="mb-0"><i class="fas fa-bullhorn me-2"></i>Recent Announcements</h6>
+                </div>
+                <div class="card-body p-3">
+                    <ul class="list-group announcement-list">
+                        {% for announcement in recent_announcements %}
+                        <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg announcement-item">
+                            <div class="d-flex align-items-center">
+                                <div class="icon icon-shape icon-sm me-3 bg-gradient-{% if announcement.priority == 'high' %}danger{% elif announcement.priority == 'medium' %}warning{% else %}info{% endif %} shadow text-center announcement-icon">
+                                    <i class="fas fa-bullhorn text-white opacity-10"></i>
+                                </div>
+                                <div class="d-flex flex-column">
+                                    <h6 class="mb-1 announcement-title">{{ announcement.title }}</h6>
+                                    <span class="announcement-date"><i class="far fa-calendar-alt me-1" style="color: var(--accent);"></i>{{ announcement.created_at|date:"M d, Y" }}</span>
+                                </div>
+                            </div>
+                            <div class="d-flex">
+                                <span class="badge bg-gradient-{% if announcement.priority == 'high' %}danger{% elif announcement.priority == 'medium' %}warning{% else %}info{% endif %} announcement-priority">
+                                    {% if announcement.priority == 'high' %}<i class="fas fa-exclamation-circle me-1"></i>
+                                    {% elif announcement.priority == 'medium' %}<i class="fas fa-exclamation me-1"></i>
+                                    {% else %}<i class="fas fa-info-circle me-1"></i>{% endif %}
+                                    {{ announcement.priority|title }}
+                                </span>
+                            </div>
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+                            <div class="d-flex align-items-center empty-state">
+                                <i class="fas fa-bullhorn fa-3x mb-3 me-3" style="color: var(--accent);"></i>
+                                <div class="d-flex flex-column">
+                                    <h6 class="mb-1">No announcements available</h6>
+                                </div>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .stat-card, .data-card, .announcement-card {
+        transition: all 0.3s ease;
+        border: 1px solid rgba(120, 109, 60, 0.2);
+        overflow: hidden;
+        background: rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stat-card:hover, .data-card:hover, .announcement-card:hover {
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2), 0 0 15px rgba(120, 109, 60, 0.2);
+        transform: translateY(-5px);
+    }
+    
+    .card-header {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .card-header::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+    
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--light-text);
+        text-shadow: 0 0 10px rgba(120, 109, 60, 0.3);
+    }
+    
+    .stat-badge {
+        font-size: 0.7rem;
+        padding: 0.35em 0.65em;
+        text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    }
+    
+    .stat-icon {
+        box-shadow: 0 0 20px rgba(120, 109, 60, 0.4);
+        transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover .stat-icon {
+        transform: scale(1.1);
+    }
+    
+    .thead-accent {
+        background: linear-gradient(135deg, rgba(27, 20, 100, 0.9), rgba(27, 20, 100, 0.7));
+        color: var(--light-text);
+        border-bottom: 2px solid var(--accent);
+    }
+    
+    .thead-accent th {
+        font-weight: 600;
+        padding: 1rem;
+        text-shadow: 0 0 5px rgba(120, 109, 60, 0.5);
+    }
+    
+    .data-row {
+        transition: all 0.3s ease;
+    }
+    
+    .data-row:hover {
+        background-color: rgba(120, 109, 60, 0.1);
+        box-shadow: 0 0 15px rgba(120, 109, 60, 0.3);
+        transform: translateX(5px);
+    }
+    
+    .data-name {
+        color: var(--light-text);
+        font-weight: 600;
+    }
+    
+    .data-value, .data-date {
+        color: var(--light-text);
+        font-size: 0.875rem;
+    }
+    
+    .trend-badge {
+        display: inline-block;
+        padding: 0.35em 0.65em;
+        font-size: 0.75rem;
+        font-weight: 600;
+        border-radius: 0.25rem;
+        text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    }
+    
+    .trend-up {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: white;
+    }
+    
+    .trend-down {
+        background: linear-gradient(135deg, #dc3545, #fd7e14);
+        color: white;
+    }
+    
+    .trend-neutral {
+        background: linear-gradient(135deg, #6c757d, #343a40);
+        color: white;
+    }
+    
+    .announcement-list {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+    .announcement-item {
+        background: rgba(0, 0, 0, 0.1);
+        margin-bottom: 10px;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .announcement-item:hover {
+        background: rgba(120, 109, 60, 0.1);
+        transform: translateX(5px);
+    }
+    
+    .announcement-icon {
+        box-shadow: 0 0 15px rgba(120, 109, 60, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .announcement-item:hover .announcement-icon {
+        transform: scale(1.1);
+    }
+    
+    .announcement-title {
+        color: var(--light-text);
+        font-weight: 600;
+    }
+    
+    .announcement-date {
+        color: var(--light-text);
+        font-size: 0.75rem;
+    }
+    
+    .announcement-priority {
+        font-size: 0.7rem;
+        padding: 0.35em 0.65em;
+        text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    }
+    
+    .empty-state {
+        padding: 1rem;
+        text-align: center;
+        color: var(--light-text);
+    }
+    
+    .bg-primary-dark {
+        background: linear-gradient(135deg, var(--primary-dark), rgba(27, 20, 100, 0.8));
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .stat-card, .data-card, .announcement-card {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:nth-child(3) { animation-delay: 0.3s; }
+    .stat-card:nth-child(4) { animation-delay: 0.4s; }
+</style>
+{% endblock %}
