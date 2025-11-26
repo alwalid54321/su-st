@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="120" viewBox="0 0 400 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(0, 10)">
+    <!-- Logo Symbol -->
+    <g transform="translate(20, 0) scale(0.8)">
+      <path d="M20 10L60 0L100 10V90L60 100L20 90V10Z" fill="#1B1464"/>
+      <path d="M35 30L60 25L85 30V70L60 75L35 70V30Z" fill="#786D3C"/>
+      <path d="M45 40L60 37L75 40V60L60 63L45 60V40Z" fill="#4834D4"/>
+      <path d="M20 10L100 10L60 0L20 10Z" fill="#A89F66"/>
+    </g>
+    
+    <!-- Text SUDASTOCK -->
+    <g transform="translate(130, 55)">
+      <text font-family="Arial Black, sans-serif" font-size="48" font-weight="900" fill="#1B1464" letter-spacing="2">
+        SUDASTOCK
+      </text>
+    </g>
+    
+    <!-- Tagline -->
+    <g transform="translate(130, 80)">
+      <text font-family="Arial, sans-serif" font-size="16" font-weight="400" fill="#786D3C" letter-spacing="1">
+        TRANSFORMING DATA INTO OPPORTUNITIES
+      </text>
+    </g>
+  </g>
+</svg>

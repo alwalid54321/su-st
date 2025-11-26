@@ -1,0 +1,415 @@
+/* Login Page Styling */
+
+.container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #0f0b3d 0%, #1B1464 50%, #251972 100%);
+    padding: 3rem 1rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Background Elements */
+.backgroundPattern {
+    position: absolute;
+    inset: 0;
+    opacity: 0.1;
+    background-image: radial-gradient(#D4AF37 1px, transparent 1px);
+    background-size: 40px 40px;
+}
+
+/* Decorative Blobs */
+.blob1,
+.blob2 {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.15;
+    animation: blobAnimation 12s infinite ease-in-out alternate;
+}
+
+.blob1 {
+    top: -10%;
+    right: -5%;
+    width: 400px;
+    height: 400px;
+    background: linear-gradient(135deg, #D4AF37 0%, #f5d77a 100%);
+}
+
+.blob2 {
+    bottom: -10%;
+    left: -5%;
+    width: 450px;
+    height: 450px;
+    background: linear-gradient(135deg, #D4AF37 0%, #c99d2e 100%);
+    animation-delay: -6s;
+}
+
+@keyframes blobAnimation {
+
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    50% {
+        transform: translate(30px, -30px) scale(1.1);
+    }
+}
+
+.loginBox {
+    max-width: 450px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    padding: 3rem;
+    border-radius: 24px;
+    box-shadow: 0 25px 50px -12px rgba(27, 20, 100, 0.25);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    position: relative;
+    z-index: 10;
+}
+
+.loginBox::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, #1B1464 0%, #D4AF37 50%, #1B1464 100%);
+    border-radius: 24px 24px 0 0;
+}
+
+.headerText {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.headerTitle {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #1B1464 0%, #2d1f7a 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.5px;
+}
+
+.headerSubtitle {
+    font-size: 0.95rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.errorAlert {
+    background: linear-gradient(135deg, #fee 0%, #fdd 100%);
+    border: 2px solid #dc3545;
+    color: #721c24;
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(220, 53, 69, 0.1);
+}
+
+.errorAlert i {
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+}
+
+.label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1B1464;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.input {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    color: #1B1464;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.input::placeholder {
+    color: #adb5bd;
+}
+
+.input:focus {
+    outline: none;
+    border-color: #D4AF37;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1);
+}
+
+.input:hover {
+    border-color: #D4AF37;
+    background: white;
+}
+
+.checkboxContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.checkboxGroup {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.checkbox {
+    width: 1.125rem;
+    height: 1.125rem;
+    border-radius: 4px;
+    border: 2px solid #D4AF37;
+    cursor: pointer;
+    accent-color: #D4AF37;
+}
+
+.checkboxLabel {
+    font-size: 0.875rem;
+    color: #495057;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.forgotPasswordLink {
+    font-size: 0.875rem;
+    color: #D4AF37;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.forgotPasswordLink:hover {
+    color: #1B1464;
+    text-decoration: underline;
+}
+
+.submitButton {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    border: none;
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: 12px;
+    color: white;
+    background: linear-gradient(135deg, #1B1464 0%, #2d1f7a 100%);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 14px rgba(27, 20, 100, 0.3);
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.submitButton:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(27, 20, 100, 0.4);
+}
+
+.submitButton:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.submitButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.separator {
+    position: relative;
+    margin: 1.5rem 0;
+    text-align: center;
+}
+
+.separator::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #e9ecef, transparent);
+}
+
+.separatorText {
+    position: relative;
+    background: white;
+    padding: 0 1rem;
+    font-size: 0.875rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.socialLoginGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+}
+
+.socialLoginButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.875rem;
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.socialLoginButton:hover {
+    border-color: #D4AF37;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
+}
+
+.socialLoginButton i {
+    color: #1B1464;
+    font-size: 1.25rem;
+}
+
+/* OTP Styles */
+.otpInputGroup {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    margin: 2rem 0;
+}
+
+.otpInput {
+    width: 3rem;
+    height: 3.5rem;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    background: #f8f9fa;
+    color: #1B1464;
+    transition: all 0.3s ease;
+}
+
+.otpInput:focus {
+    outline: none;
+    border-color: #D4AF37;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1);
+}
+
+.otpResendText {
+    text-align: center;
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-bottom: 1.5rem;
+}
+
+.otpResendButton {
+    background: none;
+    border: none;
+    color: #D4AF37;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.otpResendButton:hover {
+    color: #1B1464;
+    text-decoration: underline;
+}
+
+.backToLoginLink {
+    width: 100%;
+    padding: 0.875rem;
+    margin-top: 1rem;
+    background: transparent;
+    border: 2px solid #e9ecef;
+    color: #6c757d;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.backToLoginLink:hover {
+    border-color: #1B1464;
+    color: #1B1464;
+}
+
+.loginLinkContainer {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.loginLinkText {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.loginLink {
+    font-weight: 600;
+    color: #D4AF37;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.loginLink:hover {
+    color: #1B1464;
+    text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .loginBox {
+        padding: 2rem 1.5rem;
+    }
+
+    .headerTitle {
+        font-size: 2rem;
+    }
+
+    .socialLoginGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .otpInput {
+        width: 2.5rem;
+        height: 3rem;
+        font-size: 1.25rem;
+    }
+}

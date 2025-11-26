@@ -1,0 +1,196 @@
+// This is your Prisma schema file
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// To switch to MySQL, uncomment the following datasource and comment out the sqlite datasource above.
+// Also, ensure your .env file has a DATABASE_URL for MySQL (e.g., mysql://user:password@host:port/database)
+// datasource db_mysql {
+//   provider = "mysql"
+//   url      = env("DATABASE_URL_MYSQL")
+// }
+
+
+model GalleryImage {
+  id          Int      @id @default(autoincrement())
+  title       String
+  imageUrl    String   @map("image_url")
+  description String?
+  order       Int      @default(0)
+  isActive    Boolean  @default(true) @map("is_active")
+  isCurrent   Boolean  @default(true) @map("is_current")
+  previousVersionId Int? @map("previous_version_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("core_galleryimage")
+}
+
+// User model extending Django's AbstractUser
+model User {
+  id             Int            @id @default(autoincrement())
+  username       String         @unique
+  email          String         @unique
+  password       String
+  firstName      String?        @map("first_name")
+  lastName       String?        @map("last_name")
+  isStaff        Boolean        @default(false) @map("is_staff")
+  isActive       Boolean        @default(true) @map("is_active")
+  isSuperuser    Boolean        @default(false) @map("is_superuser")
+  dateJoined     DateTime       @default(now()) @map("date_joined")
+  lastLogin      DateTime       @updatedAt @map("last_login")
+  profileImage   String?        @map("profile_image")
+  emailVerified  Boolean        @default(false) @map("email_verified")
+  
+  // Relations
+  emailOTPs      EmailOTP[]
+  settings       UserSettings?
+  
+  @@map("core_user")
+}
+
+// Market Data model
+model MarketData {
+  id             Int      @id @default(autoincrement())
+  name           String
+  value          Float    @default(0.0)
+  portSudan      Float    @default(0.0) @map("port_sudan")
+  dmtChina       Float    @default(0.0) @map("dmt_china")
+  dmtUae         Float    @default(0.0) @map("dmt_uae")
+  dmtMersing     Float    @default(0.0) @map("dmt_mersing")
+  dmtIndia       Float    @default(0.0) @map("dmt_india")
+  status         String   @default("Active")
+  forecast       String   @default("Stable")
+  trend          Int      @default(0)
+  imageUrl       String?  @map("image_url")
+  category       String?  @default("others")
+  description    String?
+  specifications String?  // JSON string
+  details        String?  // JSON string array
+  availability   String?  // JSON object for monthly availability
+  isCurrent      Boolean  @default(true) @map("is_current")
+  previousVersionId Int? @map("previous_version_id")
+  lastUpdate     DateTime @updatedAt @map("last_update")
+  createdAt      DateTime @default(now()) @map("created_at")
+  
+  @@map("core_marketdata")
+}
+
+// Market Data Archive
+model MarketDataArchive {
+  id          Int      @id @default(autoincrement())
+  originalId  Int      @map("original_id")
+  name        String
+  value       Float    @default(0.0)
+  portSudan   Float    @default(0.0) @map("port_sudan")
+  dmtChina    Float    @default(0.0) @map("dmt_china")
+  dmtUae      Float    @default(0.0) @map("dmt_uae")
+  dmtMersing  Float    @default(0.0) @map("dmt_mersing")
+  dmtIndia    Float    @default(0.0) @map("dmt_india")
+  status      String   @default("Active")
+  forecast    String   @default("Stable")
+  trend       Int      @default(0)
+  imageUrl    String?  @map("image_url")
+  archivedAt  DateTime @default(now()) @map("archived_at")
+  lastUpdate  DateTime @map("last_update")
+  createdAt   DateTime @map("created_at")
+  
+  @@map("core_marketdataarchive")
+}
+
+// Email OTP model
+model EmailOTP {
+  id                    Int      @id @default(autoincrement())
+  userId                Int?     @map("user_id")
+  email                 String
+  otp                   String
+  createdAt             DateTime @default(now()) @map("created_at")
+  expiresAt             DateTime @map("expires_at")
+  isUsed                Boolean  @default(false) @map("is_used")
+  verificationAttempts  Int      @default(0) @map("verification_attempts")
+  ipAddress             String?  @map("ip_address")
+  userAgent             String?  @map("user_agent")
+  purpose               String   @default("login")
+  
+  // Relations
+  user                  User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([email, purpose])
+  @@index([expiresAt])
+  @@map("core_emailotp")
+}
+
+// Currency model
+model Currency {
+  id         Int      @id @default(autoincrement())
+  code       String   @unique
+  name       String   @default("Currency")
+  rate       Float    @default(1.0)
+  isCurrent  Boolean  @default(true) @map("is_current")
+  previousVersionId Int? @map("previous_version_id")
+  lastUpdate DateTime @default(now()) @map("last_update")
+  
+  @@map("core_currency")
+}
+
+// Currency Archive
+model CurrencyArchive {
+  id         Int      @id @default(autoincrement())
+  originalId Int      @map("original_id")
+  code       String
+  name       String
+  rate       Float
+  archivedAt DateTime @default(now()) @map("archived_at")
+  lastUpdate DateTime @map("last_update")
+  
+  @@map("core_currencyarchive")
+}
+
+// Announcement model
+model Announcement {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  priority  String   @default("medium")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  @@map("core_announcement")
+}
+
+// Announcement Archive
+model AnnouncementArchive {
+  id         Int      @id @default(autoincrement())
+  originalId Int      @map("original_id")
+  title      String
+  content    String
+  priority   String   @default("medium")
+  archivedAt DateTime @default(now()) @map("archived_at")
+  createdAt  DateTime @map("created_at")
+  updatedAt  DateTime @map("updated_at")
+  
+  @@map("core_announcementarchive")
+}
+
+// User Settings model
+model UserSettings {
+  id                  Int      @id @default(autoincrement())
+  userId              Int      @unique @map("user_id")
+  emailNotifications  Boolean  @default(true) @map("email_notifications")
+  darkMode            Boolean  @default(false) @map("dark_mode")
+  language            String   @default("en")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+  
+  // Relations
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("core_usersettings")
+}

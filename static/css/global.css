@@ -1,10 +1,15 @@
 /* Global CSS Variables and Styles */
 :root {
-  --primary-dark: #1B1464;  /* Dark blue from logo */
-  --accent: #786D3C;  /* Gold accent from logo */
-  --primary-light: #e8e6f2;  /* Light version of primary */
-  --accent-light: #f2f0e8;  /* Light version of accent */
-  --text-dark: #333333;
+  --primary-dark: #1B1464;
+  /* Dark blue from logo */
+  --accent: #786D3C;
+  /* Gold accent from logo */
+  --primary-light: #e8e6f2;
+  /* Light version of primary */
+  --accent-light: #f2f0e8;
+  /* Light version of accent */
+  --text-dark: #1a1a1a;
+  /* Sharper black */
   --text-light: #ffffff;
   --gray-100: #f8f9fa;
   --gray-200: #e9ecef;
@@ -19,25 +24,45 @@
   --danger: #dc3545;
   --warning: #ffc107;
   --info: #17a2b8;
+
+  /* Sharp Design Tokens */
+  --border-radius-sm: 2px;
+  --border-radius: 4px;
+  /* Sharper corners */
+  --border-radius-lg: 6px;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 /* Typography */
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Comfortaa', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: var(--text-dark);
-  line-height: 1.6;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   color: var(--primary-dark);
-  font-weight: 600;
+  font-weight: 700;
+  /* Bolder headings */
   margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+  /* Tighter tracking for headings */
 }
 
 /* SudaStock Highlight */
 .sudastock-highlight {
   color: var(--primary-dark);
-  font-weight: 600;
+  font-weight: 700;
   position: relative;
   display: inline-block;
 }
@@ -48,25 +73,23 @@ h1, h2, h3, h4, h5, h6 {
   bottom: -2px;
   left: 0;
   width: 100%;
-  height: 2px;
+  height: 3px;
+  /* Thicker underline */
   background-color: var(--accent);
-  transform: scaleX(0.8);
-  transform-origin: bottom left;
-  transition: transform 0.3s ease;
-}
-
-.sudastock-highlight:hover::after {
   transform: scaleX(1);
+  /* Always visible */
+  transform-origin: bottom left;
 }
 
 a {
   color: var(--primary-dark);
   text-decoration: none;
-  transition: color 0.3s ease;
+  transition: color 0.2s ease;
 }
 
 a:hover {
   text-decoration: none;
+  color: var(--accent);
 }
 
 /* Buttons */
@@ -76,22 +99,24 @@ a:hover {
   justify-content: center;
   padding: 0.6rem 1.5rem;
   font-weight: 600;
-  border-radius: 5px;
-  transition: all 0.3s ease;
+  border-radius: var(--border-radius);
+  transition: all 0.2s ease;
   cursor: pointer;
-  border: 2px solid transparent;
+  border: 1px solid transparent;
+  /* Thinner border */
   text-align: center;
   text-decoration: none;
   line-height: 1.5;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-sm);
+  letter-spacing: 0.01em;
 }
 
 .btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .btn-primary {
@@ -101,8 +126,9 @@ a:hover {
 }
 
 .btn-primary:hover {
-  background-color: var(--accent);
-  border-color: var(--accent);
+  background-color: #15104d;
+  /* Darker shade */
+  border-color: #15104d;
 }
 
 .btn-secondary {
@@ -209,11 +235,11 @@ a:hover {
     padding-left: 1rem;
     padding-right: 1rem;
   }
-  
+
   h1 {
     font-size: 1.8rem;
   }
-  
+
   h2 {
     font-size: 1.5rem;
   }
@@ -235,6 +261,7 @@ a:hover {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

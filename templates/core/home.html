@@ -15,11 +15,19 @@
 <style>
     /* Animation for gradient shift effect */
     @keyframes gradientShift {
-        0% { opacity: 0.6; }
-        50% { opacity: 0.9; }
-        100% { opacity: 0.6; }
+        0% {
+            opacity: 0.6;
+        }
+
+        50% {
+            opacity: 0.9;
+        }
+
+        100% {
+            opacity: 0.6;
+        }
     }
-    
+
     /* Hero section styles */
     .hero-section {
         position: relative;
@@ -28,8 +36,10 @@
         overflow: hidden;
         margin-bottom: 3rem;
         z-index: 1;
+        background: url('{% static "images/hero.jpg" %}') no-repeat center center;
+        background-size: cover;
     }
-    
+
     .hero-video {
         position: absolute;
         top: 0;
@@ -39,7 +49,7 @@
         object-fit: cover;
         z-index: 1;
     }
-    
+
     .hero-fallback {
         position: absolute;
         top: 0;
@@ -51,7 +61,7 @@
         z-index: 1;
         display: none;
     }
-    
+
     .hero-overlay {
         position: absolute;
         top: 0;
@@ -62,7 +72,7 @@
         animation: gradientShift 8s infinite;
         z-index: 2;
     }
-    
+
     .hero-content {
         position: relative;
         z-index: 3;
@@ -73,7 +83,7 @@
         align-items: center;
         padding-bottom: 3rem;
     }
-    
+
     .register-btn {
         background-color: var(--accent);
         color: white;
@@ -86,56 +96,56 @@
         border: none;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
-    
+
     .register-btn:hover {
         background-color: #8a7d44;
         transform: translateY(-3px);
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
     }
-    
+
     /* Additional styles for the Connect With Us section */
     .connect-section {
         background-color: #f8f9fa;
         padding: 4rem 0;
     }
-    
+
     .connect-background {
         background-color: var(--primary-dark);
         border-radius: 10px;
         padding: 3rem;
         color: white;
     }
-    
+
     .connect-content {
         max-width: 1200px;
         margin: 0 auto;
         text-align: center;
     }
-    
+
     .connect-content h1 {
         font-size: 2.5rem;
         margin-bottom: 1rem;
     }
-    
+
     .connect-content p {
         font-size: 1.1rem;
         line-height: 1.6;
         max-width: 800px;
         margin: 0 auto 2rem;
     }
-    
+
     .highlight {
         color: var(--accent);
         font-weight: bold;
     }
-    
+
     .features-cards {
         display: flex;
         justify-content: space-between;
         flex-wrap: wrap;
         margin-top: 3rem;
     }
-    
+
     .feature-card {
         background-color: rgba(255, 255, 255, 0.1);
         border-radius: 10px;
@@ -144,33 +154,33 @@
         margin-bottom: 2rem;
         transition: transform 0.3s ease;
     }
-    
+
     .feature-card:hover {
         transform: translateY(-10px);
     }
-    
+
     .feature-card p {
         font-size: 1rem;
         margin-bottom: 1rem;
     }
-    
+
     .feature-card h3 {
         font-size: 1.5rem;
         color: white;
     }
-    
+
     @media (max-width: 992px) {
         .feature-card {
             width: 48%;
         }
     }
-    
+
     @media (max-width: 768px) {
         .feature-card {
             width: 100%;
         }
     }
-    
+
     /* .currency-flag {
         width: 24px;
         height: 24px;
@@ -183,36 +193,38 @@
         border: 1px solid rgba(0,0,0,0.1);
         background-color: #f8f8f8;
     } */
-    
+
     .currency-flag img {
         width: 100%;
         height: 100%;
         object-fit: contain;
     }
-    
+
     /* Responsive adjustments */
     @media (max-width: 768px) {
         .currency-selector {
             flex-wrap: wrap;
             justify-content: center;
         }
-        
+
         .currency-option {
             margin-bottom: 8px;
         }
     }
-    
+
     :root {
-        --accent: #786D3C;  /* Gold accent from logo */
-        --primary-dark: #1B1464;  /* Dark blue from logo */
+        --accent: #786D3C;
+        /* Gold accent from logo */
+        --primary-dark: #1B1464;
+        /* Dark blue from logo */
     }
-    
+
     /* Market data section styles */
     .market-data-section {
         padding: 60px 0;
         background-color: #f8f9fa;
     }
-    
+
     .section-header {
         display: flex;
         justify-content: space-between;
@@ -220,7 +232,7 @@
         margin-bottom: 30px;
         padding: 0 15px;
     }
-    
+
     .section-header h2 {
         color: var(--primary-dark);
         font-size: 2rem;
@@ -229,7 +241,7 @@
         padding-bottom: 10px;
         margin: 0;
     }
-    
+
     .section-header h2::after {
         content: '';
         position: absolute;
@@ -239,22 +251,30 @@
         height: 3px;
         background-color: var(--accent);
     }
-    
+
     .update-time {
         font-size: 0.9rem;
         color: #6c757d;
         font-style: italic;
     }
-    
+
     .time-updated {
         animation: highlight-time 2s ease;
     }
-    
+
     @keyframes highlight-time {
-        0%, 100% { color: #6c757d; }
-        50% { color: var(--accent); font-weight: bold; }
+
+        0%,
+        100% {
+            color: #6c757d;
+        }
+
+        50% {
+            color: var(--accent);
+            font-weight: bold;
+        }
     }
-    
+
     /* Forecast and trend styles */
     .forecast-cell {
         display: flex;
@@ -262,7 +282,7 @@
         align-items: center;
         gap: 5px;
     }
-    
+
     .forecast-trend {
         font-weight: 600;
         font-size: 0.85rem;
@@ -271,38 +291,38 @@
         background-color: rgba(108, 117, 125, 0.1);
         color: #6c757d;
     }
-    
+
     .forecast-trend.up {
         background-color: rgba(40, 167, 69, 0.1);
         color: #28a745;
     }
-    
+
     .forecast-trend.down {
         background-color: rgba(220, 53, 69, 0.1);
         color: #dc3545;
     }
-    
+
     /* Dark mode support */
     .dark-mode .market-data-section {
         background-color: #2d2d2d;
     }
-    
+
     .dark-mode .section-header h2 {
         color: #e0e0e0;
     }
-    
+
     .dark-mode .update-time {
         color: #a0a0a0;
     }
-    
+
     .dark-mode .forecast-trend {
         background-color: rgba(108, 117, 125, 0.2);
     }
-    
+
     .dark-mode .forecast-trend.up {
         background-color: rgba(40, 167, 69, 0.2);
     }
-    
+
     .dark-mode .forecast-trend.down {
         background-color: rgba(220, 53, 69, 0.2);
     }
@@ -330,19 +350,21 @@
             {% for product in market_data %}
             <div class="ticker-item">
                 <span class="product-name">{{ product.name }}</span>
-                <span class="price" data-usd-value="{{ product.value }}"><span class="currency-symbol">$</span><span class="price-value">{{ product.value }}</span></span>
+                <span class="price" data-usd-value="{{ product.value }}"><span class="currency-symbol">$</span><span
+                        class="price-value">{{ product.value }}</span></span>
                 <span class="trend-arrow {% if product.trend > 0 %}up{% elif product.trend < 0 %}down{% endif %}">
-                    {% if product.trend > 0 %}↑{% elif product.trend < 0 %}↓{% else %}→{% endif %} {{ product.trend|abs_value }}%
-                </span>
+                    {% if product.trend > 0 %}↑{% elif product.trend < 0 %}↓{% else %}→{% endif %} {{
+                        product.trend|abs_value }}% </span>
             </div>
             {% endfor %}
             {% for product in market_data %}
             <div class="ticker-item">
                 <span class="product-name">{{ product.name }}</span>
-                <span class="price" data-usd-value="{{ product.value }}"><span class="currency-symbol">$</span><span class="price-value">{{ product.value }}</span></span>
+                <span class="price" data-usd-value="{{ product.value }}"><span class="currency-symbol">$</span><span
+                        class="price-value">{{ product.value }}</span></span>
                 <span class="trend-arrow {% if product.trend > 0 %}up{% elif product.trend < 0 %}down{% endif %}">
-                    {% if product.trend > 0 %}↑{% elif product.trend < 0 %}↓{% else %}→{% endif %} {{ product.trend|abs_value }}%
-                </span>
+                    {% if product.trend > 0 %}↑{% elif product.trend < 0 %}↓{% else %}→{% endif %} {{
+                        product.trend|abs_value }}% </span>
             </div>
             {% endfor %}
         </div>
@@ -353,42 +375,46 @@
 <section class="market-data-section">
     <div class="section-header">
         <h2>Market Data</h2>
-        <span class="update-time">Last update: {% if market_data.first %}{{ market_data.first.last_update|date:"M d, H:i" }}{% else %}N/A{% endif %}</span>
+        <span class="update-time">Last update: {% if market_data.first %}{{ market_data.first.last_update|date:"M d,
+            H:i" }}{% else %}N/A{% endif %}</span>
         <div class="refresh-button">
             <button id="refreshMarketData" class="refresh-btn">
                 <i class="fas fa-sync"></i> Refresh
             </button>
         </div>
     </div>
-    
+
     <div class="currency-toggle-container">
         <div class="currency-toggle">
             <span>Currency:</span>
             <div class="currency-options">
                 {% for currency in currencies %}
-            <div class="currency-option {% if currency.code == 'USD' %}selected{% endif %}" data-currency="{{ currency.code }}" data-rate="{{ currency.rate }}">
-                {% if currency.code == 'USD' %}
+                <div class="currency-option {% if currency.code == 'USD' %}selected{% endif %}"
+                    data-currency="{{ currency.code }}" data-rate="{{ currency.rate }}">
+                    {% if currency.code == 'USD' %}
                     <img src="{% static 'images/flags/us.png' %}" alt="USD Flag" class="currency-flag">
-                {% elif currency.code == 'AED' %}
+                    {% elif currency.code == 'AED' %}
                     <img src="{% static 'images/flags/ae.png' %}" alt="AED Flag" class="currency-flag">
-                {% elif currency.code == 'SDG' %}
+                    {% elif currency.code == 'SDG' %}
                     <img src="{% static 'images/flags/sd.png' %}" alt="SDG Flag" class="currency-flag">
-                {% elif currency.code == 'INR' %}
+                    {% elif currency.code == 'INR' %}
                     <img src="{% static 'images/flags/inr.png' %}" alt="INR flag" class="currency-flag">
-                {% elif currency.code == 'CNY' %}
+                    {% elif currency.code == 'CNY' %}
                     <img src="{% static 'images/flags/cny.png' %}" alt="CNY flag" class="currency-flag">
-                {% elif currency.code == 'TRY' %}
+                    {% elif currency.code == 'TRY' %}
                     <img src="{% static 'images/flags/try.png' %}" alt="TRY flag" class="currency-flag">
-                {% else %}
-                    <div class="currency-flag" style="background-color: var(--primary-dark); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 10px;">{{ currency.code|slice:":2" }}</div>
-                {% endif %}
-                <span>{{ currency.code }}</span>
+                    {% else %}
+                    <div class="currency-flag"
+                        style="background-color: var(--primary-dark); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 10px;">
+                        {{ currency.code|slice:":2" }}</div>
+                    {% endif %}
+                    <span>{{ currency.code }}</span>
                 </div>
                 {% endfor %}
             </div>
         </div>
     </div>
-    
+
     <div class="market-table-container">
         <table class="market-table">
             <thead>
@@ -414,19 +440,24 @@
                         </div>
                     </td>
                     <td class="price-cell" data-usd-value="{{ product.port_sudan|default:'0' }}">
-                        <span class="currency-symbol">$</span><span class="price-value">{{ product.port_sudan|default:"N/A" }}</span>
+                        <span class="currency-symbol">$</span><span class="price-value">{{
+                            product.port_sudan|default:"N/A" }}</span>
                     </td>
                     <td class="price-cell" data-usd-value="{{ product.dmt_china|default:'0' }}">
-                        <span class="currency-symbol">$</span><span class="price-value">{{ product.dmt_china|default:"N/A" }}</span>
+                        <span class="currency-symbol">$</span><span class="price-value">{{
+                            product.dmt_china|default:"N/A" }}</span>
                     </td>
                     <td class="price-cell" data-usd-value="{{ product.dmt_uae|default:'0' }}">
-                        <span class="currency-symbol">$</span><span class="price-value">{{ product.dmt_uae|default:"N/A" }}</span>
+                        <span class="currency-symbol">$</span><span class="price-value">{{ product.dmt_uae|default:"N/A"
+                            }}</span>
                     </td>
                     <td class="price-cell" data-usd-value="{{ product.dmt_mersing|default:'0' }}">
-                        <span class="currency-symbol">$</span><span class="price-value">{{ product.dmt_mersing|default:"N/A" }}</span>
+                        <span class="currency-symbol">$</span><span class="price-value">{{
+                            product.dmt_mersing|default:"N/A" }}</span>
                     </td>
                     <td class="price-cell" data-usd-value="{{ product.dmt_india|default:'0' }}">
-                        <span class="currency-symbol">$</span><span class="price-value">{{ product.dmt_india|default:"N/A" }}</span>
+                        <span class="currency-symbol">$</span><span class="price-value">{{
+                            product.dmt_india|default:"N/A" }}</span>
                     </td>
                     <td>
                         <span class="status-badge {{ product.status|lower }}">
@@ -435,10 +466,11 @@
                     </td>
                     <td>
                         <div class="forecast-cell">
-                            <span class="forecast-trend {% if product.trend > 0 %}up{% elif product.trend < 0 %}down{% endif %}">
-                                {% if product.trend > 0 %}↑{% elif product.trend < 0 %}↓{% else %}→{% endif %} {{ product.trend|abs_value }}%
-                            </span>
-                            <span>{{ product.forecast }}</span>
+                            <span
+                                class="forecast-trend {% if product.trend > 0 %}up{% elif product.trend < 0 %}down{% endif %}">
+                                {% if product.trend > 0 %}↑{% elif product.trend < 0 %}↓{% else %}→{% endif %} {{
+                                    product.trend|abs_value }}% </span>
+                                    <span>{{ product.forecast }}</span>
                         </div>
                     </td>
                     <td class="action-column">
@@ -456,7 +488,8 @@
 <section class="currency-data-section">
     <div class="section-header">
         <h2>Currency Exchange Rates</h2>
-        <span class="update-time">Last update: {% if currencies.first %}{{ currencies.first.last_update|date:"M d, H:i" }}{% else %}N/A{% endif %}</span>
+        <span class="update-time">Last update: {% if currencies.first %}{{ currencies.first.last_update|date:"M d, H:i"
+            }}{% else %}N/A{% endif %}</span>
     </div>
     <div class="currency-cards-container">
         {% for currency in currencies %}
@@ -465,19 +498,21 @@
             <div class="currency-content">
                 <div class="currency-header">
                     {% if currency.code == 'USD' %}
-                        <img src="{% static 'images/flags/us.png' %}" alt="USD flag" class="currency-flag">
+                    <img src="{% static 'images/flags/us.png' %}" alt="USD flag" class="currency-flag">
                     {% elif currency.code == 'AED' %}
-                        <img src="{% static 'images/flags/ae.png' %}" alt="AED flag" class="currency-flag">
+                    <img src="{% static 'images/flags/ae.png' %}" alt="AED flag" class="currency-flag">
                     {% elif currency.code == 'SDG' %}
-                        <img src="{% static 'images/flags/sd.png' %}" alt="SDG flag" class="currency-flag">
+                    <img src="{% static 'images/flags/sd.png' %}" alt="SDG flag" class="currency-flag">
                     {% elif currency.code == 'INR' %}
-                        <img src="{% static 'images/flags/in.png' %}" alt="INR flag" class="currency-flag">
+                    <img src="{% static 'images/flags/in.png' %}" alt="INR flag" class="currency-flag">
                     {% elif currency.code == 'CNY' %}
-                        <img src="{% static 'images/flags/cn.png' %}" alt="CNY flag" class="currency-flag">
+                    <img src="{% static 'images/flags/cn.png' %}" alt="CNY flag" class="currency-flag">
                     {% elif currency.code == 'TRY' %}
-                        <img src="{% static 'images/flags/tr.png' %}" alt="TRY flag" class="currency-flag">
+                    <img src="{% static 'images/flags/tr.png' %}" alt="TRY flag" class="currency-flag">
                     {% else %}
-                        <div class="currency-flag" style="background-color: var(--primary-dark); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 10px;">{{ currency.code|slice:":2" }}</div>
+                    <div class="currency-flag"
+                        style="background-color: var(--primary-dark); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 10px;">
+                        {{ currency.code|slice:":2" }}</div>
                     {% endif %}
                     <span class="currency-code">{{ currency.code }}</span>
                 </div>
@@ -532,18 +567,18 @@
                 fingertips, you'll be equipped to optimize your trading
                 and uncover opportunities previously beyond reach.
             </p>
-            
+
             <div class="features-cards">
                 <div class="feature-card">
                     <p>Be apart of SudaStock and</p>
                     <h3><span class="highlight">Register</span> with us</h3>
                 </div>
-                
+
                 <div class="feature-card">
                     <p>Explore our trade <span class="highlight">data</span> and perform your own</p>
                     <h3><span class="highlight">Analysis</span></h3>
                 </div>
-                
+
                 <div class="feature-card">
                     <p>Formulate your</p>
                     <h3><span class="highlight">Strategies</span> and take action</h3>
@@ -560,7 +595,7 @@
             <h2 class="gradient-text">EXPERIENCE THE DIFFERENCE</h2>
             <h3>OUR TRUSTED PARTNERS</h3>
         </div>
-        
+
         <div class="partners-grid">
             <div class="partner-logo">
                 <img src="{% static 'images/partners/partner1.jpg' %}" alt="Shabour Sons Logistics">
@@ -584,11 +619,11 @@
 
 {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         // Video fallback handling
         const heroVideo = document.querySelector('.hero-video');
         const heroFallback = document.querySelector('.hero-fallback');
-        
+
         // Show fallback if video fails to load or browser doesn't support video
         function showFallback() {
             if (heroFallback) {
@@ -598,23 +633,23 @@
                 heroVideo.style.display = 'none';
             }
         }
-        
+
         // Add event listeners to handle video errors
         if (heroVideo) {
             heroVideo.addEventListener('error', showFallback);
-            
+
             // Also check if video data is available
             if (heroVideo.readyState === 0) {
-                heroVideo.addEventListener('loadeddata', function() {
+                heroVideo.addEventListener('loadeddata', function () {
                     // Video loaded successfully, keep it visible
                     heroVideo.style.display = 'block';
                     if (heroFallback) {
                         heroFallback.style.display = 'none';
                     }
                 });
-                
+
                 // Set a timeout in case video takes too long to load
-                setTimeout(function() {
+                setTimeout(function () {
                     if (heroVideo.readyState === 0) {
                         showFallback();
                     }
@@ -624,27 +659,27 @@
             // Video element not found, show fallback
             showFallback();
         }
-        
+
         // Ticker functionality
         const tickerTrack = document.querySelector('.ticker-track');
         const tickerItems = document.querySelectorAll('.ticker-item');
-        
+
         // Add click event to ticker items
         tickerItems.forEach(item => {
-            item.addEventListener('click', function() {
+            item.addEventListener('click', function () {
                 const productName = this.querySelector('.product-name').textContent;
                 console.log(`Clicked on ${productName}`);
                 // You can add more functionality here, like redirecting to product details
             });
         });
-        
+
         // Currency conversion functionality
         const currencyOptions = document.querySelectorAll('.currency-option');
         const priceCells = document.querySelectorAll('.price-cell');
         const tickerPrices = document.querySelectorAll('.ticker-item .price');
         const baseCurrencyElements = document.querySelectorAll('.base-currency');
         const currencySymbols = document.querySelectorAll('.currency-symbol');
-        
+
         // Currency symbols mapping
         const currencySymbolMap = {
             'USD': '$',
@@ -656,51 +691,51 @@
             'CNY': '¥',
             'TRY': '₺'
         };
-        
+
         // Default currency symbol
         let currentCurrencySymbol = '$';
-        
+
         currencyOptions.forEach(option => {
-            option.addEventListener('click', function() {
+            option.addEventListener('click', function () {
                 // Remove selected class from all options
                 currencyOptions.forEach(opt => opt.classList.remove('selected'));
-                
+
                 // Add selected class to clicked option
                 this.classList.add('selected');
-                
+
                 // Get currency code and rate
                 const currencyCode = this.getAttribute('data-currency');
                 const rate = parseFloat(this.getAttribute('data-rate'));
-                
+
                 // Set currency symbol based on currency code
                 currentCurrencySymbol = currencySymbolMap[currencyCode] || currencyCode;
-                
+
                 // Update base currency display
                 baseCurrencyElements.forEach(el => {
                     el.textContent = currencyCode;
                 });
-                
+
                 // Update all currency symbols
                 currencySymbols.forEach(symbol => {
                     symbol.textContent = currentCurrencySymbol;
                 });
-                
+
                 // Convert prices in table
                 priceCells.forEach(cell => {
                     const usdValue = parseFloat(cell.getAttribute('data-usd-value'));
                     const priceValueElement = cell.querySelector('.price-value');
-                    
+
                     if (!isNaN(usdValue) && usdValue > 0) {
                         const convertedValue = (usdValue * rate).toFixed(2);
                         priceValueElement.textContent = convertedValue;
                     }
                 });
-                
+
                 // Convert prices in ticker
                 tickerPrices.forEach(price => {
                     const usdValue = parseFloat(price.getAttribute('data-usd-value'));
                     const priceValueElement = price.querySelector('.price-value');
-                    
+
                     if (!isNaN(usdValue) && usdValue > 0) {
                         const convertedValue = (usdValue * rate).toFixed(2);
                         priceValueElement.textContent = convertedValue;
@@ -708,30 +743,30 @@
                 });
             });
         });
-        
+
         // Scrolling Cards functionality
         const scrollingCardsTrack = document.querySelector('.scrolling-cards-track');
         const scrollingCards = document.querySelectorAll('.scrolling-card');
-        
+
         // Add click event to scrolling cards
         scrollingCards.forEach(card => {
-            card.addEventListener('click', function() {
+            card.addEventListener('click', function () {
                 const cardTitle = this.querySelector('.scrolling-card-title').textContent;
                 console.log(`Clicked on card: ${cardTitle}`);
                 // You can add more functionality here
             });
         });
-        
+
         // Gallery Slider functionality
         const gallerySlides = document.getElementById('gallerySlides');
         const galleryNav = document.getElementById('galleryNav');
         const galleryPrev = document.getElementById('galleryPrev');
         const galleryNext = document.getElementById('galleryNext');
         const slides = document.querySelectorAll('.gallery-slide');
-        
+
         let currentSlide = 0;
         let slideInterval;
-        
+
         // Create navigation dots
         slides.forEach((_, index) => {
             const dot = document.createElement('div');
@@ -743,50 +778,50 @@
             });
             galleryNav.appendChild(dot);
         });
-        
+
         // Function to go to a specific slide
         function goToSlide(index) {
             currentSlide = index;
             gallerySlides.style.transform = `translateX(-${currentSlide * 100}%)`;
-            
+
             // Update active dot
             document.querySelectorAll('.gallery-nav-dot').forEach((dot, i) => {
                 dot.classList.toggle('active', i === currentSlide);
             });
         }
-        
+
         // Function to go to the next slide
         function nextSlide() {
             currentSlide = (currentSlide + 1) % slides.length;
             goToSlide(currentSlide);
         }
-        
+
         // Function to go to the previous slide
         function prevSlide() {
             currentSlide = (currentSlide - 1 + slides.length) % slides.length;
             goToSlide(currentSlide);
         }
-        
+
         // Function to reset the interval
         function resetInterval() {
             clearInterval(slideInterval);
             slideInterval = setInterval(nextSlide, 5000);
         }
-        
+
         // Add event listeners to navigation arrows
         galleryNext.addEventListener('click', () => {
             nextSlide();
             resetInterval();
         });
-        
+
         galleryPrev.addEventListener('click', () => {
             prevSlide();
             resetInterval();
         });
-        
+
         // Start the automatic slideshow
         resetInterval();
-        
+
     });
 </script>
 <script src="{% static 'js/home.js' %}"></script>
