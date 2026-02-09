@@ -212,6 +212,29 @@ async function main() {
     }
   }
 
+  // Create Ports
+  const portNames = ['Port Sudan', 'Jebel Ali', 'Shanghai', 'Rotterdam', 'Istanbul', 'Cairo'];
+  for (const name of portNames) {
+    await prisma.port.create({
+      data: { name, location: `Location for ${name}`, isActive: true }
+    });
+    console.log(`Created Port: ${name}`);
+  }
+
+  // Create ProductVariations
+  const variations = [
+    { name: 'Grade 1', description: 'Premium quality' },
+    { name: 'Grade 2', description: 'Standard quality' },
+    { name: 'Organic', description: 'Certified organic' },
+    { name: 'Raw', description: 'Raw / Unprocessed' }
+  ];
+  for (const v of variations) {
+    await prisma.productVariation.create({
+      data: { name: v.name, description: v.description, isActive: true }
+    });
+    console.log(`Created Variation: ${v.name}`);
+  }
+
   console.log('Seeding finished.');
 }
 

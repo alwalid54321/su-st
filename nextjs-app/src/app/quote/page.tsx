@@ -29,20 +29,31 @@ const QuoteContent = () => {
     const [success, setSuccess] = useState(false)
     const [trackingNumber, setTrackingNumber] = useState('')
     const [products, setProducts] = useState<any[]>([])
+    const [variations, setVariations] = useState<any[]>([])
+    const [ports, setPorts] = useState<any[]>([])
+    const [currencies, setCurrencies] = useState<any[]>([])
+    const [isMounted, setIsMounted] = useState(false)
 
     useEffect(() => {
-        const fetchProducts = async () => {
+        setIsMounted(true)
+        const fetchData = async () => {
             try {
-                const res = await fetch('/api/market-data')
-                if (res.ok) {
-                    const data = await res.json()
-                    setProducts(data)
-                }
+                const [prodRes, varRes, portRes, currRes] = await Promise.all([
+                    fetch('/api/market-data'),
+                    fetch('/api/variations'),
+                    fetch('/api/ports'),
+                    fetch('/api/currencies')
+                ])
+
+                if (prodRes.ok) setProducts(await prodRes.json())
+                if (varRes.ok) setVariations(await varRes.json())
+                if (portRes.ok) setPorts(await portRes.json())
+                if (currRes.ok) setCurrencies(await currRes.json())
             } catch (err) {
-                console.error('Failed to fetch products:', err)
+                console.error('Failed to fetch form options:', err)
             }
         }
-        fetchProducts()
+        fetchData()
 
         if (productParam) {
             setFormData(prev => ({ ...prev, product: productParam }))
@@ -228,10 +239,9 @@ const QuoteContent = () => {
                                         onChange={handleChange}
                                     >
                                         <option value="">Product Variation</option>
-                                        <option value="Grade 1">Grade 1 (Premium)</option>
-                                        <option value="Grade 2">Grade 2</option>
-                                        <option value="Organic">Certified Organic</option>
-                                        <option value="Raw">Raw / Unprocessed</option>
+                                        {variations.map((v) => (
+                                            <option key={v.id} value={v.name}>{v.name}</option>
+                                        ))}
                                     </select>
                                 </div>
 
@@ -256,12 +266,9 @@ const QuoteContent = () => {
                                         onChange={handleChange}
                                     >
                                         <option value="">Choose the Port</option>
-                                        <option value="Port Sudan">Port Sudan</option>
-                                        <option value="Jebel Ali">Jebel Ali (UAE)</option>
-                                        <option value="Shanghai">Port of Shanghai</option>
-                                        <option value="Rotterdam">Port of Rotterdam</option>
-                                        <option value="Istanbul">Port of Istanbul</option>
-                                        <option value="Cairo">Port of Cairo</option>
+                                        {ports.map((p) => (
+                                            <option key={p.id} value={p.name}>{p.name}</option>
+                                        ))}
                                     </select>
                                 </div>
 
@@ -286,10 +293,9 @@ const QuoteContent = () => {
                                         onChange={handleChange}
                                     >
                                         <option value="">Choose currency</option>
-                                        <option value="USD">USD ($)</option>
-                                        <option value="EUR">EUR (€)</option>
-                                        <option value="AED">AED (Dh)</option>
-                                        <option value="CNY">CNY (¥)</option>
+                                        {currencies.map((c) => (
+                                            <option key={c.id} value={c.code}>{c.name} ({c.code})</option>
+                                        ))}
                                     </select>
                                 </div>
 

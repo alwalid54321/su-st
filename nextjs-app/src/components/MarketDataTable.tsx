@@ -29,7 +29,10 @@ export default function MarketDataTable() {
     const [exchangeRate, setExchangeRate] = useState<number>(1)
     const [loading, setLoading] = useState(true)
 
+    const [isMounted, setIsMounted] = useState(false)
+
     useEffect(() => {
+        setIsMounted(true)
         async function fetchData() {
             try {
                 const [marketRes, currencyRes] = await Promise.all([
@@ -82,7 +85,7 @@ export default function MarketDataTable() {
                 <div className="section-header">
                     <h2>Market Data</h2>
                     <span className="update-time">
-                        Last update: {marketData[0] ? new Date(marketData[0].lastUpdate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A'}
+                        Last update: {isMounted && marketData[0] ? new Date(marketData[0].lastUpdate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A'}
                     </span>
                     <div className="refresh-button">
                         <button onClick={() => window.location.reload()} className="refresh-btn">

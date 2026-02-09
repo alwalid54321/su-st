@@ -24,20 +24,25 @@ const SampleContent = () => {
     const [success, setSuccess] = useState(false)
     const [trackingNumber, setTrackingNumber] = useState('')
     const [products, setProducts] = useState<any[]>([])
+    const [variations, setVariations] = useState<any[]>([])
+    const [isMounted, setIsMounted] = useState(false)
 
     useEffect(() => {
-        const fetchProducts = async () => {
+        setIsMounted(true)
+        const fetchData = async () => {
             try {
-                const res = await fetch('/api/market-data')
-                if (res.ok) {
-                    const data = await res.json()
-                    setProducts(data)
-                }
+                const [prodRes, varRes] = await Promise.all([
+                    fetch('/api/market-data'),
+                    fetch('/api/variations')
+                ])
+
+                if (prodRes.ok) setProducts(await prodRes.json())
+                if (varRes.ok) setVariations(await varRes.json())
             } catch (err) {
-                console.error('Failed to fetch products:', err)
+                console.error('Failed to fetch form options:', err)
             }
         }
-        fetchProducts()
+        fetchData()
 
         if (productParam) {
             setFormData(prev => ({ ...prev, product: productParam }))
@@ -212,10 +217,9 @@ const SampleContent = () => {
                                 onChange={handleChange}
                             >
                                 <option value="">Product Variation</option>
-                                <option value="Grade 1">Grade 1 (Premium)</option>
-                                <option value="Grade 2">Grade 2</option>
-                                <option value="Organic">Certified Organic</option>
-                                <option value="Raw">Raw / Unprocessed</option>
+                                {variations.map((v) => (
+                                    <option key={v.id} value={v.name}>{v.name}</option>
+                                ))}
                             </select>
                         </div>
                         <div className="form-group" style={{ animationDelay: '0.8s' }}>

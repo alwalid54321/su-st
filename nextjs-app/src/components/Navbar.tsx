@@ -111,6 +111,8 @@ export default function Navbar() {
         { name: 'Overview', href: '', desc: 'Dashboard Home', icon: <DashboardIcon fontSize="small" /> },
         { name: 'Market Data', href: '/market-data', desc: 'Manage Market Rates', icon: <ShowChartIcon fontSize="small" /> },
         { name: 'Currencies', href: '/currencies', desc: 'Manage Currencies', icon: <AttachMoneyIcon fontSize="small" /> },
+        { name: 'Product Variat.', href: '/variations', desc: 'Manage Quality Grades', icon: <SettingsIcon fontSize="small" /> },
+        { name: 'Shipping Ports', href: '/ports', desc: 'Manage Ports', icon: <DashboardIcon fontSize="small" /> },
         { name: 'Gallery', href: '/gallery', desc: 'Manage Images', icon: <CollectionsIcon fontSize="small" /> },
         { name: 'Announcements', href: '/announcements', desc: 'Manage News', icon: <CampaignIcon fontSize="small" /> },
         { name: 'Users', href: '/users', desc: 'Manage Users', icon: <PeopleIcon fontSize="small" /> },

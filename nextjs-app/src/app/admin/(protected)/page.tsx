@@ -31,16 +31,16 @@ export default function AdminDashboard() {
     // Mock Data for Admin Dashboard
     const stats = [
         { label: 'Total Products', value: '9', icon: 'fa-box-open', color: 'Blue' },
-        { label: 'Active Currencies', value: '6', icon: 'fa-money-bill-wave', color: 'Green' },
-        { label: 'Gallery Images', value: '12', icon: 'fa-images', color: 'Purple' },
-        { label: 'Registered Users', value: '145', icon: 'fa-users', color: 'Yellow' },
+        { label: 'Variations', value: '4', icon: 'fa-tags', color: 'Purple' },
+        { label: 'Ports', value: '6', icon: 'fa-anchor', color: 'Green' },
+        { label: 'Active Currencies', value: '6', icon: 'fa-money-bill-wave', color: 'Yellow' },
     ]
 
     const recentActivity = [
         { action: 'Updated Price', item: 'Sesame Gadadref', user: 'Admin', time: '2 mins ago', icon: 'fa-edit', color: 'Blue' },
-        { action: 'New User', item: 'John Doe', user: 'System', time: '15 mins ago', icon: 'fa-user-plus', color: 'Green' },
-        { action: 'Currency Rate', item: 'USD/SDG', user: 'Admin', time: '1 hour ago', icon: 'fa-exchange-alt', color: 'Yellow' },
-        { action: 'Image Upload', item: 'harvest_2023.jpg', user: 'Editor', time: '3 hours ago', icon: 'fa-upload', color: 'Purple' },
+        { action: 'Added Port', item: 'Port Sudan', user: 'Admin', time: '15 mins ago', icon: 'fa-plus', color: 'Green' },
+        { action: 'New Variation', item: 'Organic', user: 'Admin', time: '1 hour ago', icon: 'fa-tag', color: 'Purple' },
+        { action: 'Currency Rate', item: 'USD/SDG', user: 'Admin', time: '3 hours ago', icon: 'fa-exchange-alt', color: 'Yellow' },
     ]
 
     // Consolidated Data from old Dashboard
@@ -83,11 +83,11 @@ export default function AdminDashboard() {
                     <p className={styles.headerSubtitle}>Overview of system activity and performance</p>
                 </div>
                 <div className={styles.headerActions}>
-                    <Link href="/admin/market-data/new" className={styles.primaryButton}>
-                        <i className="fas fa-plus"></i> Add Product
+                    <Link href="/admin/variations" className={styles.primaryButton} style={{ marginRight: '10px' }}>
+                        <i className="fas fa-tags"></i> Variations
                     </Link>
-                    <Link href="/admin/currencies" className={styles.secondaryButton}>
-                        <i className="fas fa-sync-alt"></i> Update Rates
+                    <Link href="/admin/ports" className={styles.primaryButton}>
+                        <i className="fas fa-anchor"></i> Ports
                     </Link>
                 </div>
             </header>
