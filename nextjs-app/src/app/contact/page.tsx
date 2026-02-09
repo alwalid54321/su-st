@@ -205,8 +205,8 @@ export default function ContactPage() {
                     }}>
                         {/* Contact Info Section */}
                         <Box sx={{
-                            flex: { xs: '1 1 100%', md: '0 0 40%' },
-                            maxWidth: { xs: '100%', md: '40%' }
+                            flex: { xs: '1 1 100%', md: '0 0 33%' },
+                            maxWidth: { xs: '100%', md: '33%' }
                         }}>
                             <Box
                                 sx={{
@@ -371,8 +371,8 @@ export default function ContactPage() {
 
                         {/* Contact Form Section */}
                         <Box sx={{
-                            flex: { xs: '1 1 100%', md: '0 0 58%' },
-                            maxWidth: { xs: '100%', md: '58%' } // 58% + 40% = 98% -> gap handles rest
+                            flex: { xs: '1 1 100%', md: '0 0 65%' },
+                            maxWidth: { xs: '100%', md: '65%' } // 65% + 33% = 98% -> gap handles rest
                         }}>
                             <Box
                                 sx={{
