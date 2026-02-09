@@ -36,6 +36,8 @@ import CollectionsIcon from '@mui/icons-material/Collections';
 import PeopleIcon from '@mui/icons-material/People';
 import SettingsIcon from '@mui/icons-material/Settings';
 import CampaignIcon from '@mui/icons-material/Campaign';
+import SearchIcon from '@mui/icons-material/Search';
+import LanguageIcon from '@mui/icons-material/Language';
 
 const goldColor = '#786D3C';
 const textColor = '#1B1464';
@@ -53,11 +55,26 @@ export default function Navbar() {
 
     const pathname = usePathname();
 
-    // Scroll trigger for transparency
+    const [scrollProgress, setScrollProgress] = useState(0);
+    const [searchOpen, setSearchOpen] = useState(false);
+    const [language, setLanguage] = useState('EN');
+
+    // Scroll trigger for transparency and shrinking
     const scrolled = useScrollTrigger({
         disableHysteresis: true,
-        threshold: 20,
+        threshold: 50,
     });
+
+    // Handle scroll progress
+    useEffect(() => {
+        const handleScroll = () => {
+            const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
+            const currentProgress = (window.pageYOffset / totalScroll) * 100;
+            setScrollProgress(currentProgress);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     const isProductsMenuOpen = Boolean(productsAnchorEl);
     const isDashboardMenuOpen = Boolean(dashboardAnchorEl);
@@ -121,8 +138,10 @@ export default function Navbar() {
 
     // Determine if navbar should be transparent
     const isTransparent = !scrolled && pathname === '/';
-    const navBgColor = isTransparent ? 'rgba(0, 0, 0, 0.10)' : '#fff';
-    const navShadow = isTransparent ? 'none' : '0 2px 10px rgba(0,0,0,0.05)';
+    const navBgColor = isTransparent ? 'rgba(0, 0, 0, 0.10)' : 'rgba(255, 255, 255, 0.95)';
+    const navShadow = scrolled ? '0 4px 20px rgba(0,0,0,0.1)' : 'none';
+    const navHeight = scrolled ? '70px' : '100px';
+    const logoScale = scrolled ? 0.85 : 1;
 
     const drawer = (
         <Box sx={{ textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -244,21 +263,54 @@ export default function Navbar() {
 
     return (
         <>
+            <Box
+                sx={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: `${scrollProgress}%`,
+                    height: '3px',
+                    bgcolor: goldColor,
+                    zIndex: 2000,
+                    transition: 'width 0.1s ease',
+                    display: scrollProgress > 0 ? 'block' : 'none'
+                }}
+            />
             <AppBar
                 position="fixed"
                 sx={{
                     bgcolor: navBgColor,
                     color: textColor,
                     boxShadow: navShadow,
-                    transition: 'all 0.3s ease',
-                    backdropFilter: isTransparent ? 'blur(10px)' : 'none'
+                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                    backdropFilter: 'blur(12px)',
+                    borderBottom: scrolled ? `1px solid rgba(0,0,0,0.05)` : 'none',
+                    height: navHeight,
+                    display: 'flex',
+                    justifyContent: 'center'
                 }}
             >
                 <Container maxWidth="xl">
-                    <Toolbar disableGutters sx={{ display: 'grid', gridTemplateColumns: 'auto 1fr auto', gap: 2 }}>
+                    <Toolbar
+                        disableGutters
+                        sx={{
+                            display: 'grid',
+                            gridTemplateColumns: 'auto 1fr auto',
+                            gap: 2,
+                            minHeight: { xs: '60px', md: navHeight },
+                            transition: 'min-height 0.4s ease'
+                        }}
+                    >
 
                         {/* 1. Logo (Left) */}
-                        <Box sx={{ display: 'flex', alignItems: 'center', gridColumn: '1' }}>
+                        <Box sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gridColumn: '1',
+                            transform: `scale(${logoScale})`,
+                            transition: 'transform 0.4s ease',
+                            transformOrigin: 'left center'
+                        }}>
                             <Link href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
                                 <Image
                                     src="/logo.png"
@@ -330,8 +382,61 @@ export default function Navbar() {
                             </Button>
                         </Box>
 
-                        {/* 3. Auth/Profile (Right) */}
+                        {/* 3. Auth/Profile/Search (Right) */}
                         <Box sx={{ display: { xs: 'none', lg: 'flex' }, alignItems: 'center', justifyContent: 'flex-end', gap: 2, gridColumn: '3' }}>
+
+                            {/* Search Feature */}
+                            <Box sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                bgcolor: searchOpen ? 'rgba(0,0,0,0.05)' : 'transparent',
+                                borderRadius: '20px',
+                                px: searchOpen ? 1.5 : 0,
+                                transition: 'all 0.3s ease',
+                                border: searchOpen ? `1px solid ${goldColor}` : '1px solid transparent'
+                            }}>
+                                {searchOpen && (
+                                    <input
+                                        type="text"
+                                        placeholder="Search products..."
+                                        autoFocus
+                                        style={{
+                                            background: 'transparent',
+                                            border: 'none',
+                                            outline: 'none',
+                                            padding: '8px',
+                                            color: textColor,
+                                            width: '150px'
+                                        }}
+                                    />
+                                )}
+                                <IconButton
+                                    size="small"
+                                    onClick={() => setSearchOpen(!searchOpen)}
+                                    sx={{ color: isTransparent ? '#fff' : textColor }}
+                                >
+                                    {searchOpen ? <CloseIcon fontSize="small" /> : <SearchIcon />}
+                                </IconButton>
+                            </Box>
+
+                            {/* Language Switcher */}
+                            <Button
+                                size="small"
+                                startIcon={<LanguageIcon fontSize="small" />}
+                                onClick={() => setLanguage(language === 'EN' ? 'AR' : 'EN')}
+                                sx={{
+                                    color: isTransparent ? '#fff' : textColor,
+                                    fontWeight: 700,
+                                    fontSize: '0.8rem',
+                                    minWidth: 'unset',
+                                    '&:hover': { bgcolor: 'rgba(120, 109, 60, 0.1)' }
+                                }}
+                            >
+                                {language}
+                            </Button>
+
+                            <Divider orientation="vertical" flexItem sx={{ mx: 1, borderColor: isTransparent ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)' }} />
+
                             {isAdmin ? (
                                 <Button
                                     id="dashboard-button"
@@ -402,11 +507,13 @@ export default function Navbar() {
                                         sx={{
                                             color: isTransparent ? '#fff' : textColor,
                                             borderColor: isTransparent ? '#fff' : textColor,
-                                            fontWeight: 600,
+                                            fontWeight: 700,
+                                            borderRadius: '25px',
+                                            px: 3,
                                             '&:hover': {
+                                                bgcolor: 'rgba(255,255,255,0.1)',
                                                 borderColor: goldColor,
-                                                color: goldColor,
-                                                bgcolor: isTransparent ? 'rgba(255,255,255,0.1)' : 'transparent'
+                                                color: goldColor
                                             }
                                         }}
                                     >
@@ -421,8 +528,10 @@ export default function Navbar() {
                                             bgcolor: goldColor,
                                             color: '#fff',
                                             fontWeight: 700,
+                                            borderRadius: '25px',
+                                            px: 3,
                                             '&:hover': { bgcolor: '#5a512d' },
-                                            boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+                                            boxShadow: '0 4px 15px rgba(120, 109, 60, 0.3)'
                                         }}
                                     >
                                         Register
