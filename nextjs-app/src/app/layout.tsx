@@ -1,9 +1,9 @@
 import ThemeRegistry from '@/components/ThemeRegistry'
-import Footer from '@/components/Footer'
 import Providers from '@/components/Providers'
 import ConditionalNavbar from '@/components/ConditionalNavbar'
 import ConditionalWrapper from '@/components/ConditionalWrapper'
-import ErrorBoundary from '@/components/ErrorBoundary' // Import ErrorBoundary
+import ErrorBoundary from '@/components/ErrorBoundary'
+import StyledJsxRegistry from '@/lib/styled-jsx-registry'
 import './globals.css'
 
 export const metadata = {
@@ -40,23 +40,25 @@ export default function RootLayout({
                 "contactType": "Customer Service"
               },
               "sameAs": [
-                "#" // Replace with actual social media links
+                "#"
               ]
             })
           }}
         />
       </head>
       <body className="font-sans" suppressHydrationWarning>
-        <ThemeRegistry>
-          <Providers>
-            <ConditionalNavbar />
-            <ConditionalWrapper>
-              <ErrorBoundary>
-                {children}
-              </ErrorBoundary>
-            </ConditionalWrapper>
-          </Providers>
-        </ThemeRegistry>
+        <StyledJsxRegistry>
+          <ThemeRegistry>
+            <Providers>
+              <ConditionalNavbar />
+              <ConditionalWrapper>
+                <ErrorBoundary>
+                  {children}
+                </ErrorBoundary>
+              </ConditionalWrapper>
+            </Providers>
+          </ThemeRegistry>
+        </StyledJsxRegistry>
       </body>
     </html>
   )

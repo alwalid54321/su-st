@@ -267,6 +267,7 @@ export default function Navbar() {
                                     height={60}
                                     style={{ objectFit: 'contain' }}
                                     priority
+                                    unoptimized
                                 />
                             </Link>
                         </Box>
