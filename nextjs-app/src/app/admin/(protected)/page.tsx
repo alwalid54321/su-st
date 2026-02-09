@@ -58,12 +58,44 @@ const navyColor = '#1B1464';
 
 export default function AdminDashboard() {
     const theme = useTheme();
+    const [loading, setLoading] = React.useState(true);
+    const [statsData, setStatsData] = React.useState({
+        totalProducts: 0,
+        totalVariations: 0,
+        totalPorts: 0,
+        totalCurrencies: 0,
+    });
+    const [activities, setActivities] = React.useState<any[]>([]);
+
+    React.useEffect(() => {
+        const fetchDashboardData = async () => {
+            try {
+                // Fetch Stats
+                const statsRes = await fetch('/api/admin/stats');
+                if (statsRes.ok) {
+                    const data = await statsRes.json();
+                    setStatsData(data);
+                }
+
+                setActivities([
+                    { title: 'System Online', time: 'Just now', desc: 'Secure Admin Portal Initialized', icon: <ProductIcon />, type: 'success' },
+                    { title: 'Database Connected', time: '1 min ago', desc: 'Active records synchronized', icon: <ActionIcon />, type: 'info' },
+                ]);
+            } catch (error) {
+                console.error('Failed to fetch dashboard data:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchDashboardData();
+    }, []);
 
     const stats = [
-        { label: 'Total Products', value: '124', change: '+12%', icon: <ProductIcon />, color: '#3b82f6' },
-        { label: 'Variations', value: '45', change: '+5%', icon: <VariationIcon />, color: '#8b5cf6' },
-        { label: 'Ports', value: '8', change: 'Stable', icon: <PortIcon />, color: '#10b981' },
-        { label: 'Currencies', value: '12', change: '+2', icon: <CurrencyIcon />, color: goldColor },
+        { label: 'Total Products', value: statsData.totalProducts.toString(), change: '+0%', icon: <ProductIcon />, color: '#3b82f6' },
+        { label: 'Variations', value: statsData.totalVariations.toString(), change: '+0%', icon: <VariationIcon />, color: '#8b5cf6' },
+        { label: 'Ports', value: statsData.totalPorts.toString(), change: 'Stable', icon: <PortIcon />, color: '#10b981' },
+        { label: 'Currencies', value: statsData.totalCurrencies.toString(), change: '+0%', icon: <CurrencyIcon />, color: goldColor },
     ];
 
     const chartData = {
@@ -99,12 +131,6 @@ export default function AdminDashboard() {
             x: { grid: { display: false }, ticks: { font: { size: 10 } } },
         },
     };
-
-    const activities = [
-        { title: 'New Product Added', time: '2 mins ago', desc: 'Sesame Grade A - Gadarif', icon: <ProductIcon />, type: 'success' },
-        { title: 'Price Change', time: '15 mins ago', desc: 'Cotton Short Staple ↓ 2.4%', icon: <CurrencyIcon />, type: 'warning' },
-        { title: 'Port Status Update', time: '1 hr ago', desc: 'Port Sudan: Operational', icon: <PortIcon />, type: 'info' },
-    ];
 
     return (
         <Box sx={{ flexGrow: 1 }}>
