@@ -49,17 +49,7 @@ export default function Home() {
           {/* <source src="/videos/bg_vid.mp4" type="video/mp4" /> */}
           {/* Fallback handled by CSS if video fails or poster is shown */}
         </video>
-        <div className="hero-fallback"></div>
-        <div className="hero-overlay"></div>
         <div className="hero-content">
-          <h1 className="hero-main-title">
-            Sudan&#39;s Premier <br />
-            <span style={{ color: 'var(--accent)' }}>Agricultural Commodities</span> Platform
-          </h1>
-          <p className="hero-subtitle">
-            Connecting local producers with global markets through transparent data,
-            reliable logistics, and real-time market insights.
-          </p>
           <div className="hero-actions">
             <Link href="/register" className="hero-btn hero-btn-primary">
               Get Started

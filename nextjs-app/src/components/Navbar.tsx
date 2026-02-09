@@ -121,7 +121,7 @@ export default function Navbar() {
 
     // Determine if navbar should be transparent
     const isTransparent = !scrolled && pathname === '/';
-    const navBgColor = isTransparent ? 'transparent' : '#fff';
+    const navBgColor = isTransparent ? 'rgba(255, 255, 255, 0.08)' : '#fff';
     const navShadow = isTransparent ? 'none' : '0 2px 10px rgba(0,0,0,0.05)';
 
     const drawer = (
