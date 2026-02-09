@@ -70,7 +70,12 @@ export default function Home() {
           <div className="ticker-track">
             {/* Multi-duplicate data for smoother infinite scroll on wide screens */}
             {[...tickerData, ...tickerData, ...tickerData].map((item, index) => (
-              <div key={`${item.id}-${index}`} className="ticker-item">
+              <Link
+                key={`${item.id}-${index}`}
+                href={`/market-data?product=${item.id}`}
+                className="ticker-item"
+                style={{ textDecoration: 'none' }}
+              >
                 <span className="product-name">{item.name}</span>
                 <span className="price">
                   <span className="currency-symbol">$</span>
@@ -82,7 +87,7 @@ export default function Home() {
                     {item.trend > 0 ? '↗' : item.trend < 0 ? '↘' : '→'}
                   </span>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -97,8 +102,6 @@ export default function Home() {
       {/* Gallery Slider Section */}
       <GallerySlider />
 
-      {/* Announcements/News Section */}
-      <AnnouncementsSection />
 
       {/* Call to Action Section */}
       <section className="cta-section">
