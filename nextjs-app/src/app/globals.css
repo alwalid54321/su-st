@@ -326,40 +326,132 @@ h6 {
 
 /* --- Price Ticker --- */
 .price-ticker-wrapper {
-  background: white;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  padding: 10px 0;
+  background: var(--primary-dark);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  position: relative;
+  z-index: 10;
+}
+
+.ticker-label {
+  background: var(--accent);
+  color: white;
+  padding: 12px 20px;
+  font-weight: 800;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.2);
+  z-index: 2;
+  white-space: nowrap;
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  background: #fff;
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.5);
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.price-ticker {
+  flex: 1;
   overflow: hidden;
+  padding: 12px 0;
 }
 
 .ticker-track {
   display: flex;
-  gap: 40px;
-  animation: tickerScroll 20s linear infinite;
-  /* Faster scroll */
+  gap: 60px;
+  animation: tickerScroll 40s linear infinite;
   width: max-content;
 }
 
 .price-ticker-wrapper:hover .ticker-track {
   animation-play-state: paused;
-  /* Interactive on cursor */
 }
 
 .ticker-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 0.9rem;
-  color: var(--primary-dark);
-  font-weight: 600;
+  gap: 15px;
+  padding: 4px 0;
 }
 
-.trend-arrow.up {
-  color: var(--success);
+.product-name {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.trend-arrow.down {
-  color: var(--danger);
+.price {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.currency-symbol {
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.price-value {
+  color: #fff;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  /* If available, fallback to sans */
+}
+
+.trend-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 800;
+  font-size: 0.8rem;
+}
+
+.trend-tag.up {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.trend-tag.down {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.trend-tag.neutral {
+  background: rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+}
+
+.trend-icon {
+  font-size: 1rem;
 }
 
 @keyframes tickerScroll {
@@ -368,8 +460,10 @@ h6 {
   }
 
   100% {
-    transform: translateX(-50%);
+    transform: translateX(-33.33%);
   }
+
+  /* Adjusted for 3x duplication */
 }
 
 /* --- Market Data Section (Strict Match) --- */

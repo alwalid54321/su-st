@@ -63,19 +63,25 @@ export default function Home() {
 
       {/* Price Ticker Section */}
       <div className="price-ticker-wrapper">
+        <div className="ticker-label">
+          LIVE MARKET <span className="pulse-dot"></span>
+        </div>
         <div className="price-ticker">
           <div className="ticker-track">
-            {/* Duplicate data for infinite scroll effect */}
-            {[...tickerData, ...tickerData].map((item, index) => (
+            {/* Multi-duplicate data for smoother infinite scroll on wide screens */}
+            {[...tickerData, ...tickerData, ...tickerData].map((item, index) => (
               <div key={`${item.id}-${index}`} className="ticker-item">
                 <span className="product-name">{item.name}</span>
                 <span className="price">
                   <span className="currency-symbol">$</span>
                   <span className="price-value">{Number(item.value).toFixed(2)}</span>
                 </span>
-                <span className={`trend-arrow ${item.trend > 0 ? 'up' : item.trend < 0 ? 'down' : ''}`}>
-                  {item.trend > 0 ? '↑' : item.trend < 0 ? '↓' : '→'} {Math.abs(item.trend)}%
-                </span>
+                <div className={`trend-tag ${item.trend > 0 ? 'up' : item.trend < 0 ? 'down' : 'neutral'}`}>
+                  {item.trend > 0 ? '+' : ''}{item.trend}%
+                  <span className="trend-icon">
+                    {item.trend > 0 ? '↗' : item.trend < 0 ? '↘' : '→'}
+                  </span>
+                </div>
               </div>
             ))}
           </div>
