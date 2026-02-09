@@ -2441,37 +2441,37 @@ h6 {
 .currency-toggle-container {
   background-color: #1B1464;
   /* Primary Dark */
-  padding: 20px;
-  border-radius: 12px;
-  margin-bottom: 30px;
+  padding: 12px 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   text-align: center;
 }
 
 .currency-disclaimer {
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.5);
   font-style: italic;
-  font-size: 0.9rem;
-  margin-bottom: 15px;
+  font-size: 0.75rem;
+  margin-bottom: 10px;
 }
 
 .currency-toggle {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 15px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
 .currency-label {
   color: white;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 0.9rem;
 }
 
 .currency-options {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
   justify-content: center;
 }
@@ -2479,36 +2479,48 @@ h6 {
 .currency-option {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
+  gap: 6px;
+  padding: 5px 10px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
+  border-radius: 4px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   font-weight: 600;
   color: white;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }
 
 .currency-option:hover {
   background: rgba(255, 255, 255, 0.1);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 .currency-option.selected {
-  background: #4834d4;
-  /* Brighter Blue/Purple */
-  border-color: #4834d4;
+  background: var(--accent);
+  border-color: var(--accent);
   color: white;
-  box-shadow: 0 4px 12px rgba(72, 52, 212, 0.3);
+  box-shadow: 0 4px 10px rgba(120, 109, 60, 0.2);
 }
 
 .currency-option img {
-  width: 20px;
-  height: 14px;
+  width: 18px;
+  height: 12px;
   object-fit: cover;
-  border-radius: 2px;
+  border-radius: 1px;
+}
+
+.currency-flag-initials {
+  width: 18px;
+  height: 12px;
+  background-color: var(--primary-dark);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 8px;
+  border-radius: 1px;
 }
 
 /* ===============================================

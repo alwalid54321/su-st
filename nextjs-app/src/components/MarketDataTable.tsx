@@ -115,25 +115,25 @@ export default function MarketDataTable() {
                                         >
                                             {/* Currency flags from Django */}
                                             {currency.code === 'USD' && (
-                                                <img src="/images/flags/us.png" alt="USD Flag" className="currency-flag" style={{ width: '24px', height: '16px', objectFit: 'contain', marginRight: '8px' }} />
+                                                <img src="/images/flags/us.png" alt="USD Flag" className="currency-flag" />
                                             )}
                                             {currency.code === 'AED' && (
-                                                <img src="/images/flags/ae.png" alt="AED Flag" className="currency-flag" style={{ width: '24px', height: '16px', objectFit: 'contain', marginRight: '8px' }} />
+                                                <img src="/images/flags/ae.png" alt="AED Flag" className="currency-flag" />
                                             )}
                                             {currency.code === 'SDG' && (
-                                                <img src="/images/flags/sd.png" alt="SDG Flag" className="currency-flag" style={{ width: '24px', height: '16px', objectFit: 'contain', marginRight: '8px' }} />
+                                                <img src="/images/flags/sd.png" alt="SDG Flag" className="currency-flag" />
                                             )}
                                             {currency.code === 'INR' && (
-                                                <img src="/images/flags/inr.png" alt="INR Flag" className="currency-flag" style={{ width: '24px', height: '16px', objectFit: 'contain', marginRight: '8px' }} />
+                                                <img src="/images/flags/inr.png" alt="INR Flag" className="currency-flag" />
                                             )}
                                             {currency.code === 'CNY' && (
-                                                <img src="/images/flags/cny.png" alt="CNY Flag" className="currency-flag" style={{ width: '24px', height: '16px', objectFit: 'contain', marginRight: '8px' }} />
+                                                <img src="/images/flags/cny.png" alt="CNY Flag" className="currency-flag" />
                                             )}
                                             {currency.code === 'TRY' && (
-                                                <img src="/images/flags/try.png" alt="TRY Flag" className="currency-flag" style={{ width: '24px', height: '16px', objectFit: 'contain', marginRight: '8px' }} />
+                                                <img src="/images/flags/try.png" alt="TRY Flag" className="currency-flag" />
                                             )}
                                             {!['USD', 'AED', 'SDG', 'INR', 'CNY', 'TRY'].includes(currency.code) && (
-                                                <div className="currency-flag" style={{ width: '24px', height: '16px', backgroundColor: 'var(--primary-dark)', color: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '10px', marginRight: '8px' }}>
+                                                <div className="currency-flag-initials">
                                                     {currency.code.slice(0, 2)}
                                                 </div>
                                             )}
