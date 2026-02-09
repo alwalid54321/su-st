@@ -199,8 +199,8 @@ export default function MarketDataTable() {
                                                 </div>
                                             </td>
                                             <td className="action-column">
-                                                <Link href={`/contact?product=${product.name}&type=sample`} className="action-btn sample-btn">SAMPLE</Link>
-                                                <Link href={`/contact?product=${product.name}&type=quote`} className="action-btn quote-btn">QUOTE</Link>
+                                                <Link href={`/sample?product=${product.name}`} className="action-btn sample-btn">SAMPLE</Link>
+                                                <Link href={`/quote?product=${product.name}`} className="action-btn quote-btn">QUOTE</Link>
                                             </td>
                                         </tr>
                                     ))}

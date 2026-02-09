@@ -140,6 +140,30 @@ model Currency {
   @@map("core_currency")
 }
 
+// Port model for Quote/Sample forms
+model Port {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  location  String?
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("core_port")
+}
+
+// Product Variation model
+model ProductVariation {
+  id          Int      @id @default(autoincrement())
+  name        String   // e.g., Grade 1, Organic, Raw
+  description String?
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("core_productvariation")
+}
+
 // Currency Archive
 model CurrencyArchive {
   id         Int      @id @default(autoincrement())
