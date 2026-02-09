@@ -335,8 +335,14 @@ h6 {
 .ticker-track {
   display: flex;
   gap: 40px;
-  animation: tickerScroll 30s linear infinite;
+  animation: tickerScroll 20s linear infinite;
+  /* Faster scroll */
   width: max-content;
+}
+
+.price-ticker-wrapper:hover .ticker-track {
+  animation-play-state: paused;
+  /* Interactive on cursor */
 }
 
 .ticker-item {
