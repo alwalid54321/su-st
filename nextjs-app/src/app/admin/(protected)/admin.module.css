@@ -130,30 +130,37 @@
     background-color: #e0f2fe;
     color: #1B1464;
 }
+
 .statCard:hover .iconBlue {
     background-color: #1B1464;
     color: white;
 }
+
 .iconGreen {
     background-color: #d1fae5;
     color: #059669;
 }
+
 .statCard:hover .iconGreen {
     background-color: #059669;
     color: white;
 }
+
 .iconPurple {
     background-color: #f3e8ff;
     color: #9333ea;
 }
+
 .statCard:hover .iconPurple {
     background-color: #9333ea;
     color: white;
 }
+
 .iconYellow {
     background-color: #fef9c3;
     color: #D4AF37;
 }
+
 .statCard:hover .iconYellow {
     background-color: #D4AF37;
     color: white;
@@ -170,6 +177,7 @@
     .mainGrid {
         grid-template-columns: repeat(3, 1fr);
     }
+
     .recentActivityContainer {
         grid-column: span 2 / span 2;
     }
@@ -205,6 +213,7 @@
     border: none;
     cursor: pointer;
 }
+
 .viewAllButton:hover {
     text-decoration: underline;
 }
@@ -236,10 +245,25 @@
     font-size: 0.875rem;
 }
 
-.activityIconBlue { background-color: #e0f2fe; color: #3b82f6; }
-.activityIconGreen { background-color: #d1fae5; color: #10b981; }
-.activityIconPurple { background-color: #f3e8ff; color: #a855f7; }
-.activityIconYellow { background-color: #fef9c3; color: #eab308; }
+.activityIconBlue {
+    background-color: #e0f2fe;
+    color: #3b82f6;
+}
+
+.activityIconGreen {
+    background-color: #d1fae5;
+    color: #10b981;
+}
+
+.activityIconPurple {
+    background-color: #f3e8ff;
+    color: #a855f7;
+}
+
+.activityIconYellow {
+    background-color: #fef9c3;
+    color: #eab308;
+}
 
 
 .activityContent {
@@ -326,9 +350,12 @@
 }
 
 @keyframes pulse {
-    0%, 100% {
+
+    0%,
+    100% {
         opacity: 1;
     }
+
     50% {
         opacity: 0.5;
     }
@@ -354,12 +381,15 @@
     position: relative;
     overflow: hidden;
 }
-.helpCard::before, .helpCard::after {
+
+.helpCard::before,
+.helpCard::after {
     content: '';
     position: absolute;
     border-radius: 50%;
     filter: blur(2rem);
 }
+
 .helpCard::before {
     top: -4rem;
     right: -4rem;
@@ -367,6 +397,7 @@
     height: 8rem;
     background-color: rgba(255, 255, 255, 0.05);
 }
+
 .helpCard::after {
     bottom: -3rem;
     left: -3rem;
@@ -409,4 +440,27 @@
 
 .helpButton:hover {
     background-color: #e0f2fe;
+}
+
+/* Added from dashboard.module.css */
+.chartContainer {
+    height: 300px;
+    width: 100%;
+}
+
+.announcementsList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.announcementsList li {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f3f4f6;
+    color: #374151;
+    font-size: 0.95rem;
+}
+
+.announcementsList li:last-child {
+    border-bottom: none;
 }

@@ -98,13 +98,27 @@ export default function GallerySlider() {
                                     : ''
                                 }`}
                         >
-                            <Image
-                                src={image.imageUrl}
-                                alt={image.title}
-                                fill
-                                className="slide-image"
-                                priority={index === 0}
-                            />
+                            <div className="slide-image-wrapper">
+                                {/* Blurred background layer to fill gaps */}
+                                <Image
+                                    src={image.imageUrl}
+                                    alt=""
+                                    fill
+                                    className="slide-image-blur"
+                                    priority={index < 2}
+                                    unoptimized={true}
+                                    aria-hidden="true"
+                                />
+                                {/* Main image showing full width/edges */}
+                                <Image
+                                    src={image.imageUrl}
+                                    alt={image.title}
+                                    fill
+                                    className="slide-image-main"
+                                    priority={index < 2}
+                                    unoptimized={true}
+                                />
+                            </div>
                             <div className="slide-overlay"></div>
                             <div className="slide-content">
                                 <h2 className="slide-title">{image.title}</h2>

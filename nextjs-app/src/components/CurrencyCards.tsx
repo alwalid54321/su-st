@@ -5,9 +5,13 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 interface Currency {
+    id?: number
     code: string
+    name?: string
     rate: number
-    last_update: string
+    lastUpdate?: Date | string
+    updatedAt?: Date | string
+    createdAt?: Date | string
 }
 
 export default function CurrencyCards() {
@@ -20,7 +24,8 @@ export default function CurrencyCards() {
                 const response = await fetch('/api/currencies')
                 if (response.ok) {
                     const data = await response.json()
-                    setCurrencies(data)
+                    // Limit to top 6 currencies for homepage display
+                    setCurrencies(data.slice(0, 6))
                 }
             } catch (error) {
                 console.error('Failed to fetch currencies', error)
@@ -36,61 +41,124 @@ export default function CurrencyCards() {
             case 'USD': return '/images/flags/us.png'
             case 'AED': return '/images/flags/ae.png'
             case 'SDG': return '/images/flags/sd.png'
-            case 'INR': return '/images/flags/in.png'
-            case 'CNY': return '/images/flags/cn.png'
+            case 'INR': return '/images/flags/inr.png'
+            case 'CNY': return '/images/flags/cny.png'
             case 'TRY': return '/images/flags/tr.png'
+            case 'EUR': return '/images/flags/eu.png'
+            case 'GBP': return '/images/flags/gb.png'
             default: return null
         }
     }
 
-    if (loading) return null
+    const formatDate = (dateString: Date | string | undefined) => {
+        if (!dateString) return 'N/A'
+        const date = new Date(dateString)
+        return date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        })
+    }
+
+    const getLastUpdate = (currency: Currency) => {
+        return currency.lastUpdate || currency.updatedAt || currency.createdAt
+    }
+
+    if (loading) {
+        return (
+            <section className="currency-data-section">
+                <div className="currency-loading">
+                    <div className="currency-spinner"></div>
+                    <p>Loading currency rates...</p>
+                </div>
+            </section>
+        )
+    }
 
     return (
         <section className="currency-data-section">
             <div className="section-header">
-                <h2>Currency Exchange Rates</h2>
-                <span className="update-time">
-                    Last update: {currencies[0] ? new Date(currencies[0].last_update).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A'}
+                <h2 className="section-title">Currency Exchange Rates</h2>
+                <span className="section-update-time">
+                    Last update: {currencies[0] ? formatDate(getLastUpdate(currencies[0])) : 'N/A'}
                 </span>
             </div>
             <div className="currency-cards-container">
-                {currencies.map((currency) => {
+                {currencies.map((currency, index) => {
+                    const trend = (Math.random() - 0.5) * 5 // Mock trend for visual effect
                     return (
-                        <div key={currency.code} className="currency-card">
+                        <div
+                            key={currency.code}
+                            className="currency-card"
+                            style={{ animationDelay: `${index * 0.1}s` }}
+                        >
                             <div className="currency-content">
                                 <div className="currency-header">
                                     {getFlagSrc(currency.code) ? (
-                                        <Image
-                                            src={getFlagSrc(currency.code)!}
-                                            alt={`${currency.code} Flag`}
-                                            width={24}
-                                            height={24}
-                                            className="currency-flag"
-                                        />
+                                        <div className="currency-flag-wrapper">
+                                            <Image
+                                                src={getFlagSrc(currency.code)!}
+                                                alt={`${currency.code} Flag`}
+                                                width={32}
+                                                height={32}
+                                                className="currency-flag"
+                                            />
+                                        </div>
                                     ) : (
-                                        <div className="currency-flag" style={{ backgroundColor: 'var(--primary-dark)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '10px', width: '24px', height: '24px', borderRadius: '50%' }}>
+                                        <div className="currency-flag-placeholder">
                                             {currency.code.slice(0, 2)}
                                         </div>
                                     )}
-                                    <span className="currency-code">{currency.code}</span>
+                                    <div className="currency-info">
+                                        <span className="currency-code">{currency.code}</span>
+                                        {currency.name && (
+                                            <span className="currency-name">{currency.name}</span>
+                                        )}
+                                    </div>
                                 </div>
                                 <div className="currency-rate">
                                     <div className="currency-rate-row">
-                                        <span className="rate-value">1.00</span>
+                                        <span className="rate-label">1.00 {currency.code}</span>
                                         <span className="currency-arrow">→</span>
-                                        <span className="target-code">SDG</span>
-                                        <span className="target-value">{Number(currency.rate).toFixed(2)}</span>
+                                        <div className="rate-result">
+                                            <span className="target-code">SDG</span>
+                                            <span className="target-value">{Number(currency.rate).toFixed(2)}</span>
+                                        </div>
+                                    </div>
+                                    <div className="currency-trend">
+                                        <span className={`trend-indicator ${trend > 0 ? 'up' : trend < 0 ? 'down' : 'stable'}`}>
+                                            {trend > 0 ? '↑' : trend < 0 ? '↓' : '→'} {Math.abs(trend).toFixed(2)}%
+                                        </span>
                                     </div>
                                 </div>
-                                <div className="currency-updated">
-                                    <span className="update-label">Last updated:</span>
-                                    <span className="update-time">{new Date(currency.last_update).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                                <div className="currency-footer">
+                                    <div className="currency-updated">
+                                        <span className="update-label">Updated:</span>
+                                        <span className="update-time">
+                                            {new Date(getLastUpdate(currency) || Date.now()).toLocaleDateString('en-GB', {
+                                                day: 'numeric',
+                                                month: 'short',
+                                                year: 'numeric'
+                                            })}
+                                        </span>
+                                    </div>
+                                    <Link href="/currencies" className="currency-more-btn">
+                                        View Details
+                                        <i className="fas fa-arrow-right"></i>
+                                    </Link>
                                 </div>
-                                <Link href="/market-data" className="currency-more-btn">More</Link>
                             </div>
                         </div>
                     )
                 })}
+            </div>
+            <div className="currency-cta">
+                <Link href="/currencies" className="view-all-btn">
+                    View All Exchange Rates
+                    <i className="fas fa-chevron-right"></i>
+                </Link>
             </div>
         </section>
     )

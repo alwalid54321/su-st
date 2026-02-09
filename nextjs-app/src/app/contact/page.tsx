@@ -8,7 +8,6 @@ import {
     Typography,
     Box,
     Container,
-    Grid,
     TextField,
     FormControl,
     InputLabel,
@@ -39,6 +38,8 @@ const validationSchema = yup.object({
     name: yup.string().trim().required('Name is required'),
     email: yup.string().email('Enter a valid email').required('Email is required'),
     phone: yup.string().matches(/^[0-9+()\s-]+$/, 'Enter a valid phone number'),
+    company: yup.string(),
+    country: yup.string(),
     subject: yup.string().required('Please select a subject'),
     message: yup.string().trim().required('Message is required'),
 });
@@ -47,38 +48,47 @@ export default function ContactPage() {
     const [status, setStatus] = useState<'idle' | 'success' | 'error' | 'loading'>('idle');
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string>('');
+    const [trackingNumber, setTrackingNumber] = useState('');
+
+    const handleTrackOrder = (e: React.FormEvent) => {
+        e.preventDefault()
+        if (trackingNumber) {
+            alert(`Inquiry Status: ${trackingNumber} is being reviewed by our sales team. \n\nWe will contact you within 24 hours.`)
+        }
+    }
 
     const formik = useFormik({
         initialValues: {
             name: '',
             email: '',
             phone: '',
+            company: '',
+            country: '',
             subject: '',
             message: '',
+            _gotcha: '', // Honeypot field
         },
         validationSchema: validationSchema,
         onSubmit: async (values, { resetForm }) => {
             setStatus('loading');
             try {
-                // Simulate API call
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                const response = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(values),
+                });
 
-                // Replace with actual API call
-                // const response = await fetch('/api/contact', {
-                //     method: 'POST',
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //     },
-                //     body: JSON.stringify(values),
-                // });
+                const data = await response.json();
 
-                // if (!response.ok) {
-                //     throw new Error('Failed to send message');
-                // }
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to send message');
+                }
 
                 setStatus('success');
                 setSnackbarOpen(true);
-                setErrorMessage(''); // Clear any previous error messages
+                setErrorMessage('');
                 resetForm();
             } catch (error: any) {
                 logger.error('Contact form submission error:', error, 'ContactPage');
@@ -95,6 +105,7 @@ export default function ContactPage() {
 
     return (
         <React.Fragment>
+            {/* ... existing Head ... */}
             <Head>
                 <title>Contact Us - SudaStock</title>
                 <meta name="description" content="Get in touch with SudaStock for inquiries, quotes, or support." />
@@ -106,25 +117,27 @@ export default function ContactPage() {
                 {/* <meta property="og:image" content="https://www.sudastock.com/images/contact-hero.jpg" /> */}
                 <script
                     type="application/ld+json"
-                    dangerouslySetInnerHTML={{ __html: JSON.stringify({
-                        "@context": "https://schema.org",
-                        "@type": "ContactPage",
-                        "name": "Contact Us - SudaStock",
-                        "url": "https://www.sudastock.com/contact",
-                        "description": "Get in touch with SudaStock for inquiries, quotes, or support.",
-                        "mainEntityOfPage": {
-                            "@type": "WebPage",
-                            "@id": "https://www.sudastock.com/contact"
-                        },
-                        "contactPoint": [
-                            {
-                                "@type": "ContactPoint",
-                                "telephone": "+971 502 330 481",
-                                "contactType": "Customer Service",
-                                "email": "info@sudastock.com"
-                            }
-                        ]
-                    })}}
+                    dangerouslySetInnerHTML={{
+                        __html: JSON.stringify({
+                            "@context": "https://schema.org",
+                            "@type": "ContactPage",
+                            "name": "Contact Us - SudaStock",
+                            "url": "https://www.sudastock.com/contact",
+                            "description": "Get in touch with SudaStock for inquiries, quotes, or support.",
+                            "mainEntityOfPage": {
+                                "@type": "WebPage",
+                                "@id": "https://www.sudastock.com/contact"
+                            },
+                            "contactPoint": [
+                                {
+                                    "@type": "ContactPoint",
+                                    "telephone": "+971 502 330 481",
+                                    "contactType": "Customer Service",
+                                    "email": "info@sudastock.com"
+                                }
+                            ]
+                        })
+                    }}
                 />
             </Head>
             <Box sx={{
@@ -184,9 +197,17 @@ export default function ContactPage() {
                 </Box>
 
                 <Container maxWidth="lg" sx={{ paddingY: { xs: '50px', md: '80px' } }}>
-                    <Grid container spacing={4} sx={{ paddingX: { xs: '20px', md: '0' } }}>
+                    <Box sx={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        gap: 4,
+                        marginX: { xs: '20px', md: '0' }
+                    }}>
                         {/* Contact Info Section */}
-                        <Grid item xs={12} md={5}>
+                        <Box sx={{
+                            flex: { xs: '1 1 100%', md: '0 0 40%' },
+                            maxWidth: { xs: '100%', md: '40%' }
+                        }}>
                             <Box
                                 sx={{
                                     backgroundColor: 'var(--primary-dark)',
@@ -284,7 +305,9 @@ export default function ContactPage() {
 
                                 {/* Social Media Links */}
                                 <Box sx={{ display: 'flex', justifyContent: { xs: 'center', md: 'flex-start' }, gap: '20px', marginTop: '30px' }}>
-                                    <Link href="#" target="_blank" rel="noopener noreferrer" passHref legacyBehavior>
+                                    <Link href="#" target="_blank" rel="noopener noreferrer">
+                                        {/* @next-codemod-error This Link previously used the now removed `legacyBehavior` prop, and has a child that might not be an anchor. The codemod bailed out of lifting the child props to the Link. Check that the child component does not render an anchor, and potentially move the props manually to Link. */
+                                        }
                                         <Button
                                             variant="outlined"
                                             sx={{
@@ -297,7 +320,9 @@ export default function ContactPage() {
                                             <FontAwesomeIcon icon={faFacebook} size="lg" />
                                         </Button>
                                     </Link>
-                                    <Link href="#" target="_blank" rel="noopener noreferrer" passHref legacyBehavior>
+                                    <Link href="#" target="_blank" rel="noopener noreferrer">
+                                        {/* @next-codemod-error This Link previously used the now removed `legacyBehavior` prop, and has a child that might not be an anchor. The codemod bailed out of lifting the child props to the Link. Check that the child component does not render an anchor, and potentially move the props manually to Link. */
+                                        }
                                         <Button
                                             variant="outlined"
                                             sx={{
@@ -310,7 +335,9 @@ export default function ContactPage() {
                                             <FontAwesomeIcon icon={faTwitter} size="lg" />
                                         </Button>
                                     </Link>
-                                    <Link href="#" target="_blank" rel="noopener noreferrer" passHref legacyBehavior>
+                                    <Link href="#" target="_blank" rel="noopener noreferrer">
+                                        {/* @next-codemod-error This Link previously used the now removed `legacyBehavior` prop, and has a child that might not be an anchor. The codemod bailed out of lifting the child props to the Link. Check that the child component does not render an anchor, and potentially move the props manually to Link. */
+                                        }
                                         <Button
                                             variant="outlined"
                                             sx={{
@@ -323,7 +350,9 @@ export default function ContactPage() {
                                             <FontAwesomeIcon icon={faInstagram} size="lg" />
                                         </Button>
                                     </Link>
-                                    <Link href="#" target="_blank" rel="noopener noreferrer" passHref legacyBehavior>
+                                    <Link href="#" target="_blank" rel="noopener noreferrer">
+                                        {/* @next-codemod-error This Link previously used the now removed `legacyBehavior` prop, and has a child that might not be an anchor. The codemod bailed out of lifting the child props to the Link. Check that the child component does not render an anchor, and potentially move the props manually to Link. */
+                                        }
                                         <Button
                                             variant="outlined"
                                             sx={{
@@ -338,10 +367,13 @@ export default function ContactPage() {
                                     </Link>
                                 </Box>
                             </Box>
-                        </Grid>
+                        </Box>
 
                         {/* Contact Form Section */}
-                        <Grid item xs={12} md={7}>
+                        <Box sx={{
+                            flex: { xs: '1 1 100%', md: '0 0 58%' },
+                            maxWidth: { xs: '100%', md: '58%' } // 58% + 40% = 98% -> gap handles rest
+                        }}>
                             <Box
                                 sx={{
                                     backgroundColor: 'white',
@@ -351,6 +383,51 @@ export default function ContactPage() {
                                     height: '100%',
                                 }}
                             >
+                                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
+                                    <Box
+                                        component="form"
+                                        onSubmit={handleTrackOrder}
+                                        sx={{
+                                            display: 'flex',
+                                            gap: 1,
+                                            backgroundColor: '#f0f0f0',
+                                            padding: '6px',
+                                            borderRadius: '8px',
+                                            boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.05)'
+                                        }}
+                                    >
+                                        <input
+                                            type="text"
+                                            placeholder="Tracking #"
+                                            value={trackingNumber}
+                                            onChange={(e) => setTrackingNumber(e.target.value)}
+                                            style={{
+                                                border: 'none',
+                                                background: 'transparent',
+                                                padding: '4px 8px',
+                                                fontSize: '0.85rem',
+                                                outline: 'none',
+                                                width: '120px'
+                                            }}
+                                        />
+                                        <Button
+                                            type="submit"
+                                            size="small"
+                                            variant="contained"
+                                            sx={{
+                                                backgroundColor: 'var(--primary-dark)',
+                                                '&:hover': { backgroundColor: 'var(--accent)' },
+                                                textTransform: 'none',
+                                                fontSize: '0.75rem',
+                                                minWidth: 'auto',
+                                                px: 2
+                                            }}
+                                        >
+                                            Track
+                                        </Button>
+                                    </Box>
+                                </Box>
+
                                 <Typography variant="h4" component="h2" sx={{
                                     fontSize: '2rem',
                                     marginBottom: '30px',
@@ -371,8 +448,23 @@ export default function ContactPage() {
                                 </Typography>
 
                                 <form onSubmit={formik.handleSubmit}>
-                                    <Grid container spacing={3}>
-                                        <Grid item xs={12} sm={6}>
+                                    {/* Using Box for grid layout for inputs */}
+                                    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 3 }}>
+                                        {/* Honeypot Field */}
+                                        <div style={{ display: 'none' }} aria-hidden="true">
+                                            <label htmlFor="_gotcha">Do not fill this field</label>
+                                            <input
+                                                type="text"
+                                                id="_gotcha"
+                                                name="_gotcha"
+                                                value={(formik.values as any)._gotcha}
+                                                onChange={formik.handleChange}
+                                                tabIndex={-1}
+                                                autoComplete="off"
+                                            />
+                                        </div>
+
+                                        <Box>
                                             <TextField
                                                 fullWidth
                                                 id="name"
@@ -384,8 +476,8 @@ export default function ContactPage() {
                                                 error={formik.touched.name && Boolean(formik.errors.name)}
                                                 helperText={formik.touched.name && formik.errors.name}
                                             />
-                                        </Grid>
-                                        <Grid item xs={12} sm={6}>
+                                        </Box>
+                                        <Box>
                                             <TextField
                                                 fullWidth
                                                 id="email"
@@ -397,8 +489,8 @@ export default function ContactPage() {
                                                 error={formik.touched.email && Boolean(formik.errors.email)}
                                                 helperText={formik.touched.email && formik.errors.email}
                                             />
-                                        </Grid>
-                                        <Grid item xs={12} sm={6}>
+                                        </Box>
+                                        <Box>
                                             <TextField
                                                 fullWidth
                                                 id="phone"
@@ -410,8 +502,34 @@ export default function ContactPage() {
                                                 error={formik.touched.phone && Boolean(formik.errors.phone)}
                                                 helperText={formik.touched.phone && formik.errors.phone}
                                             />
-                                        </Grid>
-                                        <Grid item xs={12} sm={6}>
+                                        </Box>
+                                        <Box>
+                                            <TextField
+                                                fullWidth
+                                                id="company"
+                                                name="company"
+                                                label="Company Name"
+                                                value={formik.values.company}
+                                                onChange={formik.handleChange}
+                                                onBlur={formik.handleBlur}
+                                                error={formik.touched.company && Boolean(formik.errors.company)}
+                                                helperText={formik.touched.company && formik.errors.company}
+                                            />
+                                        </Box>
+                                        <Box>
+                                            <TextField
+                                                fullWidth
+                                                id="country"
+                                                name="country"
+                                                label="Country"
+                                                value={formik.values.country}
+                                                onChange={formik.handleChange}
+                                                onBlur={formik.handleBlur}
+                                                error={formik.touched.country && Boolean(formik.errors.country)}
+                                                helperText={formik.touched.country && formik.errors.country}
+                                            />
+                                        </Box>
+                                        <Box>
                                             <FormControl fullWidth error={formik.touched.subject && Boolean(formik.errors.subject)}>
                                                 <InputLabel id="subject-label">Subject</InputLabel>
                                                 <Select
@@ -436,8 +554,8 @@ export default function ContactPage() {
                                                     </Typography>
                                                 )}
                                             </FormControl>
-                                        </Grid>
-                                        <Grid item xs={12}>
+                                        </Box>
+                                        <Box sx={{ gridColumn: '1 / -1' }}>
                                             <TextField
                                                 fullWidth
                                                 id="message"
@@ -452,8 +570,8 @@ export default function ContactPage() {
                                                 helperText={formik.touched.message && formik.errors.message}
                                                 sx={{ '& .MuiInputBase-root': { padding: 0 } }}
                                             />
-                                        </Grid>
-                                        <Grid item xs={12}>
+                                        </Box>
+                                        <Box sx={{ gridColumn: '1 / -1' }}>
                                             <Button
                                                 color="primary"
                                                 variant="contained"
@@ -478,35 +596,34 @@ export default function ContactPage() {
                                             >
                                                 {status === 'loading' ? <CircularProgress size={24} color="inherit" /> : 'Send Message'}
                                             </Button>
-                                        </Grid>
-                                    </Grid>
+                                        </Box>
+                                    </Box>
                                 </form>
                             </Box>
-                        </Grid>
-
-                        {/* Google Maps Section */}
-                        <Grid item xs={12}>
-                            <Box
-                                sx={{
-                                    height: { xs: '300px', sm: '350px', md: '450px' },
-                                    borderRadius: '8px',
-                                    overflow: 'hidden',
-                                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                                    width: '100%',
-                                }}
-                            >
-                                <iframe
-                                    src="https://www.google.com/maps/embed?pb=!4v1741826789629!6m8!1m7!1sqfYB9di-En-qi0pFyAudwg!2m2!1d25.18447082783544!2d55.26358743995144!3f108.96!4f38.099999999999994!5f0.7820865974627469"
-                                    width="100%"
-                                    height="100%"
-                                    style={{ border: 0 }}
-                                    allowFullScreen
-                                    loading="lazy"
-                                    referrerPolicy="no-referrer-when-downgrade"
-                                ></iframe>
-                            </Box>
-                        </Grid>
-                    </Grid>
+                        </Box>
+                    </Box>
+                    {/* Google Maps Section */}
+                    <Box sx={{ marginTop: 4 }}>
+                        <Box
+                            sx={{
+                                height: { xs: '300px', sm: '350px', md: '450px' },
+                                borderRadius: '8px',
+                                overflow: 'hidden',
+                                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                                width: '100%',
+                            }}
+                        >
+                            <iframe
+                                src="https://www.google.com/maps/embed?pb=!4v1741826789629!6m8!1m7!1sqfYB9di-En-qi0pFyAudwg!2m2!1d25.18447082783544!2d55.26358743995144!3f108.96!4f38.099999999999994!5f0.7820865974627469"
+                                width="100%"
+                                height="100%"
+                                style={{ border: 0 }}
+                                allowFullScreen
+                                loading="lazy"
+                                referrerPolicy="no-referrer-when-downgrade"
+                            ></iframe>
+                        </Box>
+                    </Box>
                 </Container>
 
                 <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
@@ -514,7 +631,7 @@ export default function ContactPage() {
                         {status === 'success' ? 'Thank you for your message! We\'ll get back to you soon.' : errorMessage}
                     </Alert>
                 </Snackbar>
-            </Box>
-        </React.Fragment>
+            </Box >
+        </React.Fragment >
     );
 }

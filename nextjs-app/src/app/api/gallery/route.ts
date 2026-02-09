@@ -6,7 +6,10 @@ export const revalidate = 0 // Disable caching
 export async function GET() {
     try {
         const images = await prisma.galleryImage.findMany({
-            where: { isActive: true },
+            where: {
+                isActive: true,
+                isCurrent: true  // Only show current versions
+            },
             orderBy: { order: 'asc' }
         })
 

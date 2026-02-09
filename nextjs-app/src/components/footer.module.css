@@ -1,9 +1,12 @@
 /* src/components/footer.module.css */
 
 .footer {
-    background-color: #1B1464; /* Dark blue background */
-    color: #f0f2f5; /* Light gray text */
-    padding: 3rem 0 1.5rem; /* Adjust padding */
+    background-color: #1B1464;
+    /* Dark blue background */
+    color: #f0f2f5;
+    /* Light gray text */
+    padding: 3rem 0 1.5rem;
+    /* Adjust padding */
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
 }
@@ -16,7 +19,8 @@
     margin: 0 auto;
     padding: 0 20px;
     margin-bottom: 2rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Subtle separator */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    /* Subtle separator */
     padding-bottom: 2rem;
 }
 
@@ -24,11 +28,13 @@
     flex: 1;
     min-width: 220px;
     margin-bottom: 1.5rem;
-    padding: 0 15px; /* Added internal padding */
+    padding: 0 15px;
+    /* Added internal padding */
 }
 
 .footerSection h3 {
-    color: #786D3C; /* Accent gold color for headings */
+    color: #786D3C;
+    /* Accent gold color for headings */
     font-size: 1.1rem;
     font-weight: 700;
     margin-bottom: 1.5rem;
@@ -75,8 +81,10 @@
 }
 
 .socialLink:hover {
-    background-color: #786D3C; /* Hover accent color */
-    color: #1B1464; /* Dark text on hover */
+    background-color: #786D3C;
+    /* Hover accent color */
+    color: #1B1464;
+    /* Dark text on hover */
     transform: translateY(-3px);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
@@ -92,12 +100,13 @@
 }
 
 .contactLink:hover {
-    color: #D4AF37;
+    color: #786D3C;
 }
 
 .contactIcon {
     margin-right: 0.8rem;
-    color: #D4AF37; /* Accent color for icons */
+    color: #786D3C;
+    /* Accent color for icons */
     font-size: 1rem;
 }
 
@@ -105,7 +114,7 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    background-color: #D4AF37;
+    background-color: #786D3C;
     color: #1B1464;
     padding: 0.7rem 1.2rem;
     border-radius: 5px;
@@ -149,11 +158,11 @@
 }
 
 .accessLink:hover {
-    color: #D4AF37;
+    color: #786D3C;
 }
 
 .accessIcon {
-    color: #D4AF37;
+    color: #786D3C;
 }
 
 .copyright {

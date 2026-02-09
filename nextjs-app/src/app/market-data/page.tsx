@@ -104,18 +104,37 @@ export default function MarketDataPage() {
 
         try {
             // Fetch current product data
-            const productRes = await fetch(`/api/admin/market-data/${selectedProduct}`)
+            const productRes = await fetch(`/api/market-data/${selectedProduct}`)
             if (!productRes.ok) throw new Error('Failed to fetch product data')
             const productData = await productRes.json()
             setSelectedProductData(productData)
 
             // Fetch historical data
             const historyRes = await fetch(
-                `/api/admin/market-data/${selectedProduct}/history`
+                `/api/market-data/${selectedProduct}/history`
             )
             if (historyRes.ok) {
                 const historyData = await historyRes.json()
-                setHistory(historyData)
+                // Merge current data as the most recent point
+                const currentAsHistory: HistoryItem = {
+                    id: -1,
+                    originalId: productData.id,
+                    name: productData.name,
+                    value: productData.value,
+                    portSudan: productData.portSudan,
+                    dmtChina: productData.dmtChina,
+                    dmtUae: productData.dmtUae,
+                    dmtMersing: productData.dmtMersing,
+                    dmtIndia: productData.dmtIndia,
+                    status: productData.status,
+                    forecast: productData.forecast,
+                    trend: productData.trend,
+                    archivedAt: new Date().toISOString(),
+                    lastUpdate: productData.lastUpdate
+                }
+                setHistory([currentAsHistory, ...historyData].sort((a, b) =>
+                    new Date(a.archivedAt).getTime() - new Date(b.archivedAt).getTime()
+                ))
             }
 
             setLastUpdated(new Date())
@@ -175,7 +194,7 @@ export default function MarketDataPage() {
                 position: 'top' as const,
                 labels: {
                     color: '#1B1464',
-                    font: { size: 12, weight: '600' as const }
+                    font: { size: 12, weight: 'bold' as const }
                 }
             },
             title: { display: false },
@@ -200,28 +219,29 @@ export default function MarketDataPage() {
                 label: 'Port Sudan',
                 data: history.map(h => Number(h.portSudan)),
                 borderColor: '#D4AF37',
-                backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                backgroundColor: (context: any) => {
+                    const ctx = context.chart.ctx;
+                    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                    gradient.addColorStop(0, 'rgba(212, 175, 55, 0.4)');
+                    gradient.addColorStop(1, 'rgba(212, 175, 55, 0)');
+                    return gradient;
+                },
                 tension: 0.4,
                 fill: true,
                 borderWidth: 3,
+                pointRadius: 4,
+                pointBackgroundColor: '#D4AF37',
             },
             {
-                label: 'DMT China',
-                data: history.map(h => Number(h.dmtChina)),
+                label: 'Global Average',
+                data: history.map(h => (Number(h.dmtChina) + Number(h.dmtUae) + Number(h.dmtIndia)) / 3),
                 borderColor: '#1B1464',
-                backgroundColor: 'rgba(27, 20, 100, 0.1)',
+                backgroundColor: 'transparent',
                 tension: 0.4,
                 fill: false,
                 borderWidth: 2,
-            },
-            {
-                label: 'DMT UAE',
-                data: history.map(h => Number(h.dmtUae)),
-                borderColor: '#28A745',
-                backgroundColor: 'rgba(40, 167, 69, 0.1)',
-                tension: 0.4,
-                fill: false,
-                borderWidth: 2,
+                borderDash: [5, 5],
+                pointRadius: 0,
             }
         ]
     } : null
@@ -231,14 +251,29 @@ export default function MarketDataPage() {
             <div className={styles.contentWrapper}>
                 {/* Header Section */}
                 <header className={styles.header}>
-                    <h1 className={styles.title}>Market Data Insights</h1>
-                    <p className={styles.subtitle}>Real-time market data and analytics powered by our database</p>
-                    {lastUpdated && (
-                        <p className={styles.lastUpdated}>
-                            Last updated: {lastUpdated.toLocaleString()}
-                        </p>
-                    )}
+                    <h1 className={styles.title}>Market Insights</h1>
+                    <p className={styles.subtitle}>Track Sudanese commodity prices and global market trends in real-time.</p>
                 </header>
+
+                {/* Market Summary Ticker/Cards */}
+                {products.length > 0 && (
+                    <div className={styles.summaryGrid}>
+                        {products.slice(0, 4).map(p => (
+                            <div key={p.id} className={styles.summaryCard} onClick={() => {
+                                setSelectedProduct(p.id);
+                                setTimeout(() => handleSearch(), 100);
+                            }}>
+                                <div className={styles.summaryInfo}>
+                                    <h3>{p.name}</h3>
+                                    <p>{formatCurrency(p.portSudan)}</p>
+                                </div>
+                                <div className={`${styles.miniTrend} ${getTrendClass(p.trend)}`}>
+                                    {getTrendIcon(p.trend)} {Math.abs(p.trend)}%
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
 
                 {/* Search Form Card */}
                 <div className={styles.card}>
@@ -314,7 +349,15 @@ export default function MarketDataPage() {
                             className={`${styles.button} ${styles.primaryButton}`}
                         >
                             <i className="fas fa-search"></i>
-                            {loading ? 'Loading...' : 'View Data'}
+                            {loading ? 'Searching...' : 'Analyze Market'}
+                        </button>
+                        <button
+                            onClick={fetchProducts}
+                            disabled={loading}
+                            className={`${styles.button} ${styles.refreshButton}`}
+                            title="Refresh product list"
+                        >
+                            <i className="fas fa-sync-alt"></i>
                         </button>
                         {selectedProductData && (
                             <button
@@ -352,6 +395,11 @@ export default function MarketDataPage() {
                                         <span className={styles.forecastText}>
                                             Forecast: <strong>{selectedProductData.forecast}</strong>
                                         </span>
+                                        {lastUpdated && (
+                                            <span className={styles.lastUpdateTag}>
+                                                <i className="fas fa-clock"></i> Updated: {lastUpdated.toLocaleTimeString()}
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
                                 <div className={`${styles.trendDisplay} ${getTrendClass(selectedProductData.trend)}`}>

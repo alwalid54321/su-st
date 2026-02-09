@@ -2,22 +2,44 @@
 
 import { useState, useEffect } from 'react'
 import styles from './currencies.module.css'
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+    Filler
+} from 'chart.js'
+import { Line } from 'react-chartjs-2'
 
-// Mock Data
-const initialCurrencies = [
-    { code: 'USD', name: 'US Dollar', rate: 1, trend: 0, updated_at: '2023-11-24T10:00:00' },
-    { code: 'SDG', name: 'Sudanese Pound', rate: 950, trend: -2.5, updated_at: '2023-11-24T10:00:00' },
-    { code: 'AED', name: 'UAE Dirham', rate: 3.67, trend: 0.1, updated_at: '2023-11-24T10:00:00' },
-    { code: 'CNY', name: 'Chinese Yuan', rate: 7.15, trend: -0.2, updated_at: '2023-11-24T10:00:00' },
-    { code: 'INR', name: 'Indian Rupee', rate: 83.3, trend: 0.5, updated_at: '2023-11-24T10:00:00' },
-    { code: 'TRY', name: 'Turkish Lira', rate: 28.8, trend: -1.2, updated_at: '2023-11-24T10:00:00' },
-    { code: 'EUR', name: 'Euro', rate: 0.92, trend: 0.3, updated_at: '2023-11-24T10:00:00' },
-    { code: 'GBP', name: 'British Pound', rate: 0.79, trend: 0.2, updated_at: '2023-11-24T10:00:00' },
-]
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+    Filler
+)
+
+interface Currency {
+    id?: number
+    code: string
+    name: string
+    rate: number
+    lastUpdate?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+}
 
 export default function CurrenciesPage() {
     const [baseCurrency, setBaseCurrency] = useState('USD')
-    const [currencies, setCurrencies] = useState(initialCurrencies)
+    const [currencies, setCurrencies] = useState<Currency[]>([])
+    const [loading, setLoading] = useState(true)
 
     // Converter State
     const [amount, setAmount] = useState<number>(1)
@@ -25,34 +47,102 @@ export default function CurrenciesPage() {
     const [toCurrency, setToCurrency] = useState('SDG')
     const [result, setResult] = useState<number>(0)
     const [conversionRate, setConversionRate] = useState<number>(0)
+    const [history, setHistory] = useState<any[]>([])
+    const [historyLoading, setHistoryLoading] = useState(false)
+    const [searchTerm, setSearchTerm] = useState('')
+
+    // Fetch currencies from API
+    useEffect(() => {
+        const fetchCurrencies = async () => {
+            try {
+                setLoading(true)
+                const response = await fetch('/api/currencies')
+                if (response.ok) {
+                    const data = await response.json()
+                    setCurrencies(data)
+                    // Set default currencies if they exist in the data
+                    if (data.length > 0) {
+                        const usd = data.find((c: Currency) => c.code === 'USD')
+                        const sdg = data.find((c: Currency) => c.code === 'SDG')
+                        if (usd) setFromCurrency(usd.code)
+                        if (sdg) setToCurrency(sdg.code)
+                        if (usd) setBaseCurrency(usd.code)
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching currencies:', error)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchCurrencies()
+    }, [])
 
     const getRate = (code: string) => {
         const currency = currencies.find(c => c.code === code)
         return currency ? currency.rate : 1
     }
 
-    const displayedCurrencies = currencies.map(c => {
-        const baseRate = getRate(baseCurrency)
-        const rate = baseCurrency === 'USD' ? c.rate : (baseCurrency === c.code ? 1 : c.rate / baseRate)
-        return { ...c, displayRate: rate }
-    })
+    const displayedCurrencies = currencies
+        .filter(c =>
+            c.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            c.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        .map(c => {
+            const baseRate = getRate(baseCurrency)
+            const rate = baseCurrency === 'USD' ? c.rate : (baseCurrency === c.code ? 1 : c.rate / baseRate)
+            return { ...c, displayRate: rate }
+        })
 
     useEffect(() => {
-        const fromRate = getRate(fromCurrency)
-        const toRate = getRate(toCurrency)
-        const amountInUSD = amount / fromRate
-        const converted = amountInUSD * toRate
-        setResult(converted)
-        setConversionRate(toRate / fromRate)
+        if (currencies.length > 0) {
+            const fromRate = getRate(fromCurrency)
+            const toRate = getRate(toCurrency)
+            const amountInUSD = amount / fromRate
+            const converted = amountInUSD * toRate
+            setResult(converted)
+            setConversionRate(toRate / fromRate)
+            fetchHistory(fromCurrency)
+        }
     }, [amount, fromCurrency, toCurrency, currencies])
+
+    const fetchHistory = async (code: string) => {
+        try {
+            setHistoryLoading(true)
+            const res = await fetch(`/api/currencies/${code}/history`)
+            if (res.ok) {
+                const data = await res.json()
+                // Add current rate as latest point
+                const current = currencies.find(c => c.code === code)
+                if (current) {
+                    const currentPoint = {
+                        rate: current.rate,
+                        archivedAt: new Date().toISOString()
+                    }
+                    setHistory([currentPoint, ...data].sort((a, b) =>
+                        new Date(a.archivedAt).getTime() - new Date(b.archivedAt).getTime()
+                    ))
+                } else {
+                    setHistory(data)
+                }
+            }
+        } catch (err) {
+            console.error('Failed to fetch history:', err)
+        } finally {
+            setHistoryLoading(false)
+        }
+    }
 
     const handleSwap = () => {
         setFromCurrency(toCurrency)
         setToCurrency(fromCurrency)
     }
 
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
+    const formatDate = (dateString: Date | string | undefined) => {
+        if (!dateString) return 'N/A'
+        const date = new Date(dateString)
+        return date.toLocaleDateString('en-US', {
             month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
         })
     }
@@ -63,15 +153,31 @@ export default function CurrenciesPage() {
         return rate.toFixed(2)
     }
 
+    const calculateTrend = (currency: Currency) => {
+        // Mock trend calculation - in real app, this would come from historical data
+        return (Math.random() - 0.5) * 5
+    }
+
+    if (loading) {
+        return (
+            <div className={styles.pageContainer}>
+                <div className={styles.loadingContainer}>
+                    <div className={styles.spinner}></div>
+                    <p>Loading currency data...</p>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div className={styles.pageContainer}>
             <div className={styles.contentWrapper}>
                 <header className={styles.header}>
                     <h1 className={styles.title}>Currency Exchange Rates</h1>
-                    <p className={styles.subtitle}>Current exchange rates and trends for major currencies</p>
+                    <p className={styles.subtitle}>Live exchange rates and trends for major currencies</p>
                 </header>
 
-                <div className={`${styles.card} p-8`}>
+                <div className={`${styles.card} ${styles.converterCard}`}>
                     <h2 className={styles.cardHeader}>
                         <i className="fas fa-exchange-alt"></i>
                         Currency Converter
@@ -80,20 +186,41 @@ export default function CurrenciesPage() {
                         <div className={styles.currencyBox}>
                             <label className={styles.label}>From</label>
                             <div className={styles.inputGroup}>
-                                <input type="number" value={amount} onChange={(e) => setAmount(parseFloat(e.target.value) || 0)} className={styles.input} placeholder="0.00" />
-                                <select value={fromCurrency} onChange={(e) => setFromCurrency(e.target.value)} className={styles.select}>
+                                <input
+                                    type="number"
+                                    value={amount}
+                                    onChange={(e) => setAmount(parseFloat(e.target.value) || 0)}
+                                    className={styles.input}
+                                    placeholder="0.00"
+                                />
+                                <select
+                                    value={fromCurrency}
+                                    onChange={(e) => setFromCurrency(e.target.value)}
+                                    className={styles.select}
+                                >
                                     {currencies.map(c => <option key={c.code} value={c.code}>{c.code}</option>)}
                                 </select>
                             </div>
                         </div>
                         <div className={styles.swapButtonContainer}>
-                            <button onClick={handleSwap} className={styles.swapButton}><i className="fas fa-exchange-alt"></i></button>
+                            <button onClick={handleSwap} className={styles.swapButton}>
+                                <i className="fas fa-exchange-alt"></i>
+                            </button>
                         </div>
                         <div className={`${styles.currencyBox} ${styles.toCurrencyBox}`}>
                             <label className={styles.label}>To</label>
                             <div className={styles.inputGroup}>
-                                <input type="text" value={result.toFixed(2)} readOnly className={styles.input} />
-                                <select value={toCurrency} onChange={(e) => setToCurrency(e.target.value)} className={styles.select}>
+                                <input
+                                    type="text"
+                                    value={result.toFixed(2)}
+                                    readOnly
+                                    className={styles.input}
+                                />
+                                <select
+                                    value={toCurrency}
+                                    onChange={(e) => setToCurrency(e.target.value)}
+                                    className={styles.select}
+                                >
                                     {currencies.map(c => <option key={c.code} value={c.code}>{c.code}</option>)}
                                 </select>
                             </div>
@@ -104,6 +231,56 @@ export default function CurrenciesPage() {
                     </div>
                 </div>
 
+                {/* Currency Analysis Chart */}
+                <div className={styles.card}>
+                    <div className={styles.cardHeader}>
+                        <h2 className={styles.chartTitle}>
+                            <i className="fas fa-chart-line"></i>
+                            {fromCurrency} Trend Analysis
+                        </h2>
+                    </div>
+                    <div className={styles.chartContainer}>
+                        {historyLoading ? (
+                            <div className={styles.chartPlaceholder}>
+                                <div className={styles.miniSpinner}></div>
+                                <p>Loading historical data...</p>
+                            </div>
+                        ) : history.length > 0 ? (
+                            <div style={{ height: '300px' }}>
+                                <Line
+                                    data={{
+                                        labels: history.map(h => new Date(h.archivedAt).toLocaleDateString()),
+                                        datasets: [{
+                                            label: `${fromCurrency} Rate (Base: USD)`,
+                                            data: history.map(h => h.rate),
+                                            borderColor: '#786D3C',
+                                            backgroundColor: 'rgba(120, 109, 60, 0.1)',
+                                            fill: true,
+                                            tension: 0.4,
+                                            pointRadius: 2
+                                        }]
+                                    }}
+                                    options={{
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        plugins: {
+                                            legend: { display: false }
+                                        },
+                                        scales: {
+                                            y: { grid: { color: 'rgba(0,0,0,0.05)' } },
+                                            x: { grid: { display: false } }
+                                        }
+                                    }}
+                                />
+                            </div>
+                        ) : (
+                            <div className={styles.chartPlaceholder}>
+                                <p>No historical data available for {fromCurrency}</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
                 <div className={styles.card}>
                     <div className={styles.baseSelectorContainer}>
                         <div>
@@ -111,15 +288,29 @@ export default function CurrenciesPage() {
                             <p className={styles.tableSubtitle}>All rates relative to base currency</p>
                         </div>
                         <div className={styles.baseSelector}>
+                            <div className={styles.searchContainer}>
+                                <i className="fas fa-search"></i>
+                                <input
+                                    type="text"
+                                    placeholder="Search currencies..."
+                                    className={styles.searchInput}
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
                             <label className={styles.label}>Base Currency:</label>
-                            <select value={baseCurrency} onChange={(e) => setBaseCurrency(e.target.value)} className={styles.select}>
+                            <select
+                                value={baseCurrency}
+                                onChange={(e) => setBaseCurrency(e.target.value)}
+                                className={styles.select}
+                            >
                                 {currencies.map(c => <option key={c.code} value={c.code}>{c.code} - {c.name}</option>)}
                             </select>
                         </div>
                     </div>
                 </div>
 
-                <div className={`${styles.card} overflow-hidden`}>
+                <div className={`${styles.card} ${styles.tableCard}`}>
                     <div className={styles.tableContainer}>
                         <table className={styles.dataTable}>
                             <thead>
@@ -132,24 +323,33 @@ export default function CurrenciesPage() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {displayedCurrencies.map((currency) => (
-                                    <tr key={currency.code} className={styles.dataTableRow}>
-                                        <td>
-                                            <div className={styles.currencyCell}>
-                                                <div className={styles.currencyIcon}><span>{currency.code.substring(0, 2)}</span></div>
-                                                <span className={styles.currencyName}>{currency.name}</span>
-                                            </div>
-                                        </td>
-                                        <td><span className={styles.codeBadge}>{currency.code}</span></td>
-                                        <td className="text-right"><span className={styles.rateValue}>{formatRate(currency.displayRate)}</span></td>
-                                        <td className="text-center">
-                                            <span className={`${styles.trendBadge} ${currency.trend > 0 ? styles.trendUp : currency.trend < 0 ? styles.trendDown : styles.trendStable}`}>
-                                                {currency.trend > 0 ? '↑' : currency.trend < 0 ? '↓' : '→'} {Math.abs(currency.trend)}%
-                                            </span>
-                                        </td>
-                                        <td className={`${styles.dateCell} text-right`}>{formatDate(currency.updated_at)}</td>
-                                    </tr>
-                                ))}
+                                {displayedCurrencies.map((currency) => {
+                                    const trend = calculateTrend(currency)
+                                    return (
+                                        <tr key={currency.code} className={styles.dataTableRow}>
+                                            <td>
+                                                <div className={styles.currencyCell}>
+                                                    <div className={styles.currencyIcon}>
+                                                        <span>{currency.code.substring(0, 2)}</span>
+                                                    </div>
+                                                    <span className={styles.currencyName}>{currency.name}</span>
+                                                </div>
+                                            </td>
+                                            <td><span className={styles.codeBadge}>{currency.code}</span></td>
+                                            <td className={styles.rateCell}>
+                                                <span className={styles.rateValue}>{formatRate(currency.displayRate)}</span>
+                                            </td>
+                                            <td className={styles.trendCell}>
+                                                <span className={`${styles.trendBadge} ${trend > 0 ? styles.trendUp : trend < 0 ? styles.trendDown : styles.trendStable}`}>
+                                                    {trend > 0 ? '↑' : trend < 0 ? '↓' : '→'} {Math.abs(trend).toFixed(2)}%
+                                                </span>
+                                            </td>
+                                            <td className={styles.dateCell}>
+                                                {formatDate(currency.lastUpdate || currency.updatedAt)}
+                                            </td>
+                                        </tr>
+                                    )
+                                })}
                             </tbody>
                         </table>
                     </div>

@@ -3,47 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 
-// Rate limiting storage (in-memory, use Redis in production)
-const loginAttempts = new Map<string, { count: number; lastAttempt: number }>()
-
-const MAX_LOGIN_ATTEMPTS = 5
-const LOCKOUT_DURATION = 15 * 60 * 1000 // 15 minutes
-
-function checkRateLimit(email: string): { allowed: boolean; remainingAttempts?: number } {
-    const now = Date.now()
-    const attempts = loginAttempts.get(email)
-
-    if (!attempts) {
-        return { allowed: true, remainingAttempts: MAX_LOGIN_ATTEMPTS }
-    }
-
-    // Reset if lockout period has passed
-    if (now - attempts.lastAttempt > LOCKOUT_DURATION) {
-        loginAttempts.delete(email)
-        return { allowed: true, remainingAttempts: MAX_LOGIN_ATTEMPTS }
-    }
-
-    if (attempts.count >= MAX_LOGIN_ATTEMPTS) {
-        return { allowed: false }
-    }
-
-    return { allowed: true, remainingAttempts: MAX_LOGIN_ATTEMPTS - attempts.count }
-}
-
-function recordFailedAttempt(email: string) {
-    const now = Date.now()
-    const attempts = loginAttempts.get(email)
-
-    if (!attempts) {
-        loginAttempts.set(email, { count: 1, lastAttempt: now })
-    } else {
-        loginAttempts.set(email, { count: attempts.count + 1, lastAttempt: now })
-    }
-}
-
-function clearAttempts(email: string) {
-    loginAttempts.delete(email)
-}
+import { checkRateLimit, recordFailedAttempt, clearAttempts } from "@/lib/rate-limit"
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
     providers: [

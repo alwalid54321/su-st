@@ -1,3 +1,5 @@
+import { createTheme } from '@mui/material/styles';
+
 export const colors = {
     primary: {
         main: '#1B1464', // Navy Blue
@@ -20,7 +22,45 @@ export const colors = {
     }
 };
 
-export const theme = {
-    colors,
-    // Add other theme variables here if needed
-};
+// Create proper MUI theme
+export const theme = createTheme({
+    palette: {
+        primary: {
+            main: colors.primary.main,
+            light: colors.primary.light,
+            dark: colors.primary.dark,
+        },
+        secondary: {
+            main: colors.accent.main,
+            light: colors.accent.light,
+            dark: colors.accent.dark,
+        },
+        text: {
+            primary: colors.text.primary,
+            secondary: colors.text.secondary,
+        },
+        background: {
+            default: colors.background.default,
+            paper: colors.background.paper,
+        },
+    },
+    typography: {
+        fontFamily: '"Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif',
+        h1: {
+            fontWeight: 800,
+        },
+        h2: {
+            fontWeight: 700,
+        },
+        h3: {
+            fontWeight: 700,
+        },
+        button: {
+            fontWeight: 600,
+            textTransform: 'none',
+        },
+    },
+    shape: {
+        borderRadius: 8,
+    },
+});

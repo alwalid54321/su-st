@@ -26,7 +26,15 @@ export default function GalleryList() {
             const res = await fetch('/api/admin/gallery')
             if (res.ok) {
                 const data = await res.json()
-                setGalleryItems(data)
+                // Map the API response to match GalleryItem interface
+                const mappedData = data.map((item: any) => ({
+                    id: item.id,
+                    title: item.title,
+                    imageUrl: item.imageUrl,
+                    category: item.description || 'Uncategorized',
+                    status: item.isActive ? 'active' : 'inactive'
+                }))
+                setGalleryItems(mappedData)
             }
         } catch (error) {
             console.error('Failed to fetch gallery items', error)

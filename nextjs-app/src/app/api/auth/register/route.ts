@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
+import { checkRateLimit, recordFailedAttempt } from '@/lib/rate-limit'
+import { sendVerificationEmail } from '@/lib/mail'
+import crypto from 'crypto'
 
 // Password validation schema with strength requirements
 const registerSchema = z.object({
@@ -18,7 +21,9 @@ const registerSchema = z.object({
         .max(30, 'Username is too long')
         .regex(/^[a-zA-Z0-9_-]+$/, 'Username can only contain letters, numbers, hyphens, and underscores'),
     firstName: z.string().optional(),
-    lastName: z.string().optional()
+    lastName: z.string().optional(),
+    // Honey pot field - should be empty
+    _gotcha: z.string().optional()
 })
 
 export async function POST(request: NextRequest) {
@@ -37,7 +42,29 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        const { email, password, username, firstName, lastName } = validationResult.data
+        const { email, password, username, firstName, lastName, _gotcha } = validationResult.data
+
+        // Bot check - Honeypot
+        if (_gotcha) {
+            // Silently fail for bots or return generic error
+            console.warn(`Bot attempt detected. IP: ${request.headers.get('x-forwarded-for')}, Email: ${email}`)
+            return NextResponse.json(
+                { error: 'Registration failed. Please try again.' },
+                { status: 400 }
+            )
+        }
+
+        // Rate limit check (using IP or email logic, here using IP as fallback or email if provided)
+        const ip = request.headers.get('x-forwarded-for') || 'unknown'
+        const rateLimitKey = `register_${ip}`
+        const rateLimit = checkRateLimit(rateLimitKey, 3, 60 * 60 * 1000) // 3 attempts per hour per IP
+
+        if (!rateLimit.allowed) {
+            return NextResponse.json(
+                { error: 'Too many registration attempts. Please try again later.' },
+                { status: 429 }
+            )
+        }
 
         // Check if user already exists
         const existingUser = await prisma.user.findFirst({
@@ -50,6 +77,7 @@ export async function POST(request: NextRequest) {
         })
 
         if (existingUser) {
+            recordFailedAttempt(rateLimitKey)
             // Generic error to prevent user enumeration
             return NextResponse.json(
                 { error: 'Registration failed. Please try again.' },
@@ -70,7 +98,8 @@ export async function POST(request: NextRequest) {
                 lastName: lastName || null,
                 isStaff: false,
                 isSuperuser: false,
-                isActive: true
+                isActive: true, // User can login but might be limited
+                emailVerified: false
             },
             select: {
                 id: true,
@@ -81,13 +110,32 @@ export async function POST(request: NextRequest) {
             }
         })
 
+        // Generate OTP
+        const otp = crypto.randomInt(100000, 999999).toString()
+        const expiresAt = new Date(Date.now() + 15 * 60 * 1000) // 15 minutes
+
+        // Create EmailOTP record
+        await prisma.emailOTP.create({
+            data: {
+                email,
+                otp,
+                expiresAt,
+                purpose: 'verification',
+                userId: user.id
+            }
+        })
+
+        // Send verification email
+        await sendVerificationEmail(email, otp)
+
         // Log registration (for security audit)
         console.log(`New user registered: ${user.email} at ${new Date().toISOString()}`)
 
         return NextResponse.json(
             {
-                message: 'Account created successfully! Please login to continue.',
-                user
+                message: 'Account created successfully! Please check your email for verification code.',
+                user,
+                requiresVerification: true
             },
             { status: 201 }
         )

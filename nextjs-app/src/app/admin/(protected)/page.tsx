@@ -1,7 +1,31 @@
 'use client'
 
 import Link from 'next/link'
+import { useState, useEffect } from 'react'
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+    Filler
+} from 'chart.js'
+import { Line } from 'react-chartjs-2'
 import styles from './admin.module.css'
+
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+    Filler
+)
 
 export default function AdminDashboard() {
     // Mock Data for Admin Dashboard
@@ -18,6 +42,37 @@ export default function AdminDashboard() {
         { action: 'Currency Rate', item: 'USD/SDG', user: 'Admin', time: '1 hour ago', icon: 'fa-exchange-alt', color: 'Yellow' },
         { action: 'Image Upload', item: 'harvest_2023.jpg', user: 'Editor', time: '3 hours ago', icon: 'fa-upload', color: 'Purple' },
     ]
+
+    // Consolidated Data from old Dashboard
+    const [announcements, setAnnouncements] = useState<any[]>([
+        { id: 1, title: 'System Upgrade Notice', date: '2025-11-25', priority: 'high' },
+        { id: 2, title: 'New API Version Released', date: '2025-11-24', priority: 'medium' },
+        { id: 3, title: 'Holiday Maintenance Schedule', date: '2025-11-22', priority: 'low' },
+    ]);
+
+    const chartData = {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [
+            {
+                label: 'Market Value',
+                data: [1200, 1250, 1230, 1280, 1300, 1320],
+                borderColor: '#1B1464',
+                backgroundColor: 'rgba(27, 20, 100, 0.1)',
+                tension: 0.4,
+                fill: true,
+            },
+        ]
+    }
+
+    const chartOptions: any = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'top' as const,
+            },
+        },
+    }
 
     return (
         <div className={styles.dashboardContainer}>
@@ -55,7 +110,38 @@ export default function AdminDashboard() {
             {/* Main Content Grid */}
             <div className={styles.mainGrid}>
 
-                {/* Recent Activity */}
+                {/* Market Analysis Chart (Spans 2 columns) */}
+                <div className={styles.card} style={{ gridColumn: 'span 2' }}>
+                    <div className={styles.cardHeader}>
+                        <h2 className={styles.cardTitle}>Market Analysis</h2>
+                    </div>
+                    <div className={styles.cardContent} style={{ padding: '1.5rem' }}>
+                        <div className={styles.chartContainer}>
+                            <Line data={chartData} options={chartOptions} />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Announcements (Spans 1 column) */}
+                <div className={styles.card}>
+                    <div className={styles.cardHeader}>
+                        <h2 className={styles.cardTitle}>Announcements</h2>
+                        <Link href="/admin/announcements" className={styles.viewAllButton}>Manage</Link>
+                    </div>
+                    <div className={styles.cardContent} style={{ padding: '0 1.5rem 1.5rem 1.5rem' }}>
+                        <ul className={styles.announcementsList}>
+                            {announcements.map(item => (
+                                <li key={item.id}>
+                                    <strong>{item.title}</strong>
+                                    <br />
+                                    <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>{item.date}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+
+                {/* Recent Activity (Spans 2 columns) */}
                 <div className={`${styles.card} ${styles.recentActivityContainer}`}>
                     <div className={styles.cardHeader}>
                         <h2 className={styles.cardTitle}>Recent Activity</h2>
@@ -83,7 +169,7 @@ export default function AdminDashboard() {
                     </div>
                 </div>
 
-                {/* Side Panel */}
+                {/* Side Panel (Spans 1 column) */}
                 <div className={styles.sidePanel}>
                     <div className={`${styles.card} ${styles.statusCard}`}>
                         <h2 className={styles.cardTitle}>System Status</h2>

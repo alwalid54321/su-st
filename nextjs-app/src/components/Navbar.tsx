@@ -20,32 +20,37 @@ import {
     ListItemText,
     Container,
     Slide,
-    useScrollTrigger
+    useScrollTrigger,
+    Divider,
+    Collapse
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import ShowChartIcon from '@mui/icons-material/ShowChart';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import CollectionsIcon from '@mui/icons-material/Collections';
+import PeopleIcon from '@mui/icons-material/People';
+import SettingsIcon from '@mui/icons-material/Settings';
+import CampaignIcon from '@mui/icons-material/Campaign';
 
-interface HideOnScrollProps {
-    children: React.ReactElement;
-}
+const goldColor = '#786D3C';
+const textColor = '#1B1464';
 
-function HideOnScroll(props: HideOnScrollProps) {
-    const { children } = props;
-    const trigger = useScrollTrigger();
-
-    return (
-        <Slide appear={false} direction="down" in={!trigger}>
-            {children}
-        </Slide>
-    );
-}
 
 export default function Navbar() {
     const { data: session } = useSession();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [productsAnchorEl, setProductsAnchorEl] = useState<null | HTMLElement>(null);
     const [dashboardAnchorEl, setDashboardAnchorEl] = useState<null | HTMLElement>(null);
+
+    // Mobile dropdown states
+    const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
+    const [mobileDashboardOpen, setMobileDashboardOpen] = useState(false);
+
     const pathname = usePathname();
 
     // Scroll trigger for transparency
@@ -95,432 +100,348 @@ export default function Navbar() {
     ];
 
     const productsDropdownItems = [
-        { name: 'Sesame Seeds', desc: 'Premium quality seeds', icon: '🌱', href: '/products?category=sesame' },
-        { name: 'Peanuts', desc: 'Rich & flavorful', icon: '🥜', href: '/products?category=others' },
-        { name: 'Gum Arabic', desc: 'Natural acacia gum', icon: '🌳', href: '/products?category=gum' },
-        { name: 'Cotton', desc: 'High-grade fiber', icon: '☁️', href: '/products?category=cotton' },
+        { name: 'All Products', href: '/products', desc: 'View all our products', icon: '📦' },
+        { name: 'Sesame Seeds', href: '/products?category=sesame', desc: 'Premium Sudanese sesame', icon: '🌾' },
+        { name: 'Gum Arabic', href: '/products?category=gum', desc: 'High-grade gum arabic', icon: '🌳' },
+        { name: 'Cotton', href: '/products?category=cotton', desc: 'Quality cotton products', icon: '☁️' },
+        { name: 'Others', href: '/products?category=others', desc: 'Peanuts, Hibiscus & more', icon: '🥜' },
     ];
 
     const dashboardDropdownItems = [
-        { name: 'Market Data', desc: 'Manage products', icon: '📊', href: '/dashboard/market-data' },
-        { name: 'Currencies', desc: 'Exchange rates', icon: '💱', href: '/dashboard/currencies' },
-        { name: 'Gallery', desc: 'Image management', icon: '🖼️', href: '/dashboard/gallery' },
+        { name: 'Overview', href: '', desc: 'Dashboard Home', icon: <DashboardIcon fontSize="small" /> },
+        { name: 'Market Data', href: '/market-data', desc: 'Manage Market Rates', icon: <ShowChartIcon fontSize="small" /> },
+        { name: 'Currencies', href: '/currencies', desc: 'Manage Currencies', icon: <AttachMoneyIcon fontSize="small" /> },
+        { name: 'Gallery', href: '/gallery', desc: 'Manage Images', icon: <CollectionsIcon fontSize="small" /> },
+        { name: 'Announcements', href: '/announcements', desc: 'Manage News', icon: <CampaignIcon fontSize="small" /> },
+        { name: 'Users', href: '/users', desc: 'Manage Users', icon: <PeopleIcon fontSize="small" /> },
+        { name: 'Settings', href: '/settings', desc: 'System Settings', icon: <SettingsIcon fontSize="small" /> },
     ];
 
+    // Determine if navbar should be transparent
+    const isTransparent = !scrolled && pathname === '/';
+    const navBgColor = isTransparent ? 'transparent' : '#fff';
+    const navShadow = isTransparent ? 'none' : '0 2px 10px rgba(0,0,0,0.05)';
+
     const drawer = (
-        <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', padding: 2 }}>
+        <Box sx={{ textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{ py: 2, display: 'flex', justifyContent: 'flex-end', px: 2 }}>
                 <IconButton onClick={handleDrawerToggle}>
                     <CloseIcon />
                 </IconButton>
             </Box>
-            <List>
+            <Divider />
+            <List sx={{ flexGrow: 1 }}>
                 {navItems.map((item) => (
                     <ListItem key={item.name} disablePadding>
                         <ListItemText sx={{ textAlign: 'center' }}>
-                            <Link href={item.href} passHref legacyBehavior>
-                                <Button
-                                    sx={{
-                                        width: '100%',
-                                        textTransform: 'uppercase',
-                                        fontWeight: pathname === item.href ? 700 : 500,
-                                        color: pathname === item.href ? '#1B1464' : 'inherit',
-                                        backgroundColor: pathname === item.href ? 'rgba(27, 20, 100, 0.05)' : 'transparent',
-                                        '&:hover': { backgroundColor: 'rgba(27, 20, 100, 0.05)' }
-                                    }}
-                                >
-                                    {item.name}
-                                </Button>
+                            <Link href={item.href} style={{ textDecoration: 'none', color: textColor, display: 'block', padding: '10px' }}>
+                                <Typography variant="button" sx={{ fontWeight: 600 }}>{item.name}</Typography>
                             </Link>
                         </ListItemText>
                     </ListItem>
                 ))}
-                <ListItem disablePadding>
+
+                {/* Mobile Products Dropdown */}
+                <ListItem disablePadding sx={{ display: 'block' }}>
                     <ListItemText sx={{ textAlign: 'center' }}>
-                        <Button
-                            onClick={handleProductsMenuOpen}
-                            endIcon={<KeyboardArrowDownIcon />}
+                        <Box
+                            onClick={() => setMobileProductsOpen(!mobileProductsOpen)}
                             sx={{
-                                width: '100%',
-                                textTransform: 'uppercase',
-                                fontWeight: pathname.startsWith('/products') ? 700 : 500,
-                                color: pathname.startsWith('/products') ? '#1B1464' : 'inherit',
-                                backgroundColor: pathname.startsWith('/products') ? 'rgba(27, 20, 100, 0.05)' : 'transparent',
-                                '&:hover': { backgroundColor: 'rgba(27, 20, 100, 0.05)' }
+                                py: 1.5,
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: textColor
                             }}
                         >
-                            Products
-                        </Button>
-                        <Menu
-                            anchorEl={productsAnchorEl}
-                            open={isProductsMenuOpen}
-                            onClose={handleProductsMenuClose}
-                            MenuListProps={{ 'aria-labelledby': 'products-button' }}
-                        >
-                            {productsDropdownItems.map((item) => (
-                                <MenuItem key={item.name} onClick={handleProductsMenuClose}>
-                                    <Link href={item.href} passHref legacyBehavior>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, textDecoration: 'none', color: 'inherit' }}>
-                                            <Typography component="span">{item.icon}</Typography>
-                                            <Box>
-                                                <Typography variant="subtitle1" component="span">{item.name}</Typography>
-                                                <Typography variant="body2" color="text.secondary">{item.desc}</Typography>
-                                            </Box>
-                                        </Box>
-                                    </Link>
-                                </MenuItem>
-                            ))}
-                        </Menu>
+                            <Typography variant="button" sx={{ fontWeight: 600, mr: 1 }}>PRODUCTS</Typography>
+                            {mobileProductsOpen ? <ExpandLess /> : <ExpandMore />}
+                        </Box>
+                        <Collapse in={mobileProductsOpen} timeout="auto" unmountOnExit>
+                            <List component="div" disablePadding sx={{ bgcolor: 'rgba(0,0,0,0.03)' }}>
+                                {productsDropdownItems.map((item) => (
+                                    <ListItem key={item.name} disablePadding>
+                                        <Link href={item.href} style={{ textDecoration: 'none', color: textColor, width: '100%' }}>
+                                            <ListItemText primary={item.name} sx={{ textAlign: 'center', py: 1 }} />
+                                        </Link>
+                                    </ListItem>
+                                ))}
+                            </List>
+                        </Collapse>
                     </ListItemText>
                 </ListItem>
 
-                {isAdmin ? (
-                    <ListItem disablePadding>
+                {/* Mobile Admin Dashboard Dropdown */}
+                {isAdmin && (
+                    <ListItem disablePadding sx={{ display: 'block' }}>
                         <ListItemText sx={{ textAlign: 'center' }}>
-                            <Button
-                                onClick={handleDashboardMenuOpen}
-                                endIcon={<KeyboardArrowDownIcon />}
+                            <Box
+                                onClick={() => setMobileDashboardOpen(!mobileDashboardOpen)}
                                 sx={{
-                                    width: '100%',
-                                    textTransform: 'uppercase',
-                                    fontWeight: pathname.startsWith('/dashboard') ? 700 : 500,
-                                    color: pathname.startsWith('/dashboard') ? '#1B1464' : 'inherit',
-                                    backgroundColor: pathname.startsWith('/dashboard') ? 'rgba(27, 20, 100, 0.05)' : 'transparent',
-                                    '&:hover': { backgroundColor: 'rgba(27, 20, 100, 0.05)' }
+                                    py: 1.5,
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: goldColor
                                 }}
                             >
-                                Admin Dashboard
-                            </Button>
-                            <Menu
-                                anchorEl={dashboardAnchorEl}
-                                open={isDashboardMenuOpen}
-                                onClose={handleDashboardMenuClose}
-                                MenuListProps={{ 'aria-labelledby': 'dashboard-button' }}
-                            >
-                                {dashboardDropdownItems.map((item) => (
-                                    <MenuItem key={item.name} onClick={handleDashboardMenuClose}>
-                                        <Link href={item.href} passHref legacyBehavior>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, textDecoration: 'none', color: 'inherit' }}>
-                                                <Typography component="span">{item.icon}</Typography>
-                                                <Box>
-                                                    <Typography variant="subtitle1" component="span">{item.name}</Typography>
-                                                    <Typography variant="body2" color="text.secondary">{item.desc}</Typography>
-                                                </Box>
-                                            </Box>
-                                        </Link>
-                                    </MenuItem>
-                                ))}
-                            </Menu>
+                                <Typography variant="button" sx={{ fontWeight: 700, mr: 1 }}>ADMIN DASHBOARD</Typography>
+                                {mobileDashboardOpen ? <ExpandLess /> : <ExpandMore />}
+                            </Box>
+                            <Collapse in={mobileDashboardOpen} timeout="auto" unmountOnExit>
+                                <List component="div" disablePadding sx={{ bgcolor: 'rgba(0,0,0,0.03)' }}>
+                                    {dashboardDropdownItems.map((item) => (
+                                        <ListItem key={item.name} disablePadding>
+                                            <Link href={`/admin${item.href}`} style={{ textDecoration: 'none', color: textColor, width: '100%' }}>
+                                                <ListItemText primary={item.name} sx={{ textAlign: 'center', py: 1 }} />
+                                            </Link>
+                                        </ListItem>
+                                    ))}
+                                </List>
+                            </Collapse>
                         </ListItemText>
                     </ListItem>
-                ) : session ? (
+                )}
+
+                {!isAdmin && session && (
                     <ListItem disablePadding>
                         <ListItemText sx={{ textAlign: 'center' }}>
-                            <Link href="/user" passHref legacyBehavior>
-                                <Button
-                                    sx={{
-                                        width: '100%',
-                                        textTransform: 'uppercase',
-                                        fontWeight: pathname === '/user' ? 700 : 500,
-                                        color: pathname === '/user' ? '#1B1464' : 'inherit',
-                                        backgroundColor: pathname === '/user' ? 'rgba(27, 20, 100, 0.05)' : 'transparent',
-                                        '&:hover': { backgroundColor: 'rgba(27, 20, 100, 0.05)' }
-                                    }}
-                                >
-                                    My Dashboard
-                                </Button>
+                            <Link href="/user" style={{ textDecoration: 'none', color: goldColor, display: 'block', padding: '10px' }}>
+                                <Typography variant="button" sx={{ fontWeight: 700 }}>MY DASHBOARD</Typography>
                             </Link>
                         </ListItemText>
                     </ListItem>
-                ) : null}
-
-                <ListItem disablePadding sx={{ display: 'flex', justifyContent: 'center', marginTop: 2, gap: 1 }}>
-                    {session ? (
-                        <Button onClick={() => signOut()} variant="contained" sx={{ bgcolor: '#1B1464', '&:hover': { bgcolor: '#2d1f7a' } }}>
-                            Logout
-                        </Button>
-                    ) : (
-                        <>
-                            <Link href="/login" passHref legacyBehavior>
-                                <Button variant="outlined" sx={{ color: '#1B1464', borderColor: '#1B1464' }}>Login</Button>
-                            </Link>
-                            <Link href="/register" passHref legacyBehavior>
-                                <Button variant="contained" sx={{ bgcolor: '#1B1464', '&:hover': { bgcolor: '#2d1f7a' } }}>Register</Button>
-                            </Link>
-                        </>
-                    )}
-                </ListItem>
+                )}
             </List>
+
+            <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {session ? (
+                    <Button
+                        onClick={() => signOut()}
+                        variant="contained"
+                        fullWidth
+                        sx={{ bgcolor: goldColor, color: '#fff', '&:hover': { bgcolor: '#5a512d' } }}
+                    >
+                        Logout
+                    </Button>
+                ) : (
+                    <>
+                        <Button component="a" href="/login" variant="outlined" fullWidth sx={{ color: textColor, borderColor: textColor }}>
+                            Login
+                        </Button>
+                        <Button component="a" href="/register" variant="contained" fullWidth sx={{ bgcolor: goldColor, color: '#fff', '&:hover': { bgcolor: '#5a512d' } }}>
+                            Register
+                        </Button>
+                    </>
+                )}
+            </Box>
         </Box>
     );
 
-    // Dynamic styles based on scroll and path
-    // Apply transparency to all main pages as requested: home, about, contact, market-data, products
-    const isTransparentPage = ['/', '/about', '/contact', '/market-data'].includes(pathname) || pathname.startsWith('/products');
-    const isTransparent = isTransparentPage && !scrolled;
-
-    // Text color: White if transparent, otherwise Navy (#1B1464)
-    const textColor = isTransparent ? '#ffffff' : '#1B1464';
-    const logoFilter = isTransparent ? 'brightness(0) invert(1)' : 'none';
-    const goldColor = '#786D3C'; // Updated Gold Color
-
     return (
         <>
-            <HideOnScroll>
-                <AppBar component="nav" sx={{
-                    backgroundColor: isTransparent ? 'transparent' : 'rgba(255, 255, 255, 0.95)',
-                    boxShadow: isTransparent ? 'none' : '0 2px 10px rgba(0,0,0,0.1)',
-                    transition: 'all 0.3s ease-in-out',
-                    backdropFilter: isTransparent ? 'none' : 'blur(10px)',
-                    padding: '10px 0',
-                }}>
-                    <Container maxWidth="xl">
-                        <Toolbar disableGutters sx={{ justifyContent: 'space-between', display: 'grid', gridTemplateColumns: { lg: 'auto 1fr auto', xs: '1fr auto' }, gap: 2 }}>
+            <AppBar
+                position="fixed"
+                sx={{
+                    bgcolor: navBgColor,
+                    color: textColor,
+                    boxShadow: navShadow,
+                    transition: 'all 0.3s ease',
+                    backdropFilter: isTransparent ? 'blur(10px)' : 'none'
+                }}
+            >
+                <Container maxWidth="xl">
+                    <Toolbar disableGutters sx={{ display: 'grid', gridTemplateColumns: 'auto 1fr auto', gap: 2 }}>
 
-                            {/* 1. Logo (Left) */}
-                            <Link href="/" passHref legacyBehavior>
-                                <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gridColumn: '1' }}>
-                                    <Image
-                                        src="/images/logo-icon.png"
-                                        alt="SudaStock"
-                                        width={120}
-                                        height={60}
-                                        priority
-                                        style={{
-                                            transition: 'all 0.3s ease-in-out',
-                                            filter: logoFilter,
-                                            objectFit: 'contain',
-                                            width: 'auto',
-                                            height: '60px'
-                                        }}
-                                    />
-                                    {/* Text removed as requested */}
-                                </Box>
+                        {/* 1. Logo (Left) */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gridColumn: '1' }}>
+                            <Link href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+                                <Image
+                                    src="/logo.png"
+                                    alt="Logo"
+                                    width={180}
+                                    height={60}
+                                    style={{ objectFit: 'contain' }}
+                                    priority
+                                />
                             </Link>
+                        </Box>
 
-                            {/* 2. Navigation Links (Center) */}
-                            <Box sx={{ display: { xs: 'none', lg: 'flex' }, alignItems: 'center', justifyContent: 'center', gap: 4, gridColumn: '2' }}>
-                                {navItems.map((item) => (
-                                    <Link key={item.name} href={item.href} passHref legacyBehavior>
-                                        <Button
-                                            sx={{
-                                                color: pathname === item.href ? goldColor : textColor,
-                                                textTransform: 'uppercase',
-                                                fontWeight: pathname === item.href ? 700 : 600,
-                                                fontSize: '0.9rem',
-                                                letterSpacing: '0.5px',
-                                                '&:hover': {
-                                                    color: goldColor,
-                                                    backgroundColor: 'transparent',
-                                                    transform: 'translateY(-2px)'
-                                                },
-                                                transition: 'all 0.2s ease'
-                                            }}
-                                        >
-                                            {item.name}
-                                        </Button>
-                                    </Link>
-                                ))}
-
+                        {/* 2. Desktop Nav (Center) */}
+                        <Box sx={{ display: { xs: 'none', lg: 'flex' }, justifyContent: 'center', alignItems: 'center', gap: 3, gridColumn: '2' }}>
+                            {navItems.map((item) => (
                                 <Button
-                                    id="products-button"
-                                    aria-controls={isProductsMenuOpen ? 'products-menu' : undefined}
-                                    aria-haspopup="true"
-                                    aria-expanded={isProductsMenuOpen ? 'true' : undefined}
-                                    onClick={handleProductsMenuOpen}
-                                    endIcon={<KeyboardArrowDownIcon />}
+                                    key={item.name}
+                                    component="a"
+                                    href={item.href}
                                     sx={{
-                                        color: pathname.startsWith('/products') ? goldColor : textColor,
+                                        color: pathname === item.href ? (isTransparent ? '#fff' : goldColor) : (isTransparent ? '#fff' : textColor),
+                                        bgcolor: pathname === item.href ? (isTransparent ? 'rgba(255,255,255,0.2)' : 'rgba(120, 109, 60, 0.1)') : 'transparent',
                                         textTransform: 'uppercase',
-                                        fontWeight: pathname.startsWith('/products') ? 700 : 600,
+                                        fontWeight: pathname === item.href ? 700 : 600,
                                         fontSize: '0.9rem',
                                         letterSpacing: '0.5px',
+                                        px: 2,
+                                        py: 1,
+                                        borderRadius: 2,
                                         '&:hover': {
-                                            color: goldColor,
-                                            backgroundColor: 'transparent',
+                                            color: isTransparent ? '#fff' : goldColor,
+                                            backgroundColor: isTransparent ? 'rgba(255,255,255,0.3)' : 'rgba(120, 109, 60, 0.05)',
                                             transform: 'translateY(-2px)'
                                         },
                                         transition: 'all 0.2s ease'
                                     }}
                                 >
-                                    Products
+                                    {item.name}
                                 </Button>
-                                <Menu
-                                    id="products-menu"
-                                    anchorEl={productsAnchorEl}
-                                    open={isProductsMenuOpen}
-                                    onClose={handleProductsMenuClose}
-                                    MenuListProps={{ 'aria-labelledby': 'products-button' }}
-                                    PaperProps={{
-                                        sx: {
-                                            mt: 1.5,
-                                            borderRadius: 2,
-                                            boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-                                            border: '1px solid rgba(0,0,0,0.05)'
+                            ))}
+
+                            <Button
+                                id="products-button"
+                                aria-controls={isProductsMenuOpen ? 'products-menu' : undefined}
+                                aria-haspopup="true"
+                                aria-expanded={isProductsMenuOpen ? 'true' : undefined}
+                                onClick={handleProductsMenuOpen}
+                                endIcon={<KeyboardArrowDownIcon />}
+                                sx={{
+                                    color: pathname.startsWith('/products') ? (isTransparent ? '#fff' : goldColor) : (isTransparent ? '#fff' : textColor),
+                                    bgcolor: pathname.startsWith('/products') ? (isTransparent ? 'rgba(255,255,255,0.2)' : 'rgba(120, 109, 60, 0.1)') : 'transparent',
+                                    textTransform: 'uppercase',
+                                    fontWeight: pathname.startsWith('/products') ? 700 : 600,
+                                    fontSize: '0.9rem',
+                                    letterSpacing: '0.5px',
+                                    px: 2,
+                                    py: 1,
+                                    borderRadius: 2,
+                                    '&:hover': {
+                                        color: isTransparent ? '#fff' : goldColor,
+                                        backgroundColor: isTransparent ? 'rgba(255,255,255,0.3)' : 'rgba(120, 109, 60, 0.05)',
+                                        transform: 'translateY(-2px)'
+                                    },
+                                    transition: 'all 0.2s ease'
+                                }}
+                            >
+                                Products
+                            </Button>
+                        </Box>
+
+                        {/* 3. Auth/Profile (Right) */}
+                        <Box sx={{ display: { xs: 'none', lg: 'flex' }, alignItems: 'center', justifyContent: 'flex-end', gap: 2, gridColumn: '3' }}>
+                            {isAdmin ? (
+                                <Button
+                                    id="dashboard-button"
+                                    aria-controls={isDashboardMenuOpen ? 'dashboard-menu' : undefined}
+                                    aria-haspopup="true"
+                                    aria-expanded={isDashboardMenuOpen ? 'true' : undefined}
+                                    onClick={handleDashboardMenuOpen}
+                                    endIcon={<KeyboardArrowDownIcon />}
+                                    sx={{
+                                        color: pathname.startsWith('/admin') ? (isTransparent ? '#fff' : goldColor) : (isTransparent ? '#fff' : textColor),
+                                        textTransform: 'uppercase',
+                                        fontWeight: pathname.startsWith('/admin') ? 700 : 600,
+                                        fontSize: '0.9rem',
+                                        '&:hover': {
+                                            color: isTransparent ? '#fff' : goldColor,
+                                            backgroundColor: 'transparent'
                                         }
                                     }}
                                 >
-                                    {productsDropdownItems.map((item) => (
-                                        <MenuItem key={item.name} onClick={handleProductsMenuClose} sx={{ py: 1.5, px: 2.5 }}>
-                                            <Link href={item.href} passHref legacyBehavior>
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, textDecoration: 'none', color: '#1B1464' }}>
-                                                    <Typography component="span" sx={{ fontSize: '1.5rem' }}>{item.icon}</Typography>
-                                                    <Box>
-                                                        <Typography variant="subtitle1" component="span" sx={{ fontWeight: 600 }}>{item.name}</Typography>
-                                                        <Typography variant="body2" color="text.secondary">{item.desc}</Typography>
-                                                    </Box>
-                                                </Box>
-                                            </Link>
-                                        </MenuItem>
-                                    ))}
-                                </Menu>
-                            </Box>
+                                    Admin Dashboard
+                                </Button>
+                            ) : session ? (
+                                <Button
+                                    component="a"
+                                    href="/user"
+                                    sx={{
+                                        color: pathname === '/user' ? (isTransparent ? '#fff' : goldColor) : (isTransparent ? '#fff' : textColor),
+                                        textTransform: 'uppercase',
+                                        fontWeight: pathname === '/user' ? 700 : 600,
+                                        fontSize: '0.9rem',
+                                        '&:hover': {
+                                            color: isTransparent ? '#fff' : goldColor,
+                                            backgroundColor: 'transparent'
+                                        }
+                                    }}
+                                >
+                                    My Dashboard
+                                </Button>
+                            ) : null}
 
-                            {/* 3. Auth/Profile (Right) */}
-                            <Box sx={{ display: { xs: 'none', lg: 'flex' }, alignItems: 'center', justifyContent: 'flex-end', gap: 2, gridColumn: '3' }}>
-                                {isAdmin ? (
-                                    <>
-                                        <Button
-                                            id="dashboard-button"
-                                            aria-controls={isDashboardMenuOpen ? 'dashboard-menu' : undefined}
-                                            aria-haspopup="true"
-                                            aria-expanded={isDashboardMenuOpen ? 'true' : undefined}
-                                            onClick={handleDashboardMenuOpen}
-                                            endIcon={<KeyboardArrowDownIcon />}
-                                            sx={{
-                                                color: pathname.startsWith('/dashboard') ? goldColor : textColor,
-                                                textTransform: 'uppercase',
-                                                fontWeight: pathname.startsWith('/dashboard') ? 700 : 600,
-                                                fontSize: '0.9rem',
-                                                '&:hover': {
-                                                    color: goldColor,
-                                                    backgroundColor: 'transparent'
-                                                }
-                                            }}
-                                        >
-                                            Admin Dashboard
-                                        </Button>
-                                        <Menu
-                                            id="dashboard-menu"
-                                            anchorEl={dashboardAnchorEl}
-                                            open={isDashboardMenuOpen}
-                                            onClose={handleDashboardMenuClose}
-                                            MenuListProps={{ 'aria-labelledby': 'dashboard-button' }}
-                                            PaperProps={{
-                                                sx: {
-                                                    mt: 1.5,
-                                                    borderRadius: 2,
-                                                    boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-                                                    border: '1px solid rgba(0,0,0,0.05)'
-                                                }
-                                            }}
-                                        >
-                                            {dashboardDropdownItems.map((item) => (
-                                                <MenuItem key={item.name} onClick={handleDashboardMenuClose} sx={{ py: 1.5, px: 2.5 }}>
-                                                    <Link href={item.href} passHref legacyBehavior>
-                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, textDecoration: 'none', color: '#1B1464' }}>
-                                                            <Typography component="span" sx={{ fontSize: '1.5rem' }}>{item.icon}</Typography>
-                                                            <Box>
-                                                                <Typography variant="subtitle1" component="span" sx={{ fontWeight: 600 }}>{item.name}</Typography>
-                                                                <Typography variant="body2" color="text.secondary">{item.desc}</Typography>
-                                                            </Box>
-                                                        </Box>
-                                                    </Link>
-                                                </MenuItem>
-                                            ))}
-                                        </Menu>
-                                    </>
-                                ) : session ? (
-                                    <Link href="/user" passHref legacyBehavior>
-                                        <Button
-                                            sx={{
-                                                color: pathname === '/user' ? goldColor : textColor,
-                                                textTransform: 'uppercase',
-                                                fontWeight: pathname === '/user' ? 700 : 600,
-                                                fontSize: '0.9rem',
-                                                '&:hover': {
-                                                    color: goldColor,
-                                                    backgroundColor: 'transparent'
-                                                }
-                                            }}
-                                        >
-                                            My Dashboard
-                                        </Button>
-                                    </Link>
-                                ) : null}
+                            {session ? (
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                    <Typography variant="body1" sx={{ cursor: 'pointer', color: isTransparent ? '#fff' : textColor, fontWeight: 600 }}>
+                                        Hello, {session.user?.name?.split(' ')[0] || 'User'}
+                                    </Typography>
+                                    <Button
+                                        onClick={() => signOut()}
+                                        variant="contained"
+                                        size="small"
+                                        sx={{
+                                            bgcolor: goldColor,
+                                            color: '#fff',
+                                            fontWeight: 700,
+                                            '&:hover': { bgcolor: '#5a512d' },
+                                            boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+                                        }}
+                                    >
+                                        Logout
+                                    </Button>
+                                </Box>
+                            ) : (
+                                <Box sx={{ display: 'flex', gap: 1.5 }}>
+                                    <Button
+                                        component="a"
+                                        href="/login"
+                                        variant="outlined"
+                                        size="small"
+                                        sx={{
+                                            color: isTransparent ? '#fff' : textColor,
+                                            borderColor: isTransparent ? '#fff' : textColor,
+                                            fontWeight: 600,
+                                            '&:hover': {
+                                                borderColor: goldColor,
+                                                color: goldColor,
+                                                bgcolor: isTransparent ? 'rgba(255,255,255,0.1)' : 'transparent'
+                                            }
+                                        }}
+                                    >
+                                        Login
+                                    </Button>
+                                    <Button
+                                        component="a"
+                                        href="/register"
+                                        variant="contained"
+                                        size="small"
+                                        sx={{
+                                            bgcolor: goldColor,
+                                            color: '#fff',
+                                            fontWeight: 700,
+                                            '&:hover': { bgcolor: '#5a512d' },
+                                            boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+                                        }}
+                                    >
+                                        Register
+                                    </Button>
+                                </Box>
+                            )}
+                        </Box>
 
-                                {session ? (
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                        <Typography variant="body1" sx={{ cursor: 'pointer', color: textColor, fontWeight: 600 }}>
-                                            Hello, {session.user?.name?.split(' ')[0] || 'User'}
-                                        </Typography>
-                                        <Button
-                                            onClick={() => signOut()}
-                                            variant="contained"
-                                            size="small"
-                                            sx={{
-                                                bgcolor: goldColor,
-                                                color: '#fff',
-                                                fontWeight: 700,
-                                                '&:hover': { bgcolor: '#5a512d' },
-                                                boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
-                                            }}
-                                        >
-                                            Logout
-                                        </Button>
-                                    </Box>
-                                ) : (
-                                    <Box sx={{ display: 'flex', gap: 1.5 }}>
-                                        <Link href="/login" passHref legacyBehavior>
-                                            <Button
-                                                variant="outlined"
-                                                size="small"
-                                                sx={{
-                                                    color: textColor,
-                                                    borderColor: textColor,
-                                                    fontWeight: 600,
-                                                    '&:hover': {
-                                                        borderColor: goldColor,
-                                                        color: goldColor
-                                                    }
-                                                }}
-                                            >
-                                                Login
-                                            </Button>
-                                        </Link>
-                                        <Link href="/register" passHref legacyBehavior>
-                                            <Button
-                                                variant="contained"
-                                                size="small"
-                                                sx={{
-                                                    bgcolor: goldColor,
-                                                    color: '#fff',
-                                                    fontWeight: 700,
-                                                    '&:hover': { bgcolor: '#5a512d' },
-                                                    boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
-                                                }}
-                                            >
-                                                Register
-                                            </Button>
-                                        </Link>
-                                    </Box>
-                                )}
-                            </Box>
+                        {/* Mobile Menu Icon */}
+                        <IconButton
+                            color="inherit"
+                            aria-label="open drawer"
+                            edge="start"
+                            onClick={handleDrawerToggle}
+                            sx={{ display: { lg: 'none' }, color: isTransparent ? '#fff' : textColor, gridColumn: '3', justifySelf: 'end' }}
+                        >
+                            <MenuIcon />
+                        </IconButton>
+                    </Toolbar>
+                </Container>
+            </AppBar>
 
-                            {/* Mobile Menu Icon */}
-                            <IconButton
-                                color="inherit"
-                                aria-label="open drawer"
-                                edge="start"
-                                onClick={handleDrawerToggle}
-                                sx={{ display: { lg: 'none' }, color: textColor, gridColumn: '2', justifySelf: 'end' }}
-                            >
-                                <MenuIcon />
-                            </IconButton>
-                        </Toolbar>
-                    </Container>
-                </AppBar>
-            </HideOnScroll>
             <Drawer
                 variant="temporary"
                 open={mobileOpen}
@@ -533,6 +454,64 @@ export default function Navbar() {
             >
                 {drawer}
             </Drawer>
+
+            {/* Shared Products Menu */}
+            <Menu
+                id="products-menu"
+                anchorEl={productsAnchorEl}
+                open={isProductsMenuOpen}
+                onClose={handleProductsMenuClose}
+                MenuListProps={{ 'aria-labelledby': 'products-button' }}
+                PaperProps={{
+                    sx: {
+                        mt: 1.5,
+                        borderRadius: 2,
+                        boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                        border: '1px solid rgba(0,0,0,0.05)'
+                    }
+                }}
+            >
+                {productsDropdownItems.map((item) => (
+                    <MenuItem key={item.name} onClick={handleProductsMenuClose} sx={{ py: 1.5, px: 2.5 }}>
+                        <Box component="a" href={item.href} sx={{ display: 'flex', alignItems: 'center', gap: 2, textDecoration: 'none', color: '#1B1464' }}>
+                            <Typography component="span" sx={{ fontSize: '1.5rem' }}>{item.icon}</Typography>
+                            <Box>
+                                <Typography variant="subtitle1" component="span" sx={{ fontWeight: 600 }}>{item.name}</Typography>
+                                <Typography variant="body2" color="text.secondary">{item.desc}</Typography>
+                            </Box>
+                        </Box>
+                    </MenuItem>
+                ))}
+            </Menu>
+
+            {/* Shared Dashboard Menu */}
+            <Menu
+                id="dashboard-menu"
+                anchorEl={dashboardAnchorEl}
+                open={isDashboardMenuOpen}
+                onClose={handleDashboardMenuClose}
+                MenuListProps={{ 'aria-labelledby': 'dashboard-button' }}
+                PaperProps={{
+                    sx: {
+                        mt: 1.5,
+                        borderRadius: 2,
+                        boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                        border: '1px solid rgba(0,0,0,0.05)'
+                    }
+                }}
+            >
+                {dashboardDropdownItems.map((item) => (
+                    <MenuItem key={item.name} onClick={handleDashboardMenuClose} sx={{ py: 1.5, px: 2.5 }}>
+                        <Box component="a" href={`/admin${item.href}`} sx={{ display: 'flex', alignItems: 'center', gap: 2, textDecoration: 'none', color: '#1B1464' }}>
+                            <Box component="span" sx={{ display: 'flex', color: goldColor }}>{item.icon}</Box>
+                            <Box>
+                                <Typography variant="subtitle1" component="span" sx={{ fontWeight: 600 }}>{item.name}</Typography>
+                                <Typography variant="body2" color="text.secondary">{item.desc}</Typography>
+                            </Box>
+                        </Box>
+                    </MenuItem>
+                ))}
+            </Menu>
         </>
     );
 }

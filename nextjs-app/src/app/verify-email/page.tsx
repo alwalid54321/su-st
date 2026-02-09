@@ -1,51 +1,90 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import styles from './verify-email.module.css'
 
-export default function VerifyEmailPage() {
+function VerifyEmailContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
-    const email = searchParams.get('email') || 'your email'
+    const emailFromQuery = searchParams.get('email')
 
-    const [otp, setOtp] = useState(['', '', '', '', '', ''])
+    const [otp, setOtp] = useState('')
     const [loading, setLoading] = useState(false)
-    const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle')
+    const [resendLoading, setResendLoading] = useState(false)
+    const [error, setError] = useState('')
+    const [success, setSuccess] = useState('')
 
-    const handleOtpChange = (index: number, value: string) => {
-        if (value.length > 1) return
-        const newOtp = [...otp]
-        newOtp[index] = value
-        setOtp(newOtp)
+    const handleResend = async () => {
+        if (!emailFromQuery) return
+        setResendLoading(true)
+        setError('')
+        setSuccess('')
 
-        // Auto focus next input
-        if (value && index < 5) {
-            const nextInput = document.getElementById(`otp-${index + 1}`)
-            nextInput?.focus()
-        }
-    }
+        try {
+            const response = await fetch('/api/auth/resend-verification', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: emailFromQuery }),
+            })
 
-    const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
-        if (e.key === 'Backspace' && !otp[index] && index > 0) {
-            const prevInput = document.getElementById(`otp-${index - 1}`)
-            prevInput?.focus()
+            const data = await response.json()
+
+            if (!response.ok) {
+                setError(data.error || 'Failed to resend code')
+            } else {
+                setSuccess(data.message || 'Code resent successfully!')
+            }
+        } catch (err) {
+            setError('Failed to resend code')
+        } finally {
+            setResendLoading(false)
         }
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setLoading(true)
+        setError('')
+        setSuccess('')
 
-        // Simulate verification
-        setTimeout(() => {
+        if (!emailFromQuery) {
+            setError('Email address not found. Please register again.')
             setLoading(false)
-            setStatus('success')
+            return
+        }
+
+        try {
+            const response = await fetch('/api/auth/verify-email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: emailFromQuery,
+                    otp: otp.trim()
+                }),
+            })
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                setError(data.error || 'Verification failed')
+                setLoading(false)
+                return
+            }
+
+            setSuccess('Email verified successfully! Redirecting to login...')
+
             setTimeout(() => {
                 router.push('/login?verified=true')
             }, 2000)
-        }, 1500)
+
+        } catch (error: any) {
+            setError('An unexpected error occurred')
+            setLoading(false)
+        }
     }
 
     return (
@@ -55,71 +94,98 @@ export default function VerifyEmailPage() {
             <div className={styles.backgroundGradient}></div>
 
             {/* Decorative Blobs */}
-            <div className={styles.blob1}></div>
-            <div className={styles.blob2}></div>
+            <div className={`${styles.blob1}`}></div>
+            <div className={`${styles.blob2}`}></div>
 
             <div className={styles.formContainer}>
                 <div className={styles.headerText}>
                     <h2 className={styles.headerTitle}>
-                        Verify Email
+                        Verification
                     </h2>
                     <p className={styles.headerSubtitle}>
-                        We've sent a code to <span className={styles.emailHighlight}>{email}</span>
+                        Enter the 6-digit code sent to<br />
+                        <strong>{emailFromQuery || 'your email'}</strong>
                     </p>
                 </div>
 
-                {status === 'success' ? (
-                    <div className={styles.successMessage}>
-                        <div className={styles.successIconContainer}>
-                            <div className={styles.successIcon}>
-                                <i className="fas fa-check"></i>
-                            </div>
-                        </div>
-                        <h3 className={styles.successTitle}>Email Verified!</h3>
-                        <p className={styles.successText}>Redirecting to login...</p>
+                {error && (
+                    <div className={styles.errorAlert}>
+                        <i className={`fas fa-exclamation-circle ${styles.alertIcon}`}></i>
+                        {error}
                     </div>
-                ) : (
-                    <form className={styles.form} onSubmit={handleSubmit}>
-                        <div className={styles.otpInputGroup}>
-                            {otp.map((digit, index) => (
-                                <input
-                                    key={index}
-                                    id={`otp-${index}`}
-                                    type="text"
-                                    maxLength={1}
-                                    value={digit}
-                                    onChange={(e) => handleOtpChange(index, e.target.value)}
-                                    onKeyDown={(e) => handleKeyDown(index, e)}
-                                    className={styles.otpInput}
-                                />
-                            ))}
-                        </div>
-
-                        <div className={styles.headerText}>
-                            <p className={styles.resendCodeText}>
-                                Didn't receive the code?{' '}
-                                <button type="button" className={styles.resendCodeButton}>
-                                    Resend
-                                </button>
-                            </p>
-                            <button
-                                type="submit"
-                                disabled={loading || otp.some(d => !d)}
-                                className={styles.submitButton}
-                            >
-                                {loading ? 'Verifying...' : 'Verify Email'}
-                            </button>
-                        </div>
-
-                        <div className={styles.backToLoginLinkContainer}>
-                            <Link href="/login" className={styles.backToLoginLink}>
-                                <i className="fas fa-arrow-left"></i>
-                                Back to Login
-                            </Link>
-                        </div>
-                    </form>
                 )}
+
+                {success && (
+                    <div className={styles.successAlert}>
+                        <i className={`fas fa-check-circle ${styles.alertIcon}`}></i>
+                        {success}
+                    </div>
+                )}
+
+                <form className={styles.form} onSubmit={handleSubmit}>
+                    <div>
+                        <label htmlFor="otp" className={styles.label}>
+                            Verification Code
+                        </label>
+                        <input
+                            id="otp"
+                            name="otp"
+                            type="text"
+                            required
+                            maxLength={6}
+                            value={otp}
+                            onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ''))}
+                            className={styles.input}
+                            placeholder="000000"
+                            autoComplete="off"
+                            autoFocus
+                        />
+                    </div>
+
+                    <div className={styles.submitButtonContainer}>
+                        <button
+                            type="submit"
+                            disabled={loading || otp.length !== 6 || !!success}
+                            className={styles.submitButton}
+                        >
+                            {loading ? (
+                                <>
+                                    <i className="fas fa-spinner fa-spin"></i>
+                                    Verifying...
+                                </>
+                            ) : 'Verify Account'}
+                        </button>
+                    </div>
+                </form>
+
+                <div className={styles.loginLinkContainer}>
+                    <p className={styles.loginLinkText}>
+                        Didn't receive the code?{' '}
+                        <button
+                            type="button"
+                            className={styles.loginLink}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                            onClick={handleResend}
+                            disabled={resendLoading}
+                        >
+                            {resendLoading ? 'Sending...' : 'Resend Code'}
+                        </button>
+                    </p>
+                    <p className={styles.loginLinkText} style={{ marginTop: '0.5rem' }}>
+                        <Link href="/login" className={styles.loginLink}>
+                            Back to Login
+                        </Link>
+                    </p>
+                </div>
             </div>
         </div>
+    )
+}
+
+export default function VerifyEmailPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <VerifyEmailContent />
+        </Suspense>
     )
 }

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import styles from './login.module.css'
+import styles from './admin-login.module.css'
 
 export default function AdminLoginPage() {
     const router = useRouter()
@@ -13,7 +13,7 @@ export default function AdminLoginPage() {
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
         setLoading(true)
         setError('')
@@ -27,98 +27,91 @@ export default function AdminLoginPage() {
 
             if (result?.error) {
                 setError('Invalid admin credentials')
+                setLoading(false)
             } else {
-                router.push('/admin')
-                router.refresh()
+                const response = await fetch('/api/auth/session')
+                const session = await response.json()
+
+                if (session?.user?.isStaff || session?.user?.isSuperuser) {
+                    router.push('/admin')
+                    router.refresh()
+                } else {
+                    setError('Access denied. Admin privileges required.')
+                    setLoading(false)
+                }
             }
         } catch (error) {
             setError('An error occurred. Please try again.')
-        } finally {
             setLoading(false)
         }
     }
 
     return (
-        <div className={styles.container}>
-            <div className={styles.backgroundPattern}></div>
-            <div className={styles.backgroundGradient}></div>
+        <div className={styles.loginContainer}>
+            <div className={styles.loginCard}>
+                <header className={styles.loginHeader}>
+                    <h2>Admin Portal</h2>
+                    <p>Secure login for authorized administrators only</p>
+                </header>
 
-            <div className={styles.loginBox}>
-                <div className={styles.formContainer}>
-                    <header className={styles.header}>
-                        <div className={styles.logoContainer}>
-                            <i className={`fas fa-shield-alt ${styles.logoIcon}`}></i>
-                        </div>
-                        <h1 className={styles.title}>Admin Portal</h1>
-                        <p className={styles.subtitle}>Secure Access Required</p>
-                    </header>
-
-                    <div className={styles.formContent}>
-                        {error && (
-                            <div className={styles.errorBox}>
-                                <i className={`fas fa-lock ${styles.errorIcon}`}></i>
-                                <div>
-                                    <p className={styles.errorTitle}>Access Denied</p>
-                                    <p>{error}</p>
-                                </div>
-                            </div>
-                        )}
-
-                        <form onSubmit={handleSubmit} className={styles.form}>
-                            <div>
-                                <label className={styles.label}>Admin Email</label>
-                                <div className={styles.inputWrapper}>
-                                    <div className={styles.inputIcon}>
-                                        <i className="fas fa-user-shield"></i>
-                                    </div>
-                                    <input
-                                        type="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        required
-                                        className={styles.input}
-                                        placeholder="admin@sudastock.com"
-                                    />
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className={styles.label}>Password</label>
-                                <div className={styles.inputWrapper}>
-                                    <div className={styles.inputIcon}>
-                                        <i className="fas fa-key"></i>
-                                    </div>
-                                    <input
-                                        type="password"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        required
-                                        className={styles.input}
-                                        placeholder="••••••••"
-                                    />
-                                </div>
-                            </div>
-
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className={styles.submitButton}
-                            >
-                                {loading ? 'Verifying Credentials...' : 'Access Dashboard'}
-                            </button>
-                        </form>
-
-                        <footer className={styles.footer}>
-                            <Link href="/" className={styles.backLink}>
-                                <i className="fas fa-arrow-left"></i> Back to Main Site
-                            </Link>
-                        </footer>
+                {error && (
+                    <div className={styles.errorMessage}>
+                        {error}
                     </div>
+                )}
+
+                <form onSubmit={handleLogin}>
+                    <div className={styles.formGroup}>
+                        <label htmlFor="admin-email">Admin Email</label>
+                        <input
+                            id="admin-email"
+                            name="email"
+                            type="email"
+                            autoComplete="email"
+                            required
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="admin@sudastock.com"
+                        />
+                    </div>
+                    <div className={styles.formGroup}>
+                        <label htmlFor="admin-password">Admin Password</label>
+                        <input
+                            id="admin-password"
+                            name="password"
+                            type="password"
+                            autoComplete="current-password"
+                            required
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Enter admin password"
+                        />
+                    </div>
+
+                    <div>
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className={styles.loginButton}
+                        >
+                            {loading ? 'Verifying...' : 'Sign in as Admin'}
+                        </button>
+                    </div>
+                </form>
+
+                <div className={styles.loginFooter}>
+                    <p>
+                        Not an admin?{' '}
+                        <Link href="/login">
+                            User Login
+                        </Link>
+                    </p>
                 </div>
 
-                <div className={styles.copyright}>
-                    <p>&copy; 2024 SudaStock. All rights reserved.</p>
-                    <p>Unauthorized access is strictly prohibited.</p>
+                <div className={styles.securityNotice}>
+                    <p>
+                        All admin login attempts are monitored and logged for security purposes
+                    </p>
                 </div>
             </div>
         </div>

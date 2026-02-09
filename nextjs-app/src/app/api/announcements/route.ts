@@ -4,10 +4,12 @@ import { prisma } from '@/lib/prisma'
 export async function GET() {
     try {
         const announcements = await prisma.announcement.findMany({
-            take: 5,
-            orderBy: {
-                createdAt: 'desc'
-            }
+            where: { isActive: true },
+            orderBy: [
+                { isFeatured: 'desc' },  // Featured first
+                { createdAt: 'desc' }     // Then by newest
+            ],
+            take: 6  // Limit to 6 for homepage
         })
 
         return NextResponse.json(announcements)

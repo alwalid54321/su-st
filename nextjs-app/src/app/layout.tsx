@@ -1,3 +1,4 @@
+import ThemeRegistry from '@/components/ThemeRegistry'
 import Footer from '@/components/Footer'
 import Providers from '@/components/Providers'
 import ConditionalNavbar from '@/components/ConditionalNavbar'
@@ -46,14 +47,16 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans" suppressHydrationWarning>
-        <Providers>
-          <ConditionalNavbar />
-          <ConditionalWrapper>
-            <ErrorBoundary>
-              {children}
-            </ErrorBoundary>
-          </ConditionalWrapper>
-        </Providers>
+        <ThemeRegistry>
+          <Providers>
+            <ConditionalNavbar />
+            <ConditionalWrapper>
+              <ErrorBoundary>
+                {children}
+              </ErrorBoundary>
+            </ConditionalWrapper>
+          </Providers>
+        </ThemeRegistry>
       </body>
     </html>
   )

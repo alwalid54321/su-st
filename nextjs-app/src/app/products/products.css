@@ -22,27 +22,6 @@
     height: 100vh;
     display: flex;
     align-items: center;
-    justify-content: center;
-    text-align: center;
-    color: white;
-    margin-bottom: 50px;
-}
-
-.hero-content h1 {
-    font-size: 3rem;
-    font-weight: 700;
-    margin-bottom: 10px;
-}
-
-.hero-content p {
-    font-size: 1.2rem;
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.why-products-section {
-    padding: 50px 20px;
-    max-width: 1200px;
     margin: 0 auto;
 }
 

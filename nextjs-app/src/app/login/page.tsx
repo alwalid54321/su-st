@@ -241,6 +241,12 @@ export default function LoginPage() {
                             Register here
                         </Link>
                     </p>
+                    <p className={styles.loginLinkText} style={{ marginTop: '0.5rem' }}>
+                        Are you an admin?{' '}
+                        <Link href="/admin/login" className={styles.loginLink}>
+                            Admin Portal
+                        </Link>
+                    </p>
 
                 </div>
             </div>

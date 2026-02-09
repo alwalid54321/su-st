@@ -6,6 +6,7 @@ import Link from 'next/link'
 import MarketDataTable from '@/components/MarketDataTable'
 import CurrencyCards from '@/components/CurrencyCards'
 import GallerySlider from '@/components/GallerySlider'
+import AnnouncementsSection from '@/components/AnnouncementsSection'
 
 interface MarketTickerItem {
   id: number
@@ -45,13 +46,28 @@ export default function Home() {
           preload="auto"
           poster="/images/hero.jpg"
         >
-          <source src="/videos/bg_vid.mp4" type="video/mp4" />
+          {/* <source src="/videos/bg_vid.mp4" type="video/mp4" /> */}
           {/* Fallback handled by CSS if video fails or poster is shown */}
         </video>
         <div className="hero-fallback"></div>
         <div className="hero-overlay"></div>
         <div className="hero-content">
-          <Link href="/register" className="btn register-btn">Register Now</Link>
+          <h1 className="hero-main-title">
+            Sudan&#39;s Premier <br />
+            <span style={{ color: 'var(--accent)' }}>Agricultural Commodities</span> Platform
+          </h1>
+          <p className="hero-subtitle">
+            Connecting local producers with global markets through transparent data,
+            reliable logistics, and real-time market insights.
+          </p>
+          <div className="hero-actions">
+            <Link href="/register" className="hero-btn hero-btn-primary">
+              Get Started
+            </Link>
+            <Link href="/market-data" className="hero-btn hero-btn-secondary">
+              View Market Data
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -85,6 +101,9 @@ export default function Home() {
       {/* Gallery Slider Section */}
       <GallerySlider />
 
+      {/* Announcements/News Section */}
+      <AnnouncementsSection />
+
       {/* Call to Action Section */}
       <section className="cta-section">
         <div className="container">
@@ -92,8 +111,8 @@ export default function Home() {
             <h2>READY TO SOURCE PREMIUM SUDANESE PRODUCTS?</h2>
             <p>Contact us today to discuss your requirements and get a personalized quote.</p>
             <div className="cta-buttons">
-              <Link href="/contact?type=quote" className="btn btn-primary">Request Quote</Link>
-              <Link href="/contact?type=sample" className="btn btn-secondary">Request Sample</Link>
+              <Link href="/quote" className="btn btn-primary">Request Quote</Link>
+              <Link href="/sample" className="btn btn-secondary">Request Sample</Link>
             </div>
           </div>
         </div>
@@ -115,24 +134,27 @@ export default function Home() {
             </p>
 
             <div className="features-cards">
-              <div className="feature-card">
+              <Link href="/register" className="feature-card" style={{ textDecoration: 'none' }}>
                 <p>Be apart of SudaStock and</p>
                 <h3><span className="highlight">Register</span> with us</h3>
-              </div>
+              </Link>
 
-              <div className="feature-card">
+              <Link href="/market-data" className="feature-card" style={{ textDecoration: 'none' }}>
                 <p>Explore our trade <span className="highlight">data</span> and perform your own</p>
                 <h3><span className="highlight">Analysis</span></h3>
-              </div>
+              </Link>
 
-              <div className="feature-card">
+              <Link href="/products" className="feature-card" style={{ textDecoration: 'none' }}>
                 <p>Formulate your</p>
                 <h3><span className="highlight">Strategies</span> and take action</h3>
-              </div>
+              </Link>
             </div>
           </div>
         </div>
       </section>
+
+      {/* Announcements Section */}
+      <AnnouncementsSection />
 
       {/* Partners Section */}
       <section className="partners-section">

@@ -155,12 +155,17 @@ model CurrencyArchive {
 
 // Announcement model
 model Announcement {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String
-  priority  String   @default("medium")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id           Int      @id @default(autoincrement())
+  title        String
+  content      String
+  priority     String   @default("medium") // low, medium, high
+  isActive     Boolean  @default(true) @map("is_active")
+  isFeatured   Boolean  @default(false) @map("is_featured")
+  imageUrl     String?  @map("image_url")
+  externalLink String?  @map("external_link")
+  category     String   @default("news") // news, alert, update, promotion
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
   
   @@map("core_announcement")
 }

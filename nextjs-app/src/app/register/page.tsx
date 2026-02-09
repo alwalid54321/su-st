@@ -14,10 +14,11 @@ export default function RegisterPage() {
         password: '',
         confirmPassword: '',
         firstName: '',
-        lastName: ''
+        lastName: '',
+        _gotcha: '' // Honeypot field
     })
     const [error, setError] = useState('')
-    const [fieldErrors, setFieldErrors] = useState<any>({})
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string[] | undefined>>({})
     const [loading, setLoading] = useState(false)
     const [passwordStrength, setPasswordStrength] = useState(0)
     const [showPassword, setShowPassword] = useState(false)
@@ -63,7 +64,7 @@ export default function RegisterPage() {
         }))
         // Clear field-specific error
         if (fieldErrors[name]) {
-            setFieldErrors((prev: any) => ({ ...prev, [name]: null }))
+            setFieldErrors(prev => ({ ...prev, [name]: undefined }))
         }
     }
 
@@ -90,7 +91,8 @@ export default function RegisterPage() {
                     email: formData.email.trim().toLowerCase(),
                     password: formData.password,
                     firstName: formData.firstName.trim() || undefined,
-                    lastName: formData.lastName.trim() || undefined
+                    lastName: formData.lastName.trim() || undefined,
+                    _gotcha: formData._gotcha // Should be empty
                 }),
             })
 
@@ -108,10 +110,10 @@ export default function RegisterPage() {
                 return
             }
 
-            // Success! Redirect to login
-            router.push('/login?registered=true')
-        } catch (error: any) {
-            setError(error.message || 'An unexpected error occurred')
+            // Success! Redirect to verify email
+            router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`)
+        } catch (error) {
+            setError(error instanceof Error ? error.message : 'An unexpected error occurred')
             setLoading(false)
         }
     }
@@ -148,6 +150,20 @@ export default function RegisterPage() {
                 )}
 
                 <form className={styles.form} onSubmit={handleSubmit}>
+                    {/* Honeypot field - hidden from users */}
+                    <div style={{ display: 'none' }} aria-hidden="true">
+                        <label htmlFor="_gotcha">Do not fill this field</label>
+                        <input
+                            type="text"
+                            id="_gotcha"
+                            name="_gotcha"
+                            value={(formData as { _gotcha: string })._gotcha}
+                            onChange={handleChange}
+                            tabIndex={-1}
+                            autoComplete="off"
+                        />
+                    </div>
+
                     <div className={styles.grid2Cols}>
                         <div>
                             <label htmlFor="firstName" className={styles.label}>

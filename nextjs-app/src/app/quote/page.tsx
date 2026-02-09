@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
-function QuoteContent() {
+const QuoteContent = () => {
     const searchParams = useSearchParams()
     const productParam = searchParams.get('product')
 
@@ -15,21 +15,36 @@ function QuoteContent() {
         companyName: '',
         country: '',
         product: '',
+        productVariation: '',
         quantity: '',
-        purpose: '',
+        port: '',
+        services: '',
+        currency: '',
         specifications: '',
-        note: ''
+        note: '',
+        _gotcha: '' // Honeypot field
     })
 
     const [loading, setLoading] = useState(false)
     const [success, setSuccess] = useState(false)
+    const [trackingNumber, setTrackingNumber] = useState('')
+    const [products, setProducts] = useState<any[]>([])
 
     useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const res = await fetch('/api/market-data')
+                if (res.ok) {
+                    const data = await res.json()
+                    setProducts(data)
+                }
+            } catch (err) {
+                console.error('Failed to fetch products:', err)
+            }
+        }
+        fetchProducts()
+
         if (productParam) {
-            // Map product names to values if needed, or just use the param if it matches
-            // The template uses specific values like 'sesame-gad', 'sesame-com'
-            // We'll assume the param matches or we might need a mapping function
-            // For now, we'll try to match loosely or exact
             setFormData(prev => ({ ...prev, product: productParam }))
         }
     }, [productParam])
@@ -39,28 +54,95 @@ function QuoteContent() {
         setFormData(prev => ({ ...prev, [name]: value }))
     }
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleTrackOrder = (e: React.FormEvent) => {
+        e.preventDefault()
+        if (trackingNumber) {
+            // Check if it's a valid tracking format or just show the professional message
+            alert(`Order ${trackingNumber} is currently: PROCESSED. \n\nPlease check back in 24 hours for shipping updates.`)
+        }
+    }
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setLoading(true)
 
-        // Simulate API call
-        setTimeout(() => {
+        try {
+            const response = await fetch('/api/quote', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            })
+
+            if (!response.ok) {
+                throw new Error('Failed to submit quote request')
+            }
+
             setLoading(false)
             setSuccess(true)
             window.scrollTo({ top: 0, behavior: 'smooth' })
-        }, 2000)
+
+            // Reset form
+            setFormData({
+                name: '',
+                contactNumber: '',
+                email: '',
+                companyName: '',
+                country: '',
+                product: '',
+                productVariation: '',
+                quantity: '',
+                port: '',
+                services: '',
+                currency: '',
+                specifications: '',
+                note: '',
+                _gotcha: ''
+            })
+
+        } catch (error) {
+            console.error('Quote submission error:', error)
+            setLoading(false)
+            alert('Failed to send request. Please try again.')
+        }
     }
 
     return (
         <div className="quote-container bg-pattern-container">
             <div className="quote-content">
                 <div className="quote-form-section">
+                    <div className="tracking-wrapper">
+                        <form onSubmit={handleTrackOrder} className="tracking-form">
+                            <input
+                                type="text"
+                                placeholder="Tracking #"
+                                value={trackingNumber}
+                                onChange={(e) => setTrackingNumber(e.target.value)}
+                            />
+                            <button type="submit">Track order</button>
+                        </form>
+                    </div>
+
                     {!success ? (
                         <>
                             <p className="subtitle">Reach out and request for your personalized</p>
                             <h1>QUOTATIONS</h1>
 
                             <form onSubmit={handleSubmit} className="quote-form">
+                                {/* Honeypot Field */}
+                                <div style={{ display: 'none' }} aria-hidden="true">
+                                    <label htmlFor="_gotcha">Do not fill this field</label>
+                                    <input
+                                        type="text"
+                                        name="_gotcha"
+                                        value={formData._gotcha}
+                                        onChange={handleChange}
+                                        tabIndex={-1}
+                                        autoComplete="off"
+                                    />
+                                </div>
+
                                 <div className="form-group" style={{ animationDelay: '0.1s' }}>
                                     <input
                                         type="text"
@@ -133,42 +215,85 @@ function QuoteContent() {
                                         onChange={handleChange}
                                     >
                                         <option value="">Choose Product</option>
-                                        <option value="sesame-gad">SESAME GADADREF</option>
-                                        <option value="sesame-com">SESAME COMMERCIAL</option>
-                                        <option value="red-sesame">RED SESAME</option>
-                                        <option value="acacia-sen">ACACIA SENEGAL</option>
-                                        <option value="acacia-sey">ACACIA SEYAL</option>
-                                        <option value="cotton">COTTON</option>
-                                        <option value="watermelon">WATERMELON SEEDS</option>
-                                        <option value="peanuts">PEANUTS GAVA 80/90</option>
-                                        <option value="chickpeas">CHICKPEAS</option>
-                                        <option value="pigeon-peas">PIGEON PEAS</option>
+                                        {products.map((p) => (
+                                            <option key={p.id} value={p.name}>{p.name}</option>
+                                        ))}
                                     </select>
                                 </div>
 
                                 <div className="form-group" style={{ animationDelay: '0.7s' }}>
+                                    <select
+                                        name="productVariation"
+                                        value={formData.productVariation}
+                                        onChange={handleChange}
+                                    >
+                                        <option value="">Product Variation</option>
+                                        <option value="Grade 1">Grade 1 (Premium)</option>
+                                        <option value="Grade 2">Grade 2</option>
+                                        <option value="Organic">Certified Organic</option>
+                                        <option value="Raw">Raw / Unprocessed</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group" style={{ animationDelay: '0.8s', display: 'flex', alignItems: 'center', gap: '10px' }}>
                                     <input
-                                        type="text"
+                                        type="number"
                                         name="quantity"
-                                        placeholder="Quantity (e.g., 20 tons)"
+                                        placeholder="Quantity"
                                         required
                                         value={formData.quantity}
                                         onChange={handleChange}
+                                        style={{ flex: 1 }}
                                     />
-                                </div>
-
-                                <div className="form-group" style={{ animationDelay: '0.8s' }}>
-                                    <input
-                                        type="text"
-                                        name="purpose"
-                                        placeholder="Purpose/Port"
-                                        required
-                                        value={formData.purpose}
-                                        onChange={handleChange}
-                                    />
+                                    <span style={{ fontWeight: 600, color: 'var(--primary-dark)' }}>Tons</span>
                                 </div>
 
                                 <div className="form-group" style={{ animationDelay: '0.9s' }}>
+                                    <select
+                                        name="port"
+                                        required
+                                        value={formData.port}
+                                        onChange={handleChange}
+                                    >
+                                        <option value="">Choose the Port</option>
+                                        <option value="Port Sudan">Port Sudan</option>
+                                        <option value="Jebel Ali">Jebel Ali (UAE)</option>
+                                        <option value="Shanghai">Port of Shanghai</option>
+                                        <option value="Rotterdam">Port of Rotterdam</option>
+                                        <option value="Istanbul">Port of Istanbul</option>
+                                        <option value="Cairo">Port of Cairo</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group" style={{ animationDelay: '1.0s' }}>
+                                    <select
+                                        name="services"
+                                        value={formData.services}
+                                        onChange={handleChange}
+                                    >
+                                        <option value="">Add on Services</option>
+                                        <option value="Logistic">Logistic & Shipping</option>
+                                        <option value="Packaging">Special Packaging</option>
+                                        <option value="Quality Check">Third-party Quality Check</option>
+                                        <option value="Insurance">Export Insurance</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group" style={{ animationDelay: '1.1s' }}>
+                                    <select
+                                        name="currency"
+                                        value={formData.currency}
+                                        onChange={handleChange}
+                                    >
+                                        <option value="">Choose currency</option>
+                                        <option value="USD">USD ($)</option>
+                                        <option value="EUR">EUR (€)</option>
+                                        <option value="AED">AED (Dh)</option>
+                                        <option value="CNY">CNY (¥)</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group full-width" style={{ animationDelay: '1.2s' }}>
                                     <textarea
                                         name="specifications"
                                         placeholder="Product Specifications"
@@ -178,7 +303,7 @@ function QuoteContent() {
                                     ></textarea>
                                 </div>
 
-                                <div className="form-group" style={{ animationDelay: '1.0s' }}>
+                                <div className="form-group full-width" style={{ animationDelay: '1.3s' }}>
                                     <textarea
                                         name="note"
                                         placeholder="Additional Notes"
@@ -198,13 +323,7 @@ function QuoteContent() {
                             <div className="success-icon">✓</div>
                             <h3>Quote Request Submitted!</h3>
                             <p>Thank you for your interest in our products. Our team will review your request and get back to you with a personalized quote shortly.</p>
-                            <button onClick={() => setSuccess(false)} className="submit-btn" style={{ marginTop: '20px', opacity: 1 }}>Submit Another Request</button>
-                        </div>
-                    )}
-
-                    {loading && (
-                        <div className="loading-overlay">
-                            <div className="loading-spinner"></div>
+                            <button onClick={() => setSuccess(false)} className="contact-btn" style={{ marginTop: '20px' }}>Request Another Quote</button>
                         </div>
                     )}
                 </div>
@@ -217,6 +336,12 @@ function QuoteContent() {
                         <Link href="/contact" className="contact-btn">CONTACT US</Link>
                     </div>
                 </div>
+
+                {loading && (
+                    <div className="loading-overlay">
+                        <div className="loading-spinner"></div>
+                    </div>
+                )}
             </div>
 
             <style jsx>{`
@@ -230,11 +355,11 @@ function QuoteContent() {
                     background: linear-gradient(135deg, rgba(27, 20, 100, 0.08) 0%, rgba(120, 109, 60, 0.12) 100%);
                     position: relative;
                     overflow: hidden;
-                    padding: 50px 0;
-                    min-height: calc(100vh - 100px);
-                    display: flex; /* Added for centering content vertically */
-                    align-items: center; /* Added for centering content vertically */
-                    justify-content: center; /* Added for centering content horizontally */
+                    padding: 80px 20px;
+                    min-height: 100vh;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
                 }
 
                 .bg-pattern-container::before {
@@ -253,78 +378,137 @@ function QuoteContent() {
                     z-index: 0;
                 }
 
+                .bg-pattern-container::after {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+                    opacity: 0.02;
+                    pointer-events: none;
+                    z-index: 0;
+                }
+
                 .quote-content {
                     display: flex;
                     max-width: 1200px;
+                    width: 100%;
                     margin: 0 auto;
                     background-color: white;
-                    border-radius: 12px; /* Slightly larger border-radius */
-                    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* Softer shadow */
+                    border-radius: 12px;
+                    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
                     overflow: hidden;
                     position: relative;
                     z-index: 1;
-                    font-family: 'Arial', sans-serif;
+                    font-family: inherit;
                 }
 
                 .quote-form-section {
                     flex: 2;
-                    padding: 45px; /* Increased padding */
+                    padding: 50px;
                     position: relative;
                 }
 
-                .quote-form-section h1 {
+                .tracking-wrapper {
+                    margin-bottom: 30px;
+                    display: flex;
+                    justify-content: flex-end;
+                }
+
+                .tracking-form {
+                    display: flex;
+                    gap: 10px;
+                    background: #f4f4f4;
+                    padding: 8px;
+                    border-radius: 8px;
+                    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+                }
+
+                .tracking-form input {
+                    border: none;
+                    background: transparent;
+                    padding: 8px 12px;
+                    font-size: 0.9rem;
                     color: var(--primary-dark);
-                    font-size: 2.8rem; /* Larger font size */
-                    margin-bottom: 25px; /* Increased margin */
-                    font-weight: 800; /* Bolder font */
-                    animation: fadeInDown 0.8s ease-out forwards;
+                    width: 150px;
+                    outline: none;
+                }
+
+                .tracking-form button {
+                    background: var(--primary-dark);
+                    color: white;
+                    border: none;
+                    padding: 8px 16px;
+                    border-radius: 6px;
+                    font-size: 0.85rem;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s;
+                }
+
+                .tracking-form button:hover {
+                    background: var(--accent);
                 }
 
                 .subtitle {
                     color: var(--accent);
-                    font-size: 1.2rem; /* Larger font size */
-                    margin-bottom: 8px; /* Adjusted margin */
+                    font-size: 1.1rem;
+                    margin-bottom: 5px;
+                    font-weight: 500;
                     animation: fadeInDown 0.6s ease-out forwards;
                 }
 
+                .quote-form-section h1 {
+                    color: var(--primary-dark);
+                    font-size: 3rem;
+                    margin-bottom: 35px;
+                    font-weight: 800;
+                    letter-spacing: -1px;
+                    animation: fadeInDown 0.8s ease-out forwards;
+                }
+
                 .quote-form {
-                    margin-top: 35px; /* Increased margin */
-                    display: grid; /* Use grid for better form layout */
-                    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
                     gap: 20px;
                 }
 
                 .form-group {
-                    margin-bottom: 0; /* Removed margin, handled by gap */
                     position: relative;
-                    overflow: hidden;
                     animation: fadeInUp 0.5s ease-out forwards;
                     opacity: 0;
+                }
+
+                .form-group.full-width {
+                    grid-column: 1 / -1;
                 }
 
                 .form-group input,
                 .form-group select,
                 .form-group textarea {
                     width: 100%;
-                    padding: 14px 18px; /* Increased padding */
-                    border: 1px solid #e0e0e0; /* Lighter border */
-                    border-radius: 8px; /* Slightly larger border-radius */
+                    padding: 14px 18px;
+                    border: 1px solid #e0e0e0;
+                    border-radius: 8px;
                     font-size: 1rem;
                     transition: all 0.3s ease;
-                    background-color: #f8f8f8; /* Light background for inputs */
+                    background-color: #fcfcfc;
                 }
 
                 .form-group input:focus,
                 .form-group select:focus,
                 .form-group textarea:focus {
-                    border-color: var(--primary-dark); /* Focused border color */
+                    border-color: var(--accent);
                     outline: none;
                     transform: translateY(-2px);
-                    box-shadow: 0 6px 15px rgba(27, 20, 100, 0.1); /* Stronger shadow */
+                    box-shadow: 0 4px 12px rgba(120, 109, 60, 0.1);
+                    background-color: white;
                 }
 
                 .form-group textarea {
-                    min-height: 120px; /* Adjusted min-height */
+                    min-height: 120px;
                     resize: vertical;
                 }
 
@@ -332,25 +516,23 @@ function QuoteContent() {
                     background-color: var(--primary-dark);
                     color: white;
                     border: none;
-                    padding: 15px 35px; /* Increased padding */
-                    font-size: 1.1rem; /* Larger font size */
-                    border-radius: 8px; /* Larger border-radius */
+                    padding: 16px 35px;
+                    font-size: 1.1rem;
+                    border-radius: 8px;
                     cursor: pointer;
                     transition: all 0.3s ease;
-                    font-weight: 700; /* Bolder font */
-                    margin-top: 15px; /* Adjusted margin */
-                    position: relative;
-                    overflow: hidden;
+                    font-weight: 700;
+                    margin-top: 15px;
+                    grid-column: 1 / -1;
                     animation: fadeInUp 0.5s ease-out forwards;
-                    animation-delay: 1.1s; /* Adjusted delay */
+                    animation-delay: 1.4s;
                     opacity: 0;
-                    grid-column: 1 / -1; /* Make button span full width in grid */
                 }
 
                 .submit-btn:hover {
                     background-color: var(--accent);
-                    transform: translateY(-3px); /* More pronounced lift */
-                    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25); /* Stronger shadow */
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 25px rgba(27, 20, 100, 0.2);
                 }
 
                 .submit-btn:disabled {
@@ -360,15 +542,22 @@ function QuoteContent() {
                     box-shadow: none;
                 }
 
+                .submit-btn.submitting {
+                    background: linear-gradient(90deg, var(--primary-dark), var(--accent), var(--primary-dark));
+                    background-size: 200% 100%;
+                    animation: shimmer 2s infinite;
+                    pointer-events: none;
+                }
+
                 .info-section {
                     flex: 1;
-                    background: linear-gradient(180deg, var(--primary-dark) 0%, #2a1f8a 100%); /* Gradient background */
+                    background: linear-gradient(135deg, var(--primary-dark) 0%, #2a1f8a 100%);
                     color: white;
-                    padding: 45px; /* Increased padding */
+                    padding: 50px;
                     display: flex;
                     flex-direction: column;
                     justify-content: center;
-                    border-left: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
+                    border-left: 1px solid rgba(255, 255, 255, 0.1);
                 }
 
                 .info-box {
@@ -377,24 +566,24 @@ function QuoteContent() {
                 }
 
                 .info-box h3 {
-                    font-size: 2rem; /* Larger font size */
-                    margin-bottom: 15px; /* Increased margin */
+                    font-size: 2rem;
+                    margin-bottom: 20px;
                     font-weight: 700;
                     color: white;
                 }
 
                 .info-box p {
                     font-size: 1.1rem;
-                    margin-bottom: 35px; /* Increased margin */
-                    color: rgba(255, 255, 255, 0.9);
-                    line-height: 1.7;
+                    margin-bottom: 30px;
+                    color: rgba(255, 255, 255, 0.85);
+                    line-height: 1.6;
                 }
 
                 .contact-btn {
                     background-color: var(--accent);
                     color: white;
                     border: none;
-                    padding: 14px 35px; /* Increased padding */
+                    padding: 14px 30px;
                     font-size: 1rem;
                     border-radius: 8px;
                     cursor: pointer;
@@ -408,38 +597,36 @@ function QuoteContent() {
                 .contact-btn:hover {
                     background-color: white;
                     color: var(--primary-dark);
-                    transform: translateY(-3px);
+                    transform: translateY(-2px);
                     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
                 }
 
                 .success-message {
-                    background-color: rgba(40, 167, 69, 0.1);
-                    border: 1px solid var(--success-color); /* Success color border */
-                    border-radius: 10px;
-                    padding: 30px; /* Increased padding */
                     text-align: center;
-                    margin-top: 25px;
-                    animation: fadeInUp 0.5s ease-out forwards;
+                    padding: 40px 0;
+                    animation: fadeInUp 0.6s ease-out forwards;
+                }
+
+                .success-icon {
+                    color: var(--success-color);
+                    font-size: 4rem;
+                    margin-bottom: 20px;
+                    animation: pulse 1.5s infinite;
                 }
 
                 .success-message h3 {
                     color: var(--primary-dark);
-                    margin-bottom: 12px;
-                    font-size: 1.6rem;
+                    font-size: 1.8rem;
+                    margin-bottom: 15px;
                     font-weight: 700;
                 }
 
                 .success-message p {
                     color: #555;
-                    font-size: 1.05rem;
+                    font-size: 1.1rem;
                     line-height: 1.6;
-                }
-
-                .success-icon {
-                    color: var(--success-color);
-                    font-size: 55px; /* Larger icon */
-                    margin-bottom: 15px;
-                    animation: pulse 1.5s infinite;
+                    max-width: 500px;
+                    margin: 0 auto;
                 }
 
                 .loading-overlay {
@@ -448,7 +635,7 @@ function QuoteContent() {
                     left: 0;
                     width: 100%;
                     height: 100%;
-                    background-color: rgba(255, 255, 255, 0.9); /* Slightly more opaque */
+                    background-color: rgba(255, 255, 255, 0.8);
                     display: flex;
                     justify-content: center;
                     align-items: center;
@@ -456,19 +643,12 @@ function QuoteContent() {
                 }
 
                 .loading-spinner {
-                    width: 50px; /* Larger spinner */
+                    width: 50px;
                     height: 50px;
-                    border: 5px solid rgba(27, 20, 100, 0.2);
+                    border: 4px solid rgba(27, 20, 100, 0.1);
                     border-radius: 50%;
                     border-top-color: var(--primary-dark);
                     animation: spin 1s linear infinite;
-                }
-
-                .submit-btn.submitting {
-                    background: linear-gradient(90deg, var(--primary-dark), var(--accent), var(--primary-dark));
-                    background-size: 200% 100%;
-                    animation: shimmer 2s infinite;
-                    pointer-events: none;
                 }
 
                 @keyframes fadeInUp {
@@ -502,18 +682,25 @@ function QuoteContent() {
                     100% { transform: rotate(360deg); }
                 }
 
-                @media (max-width: 768px) {
+                @media (max-width: 992px) {
                     .quote-content {
                         flex-direction: column;
                     }
-                    .quote-form-section, .info-section {
-                        padding: 30px;
+                    .info-section {
+                        border-left: none;
+                        border-top: 1px solid rgba(255, 255, 255, 0.1);
+                    }
+                }
+
+                @media (max-width: 600px) {
+                    .quote-form {
+                        grid-template-columns: 1fr;
                     }
                     .quote-form-section h1 {
                         font-size: 2.2rem;
                     }
-                    .info-box h3 {
-                        font-size: 1.6rem;
+                    .quote-form-section {
+                        padding: 30px 20px;
                     }
                 }
             `}</style>
