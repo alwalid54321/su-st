@@ -326,33 +326,34 @@ h6 {
 
 /* --- Price Ticker --- */
 .price-ticker-wrapper {
-  background: var(--primary-dark);
-  border-bottom: 2px solid rgba(255, 255, 255, 0.05);
+  background: white;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;
   position: relative;
   z-index: 10;
+  user-select: none;
 }
 
 .ticker-label {
-  background: var(--accent);
-  color: white;
+  background: var(--primary-dark);
+  color: #fff;
   padding: 12px 20px;
   font-weight: 800;
   font-size: 0.75rem;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
   display: flex;
   align-items: center;
   gap: 10px;
-  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.2);
-  z-index: 2;
+  box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+  z-index: 5;
   white-space: nowrap;
 }
 
 .pulse-dot {
   width: 8px;
   height: 8px;
-  background: #fff;
+  background: var(--accent);
   border-radius: 50%;
   display: inline-block;
   animation: pulse 1.5s infinite;
@@ -379,6 +380,12 @@ h6 {
   flex: 1;
   overflow: hidden;
   padding: 12px 0;
+  cursor: grab;
+  position: relative;
+}
+
+.price-ticker:active {
+  cursor: grabbing;
 }
 
 .ticker-track {
@@ -386,10 +393,16 @@ h6 {
   gap: 60px;
   animation: tickerScroll 40s linear infinite;
   width: max-content;
+  will-change: transform;
 }
 
 .price-ticker-wrapper:hover .ticker-track {
   animation-play-state: paused;
+}
+
+.ticker-track.dragging {
+  animation: none !important;
+  transition: transform 0.1s ease-out;
 }
 
 .ticker-item {
@@ -397,12 +410,17 @@ h6 {
   align-items: center;
   gap: 15px;
   padding: 4px 0;
+  pointer-events: none;
+}
+
+.ticker-item a {
+  pointer-events: auto;
 }
 
 .product-name {
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 700;
-  font-size: 0.95rem;
+  color: var(--primary-dark);
+  font-weight: 800;
+  font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -419,10 +437,8 @@ h6 {
 }
 
 .price-value {
-  color: #fff;
+  color: var(--primary-dark);
   font-weight: 700;
-  font-family: 'JetBrains Mono', monospace;
-  /* If available, fallback to sans */
 }
 
 .trend-tag {
@@ -432,26 +448,30 @@ h6 {
   padding: 4px 10px;
   border-radius: 6px;
   font-weight: 800;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
+  border: 1px solid transparent;
 }
 
 .trend-tag.up {
-  background: rgba(16, 185, 129, 0.1);
+  background: rgba(16, 185, 129, 0.05);
   color: #10b981;
+  border-color: rgba(16, 185, 129, 0.1);
 }
 
 .trend-tag.down {
-  background: rgba(239, 68, 68, 0.1);
+  background: rgba(239, 68, 68, 0.05);
   color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.1);
 }
 
 .trend-tag.neutral {
-  background: rgba(255, 255, 255, 0.1);
-  color: #94a3b8;
+  background: rgba(100, 116, 139, 0.05);
+  color: #64748b;
+  border-color: rgba(100, 116, 139, 0.1);
 }
 
 .trend-icon {
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 
 @keyframes tickerScroll {
@@ -462,8 +482,6 @@ h6 {
   100% {
     transform: translateX(-33.33%);
   }
-
-  /* Adjusted for 3x duplication */
 }
 
 /* --- Market Data Section (Strict Match) --- */
