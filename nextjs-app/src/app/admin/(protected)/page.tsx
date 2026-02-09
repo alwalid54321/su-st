@@ -224,6 +224,7 @@ export default function AdminDashboard() {
                                         <Button
                                             fullWidth
                                             variant="contained"
+                                            href="/admin/market-data"
                                             sx={{
                                                 bgcolor: 'rgba(255,255,255,0.1)',
                                                 textTransform: 'none',
@@ -238,6 +239,7 @@ export default function AdminDashboard() {
                                         <Button
                                             fullWidth
                                             variant="contained"
+                                            href="/admin/currencies"
                                             sx={{
                                                 bgcolor: 'rgba(255,255,255,0.1)',
                                                 textTransform: 'none',
@@ -246,6 +248,36 @@ export default function AdminDashboard() {
                                             }}
                                         >
                                             Update Rates
+                                        </Button>
+                                    </Grid>
+                                    <Grid size={{ xs: 6 }}>
+                                        <Button
+                                            fullWidth
+                                            variant="contained"
+                                            href="/admin/variations"
+                                            sx={{
+                                                bgcolor: 'rgba(255,255,255,0.1)',
+                                                textTransform: 'none',
+                                                fontSize: '0.75rem',
+                                                '&:hover': { bgcolor: goldColor }
+                                            }}
+                                        >
+                                            Variations
+                                        </Button>
+                                    </Grid>
+                                    <Grid size={{ xs: 6 }}>
+                                        <Button
+                                            fullWidth
+                                            variant="contained"
+                                            href="/admin/ports"
+                                            sx={{
+                                                bgcolor: 'rgba(255,255,255,0.1)',
+                                                textTransform: 'none',
+                                                fontSize: '0.75rem',
+                                                '&:hover': { bgcolor: goldColor }
+                                            }}
+                                        >
+                                            Ports
                                         </Button>
                                     </Grid>
                                 </Grid>
