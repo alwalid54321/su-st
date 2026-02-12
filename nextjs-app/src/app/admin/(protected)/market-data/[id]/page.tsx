@@ -35,7 +35,6 @@ export default function EditMarketData() {
         value: 0,
         status: 'Active',
         forecast: 'Stable',
-        trend: 0,
         category: 'others',
         description: '',
         imageUrl: '',
@@ -43,6 +42,12 @@ export default function EditMarketData() {
         details: '',
         availability: ''
     })
+
+    const [originalValue, setOriginalValue] = useState<number | null>(null)
+
+    const calculatedTrend = originalValue && formData.value
+        ? Math.round(((formData.value - originalValue) / originalValue) * 100)
+        : 0;
 
     useEffect(() => {
         if (!isNew && id) {
@@ -62,10 +67,11 @@ export default function EditMarketData() {
                     return;
                 }
 
+                const val = parseFloat(data.value) || 0;
                 setFormData({
                     name: data.name || '',
                     category: data.category || 'others',
-                    value: parseFloat(data.value) || 0,
+                    value: val,
                     portSudan: parseFloat(data.portSudan) || 0,
                     dmtChina: parseFloat(data.dmtChina) || 0,
                     dmtUae: parseFloat(data.dmtUae) || 0,
@@ -73,13 +79,13 @@ export default function EditMarketData() {
                     dmtIndia: parseFloat(data.dmtIndia) || 0,
                     status: data.status || 'Active',
                     forecast: data.forecast || 'Stable',
-                    trend: parseInt(data.trend) || 0,
                     imageUrl: data.imageUrl || '',
                     description: data.description || '',
                     specifications: data.specifications || '',
                     details: data.details || '',
                     availability: data.availability || ''
                 })
+                setOriginalValue(val)
             } else if (res.status === 404) {
                 console.warn(`Market data with ID ${id} not found.`);
                 router.push('/admin/market-data'); // Redirect to list if not found
@@ -115,24 +121,9 @@ export default function EditMarketData() {
             const url = isNew ? '/api/admin/market-data' : `/api/admin/market-data/${id}/`
             const method = isNew ? 'POST' : 'PUT'
 
-            // Send data with Prisma camelCase field names
             const dataToSend = {
-                name: formData.name,
-                category: formData.category,
-                value: formData.value,
-                portSudan: formData.portSudan,
-                dmtChina: formData.dmtChina,
-                dmtUae: formData.dmtUae,
-                dmtMersing: formData.dmtMersing,
-                dmtIndia: formData.dmtIndia,
-                status: formData.status,
-                forecast: formData.forecast,
-                trend: formData.trend,
-                imageUrl: formData.imageUrl,
-                description: formData.description,
-                specifications: formData.specifications,
-                details: formData.details,
-                availability: formData.availability
+                ...formData,
+                trend: calculatedTrend
             };
 
             const res = await fetch(url, {
@@ -198,26 +189,32 @@ export default function EditMarketData() {
                 <form onSubmit={handleSubmit} className={styles.form}>
                     <div className={styles.formContent}>
                         <section className={styles.section}>
-                            <h3><span className={`${styles.sectionIcon} ${styles.iconBlue}`}><i className="fas fa-info"></i></span>Basic Information</h3>
-                            <div className={`${styles.grid} ${styles.gridCols2}`}>
-                                <div>
-                                    <label className={styles.label}>Product Name</label>
-                                    <input type="text" name="name" value={formData.name} onChange={handleChange} required className={styles.input} placeholder="e.g., White Sesame Seeds" />
+                            <h3 className={styles.sectionTitle}>
+                                <div className={`${styles.sectionIcon} ${styles.iconBlue}`}><i className="fas fa-info-circle"></i></div>
+                                Basic Information
+                            </h3>
+                            <div className={styles.grid}>
+                                <div className={styles.gridCols2}>
+                                    <div>
+                                        <label className={styles.label}>Product Name</label>
+                                        <input type="text" name="name" value={formData.name} onChange={handleChange} required className={styles.input} placeholder="e.g., White Sesame Seeds" />
+                                    </div>
+                                    <div>
+                                        <label className={styles.label}>Category</label>
+                                        <select name="category" value={formData.category} onChange={handleChange} className={styles.select}>
+                                            <option value="sesame">Sesame Seeds</option>
+                                            <option value="gum">Gum Arabic</option>
+                                            <option value="cotton">Port Sudan Cotton</option>
+                                            <option value="oil">Vegetable Oil</option>
+                                            <option value="others">Others</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 <div>
-                                    <label className={styles.label}>Category</label>
-                                    <select name="category" value={formData.category} onChange={handleChange} className={styles.select}>
-                                        <option value="sesame">Sesame</option>
-                                        <option value="gum">Gum Arabic</option>
-                                        <option value="cotton">Cotton</option>
-                                        <option value="others">Others</option>
-                                    </select>
-                                </div>
-                                <div className={styles.colSpan2}>
                                     <label className={styles.label}>Image URL</label>
                                     <input type="text" name="imageUrl" value={formData.imageUrl} onChange={handleChange} className={styles.input} placeholder="/images/products/..." />
                                 </div>
-                                <div className={styles.colSpan2}>
+                                <div>
                                     <label className={styles.label}>Description</label>
                                     <textarea name="description" value={formData.description} onChange={handleChange} rows={3} className={styles.textarea} placeholder="Product description..." />
                                 </div>
@@ -225,23 +222,40 @@ export default function EditMarketData() {
                         </section>
 
                         <section className={styles.section}>
-                            <h3><span className={`${styles.sectionIcon} ${styles.iconGreen}`}><i className="fas fa-tag"></i></span>Pricing Details (USD)</h3>
-                            <div className={`${styles.grid} ${styles.gridCols3}`}>
-                                {['portSudan', 'dmtChina', 'dmtUae', 'dmtMersing', 'dmtIndia'].map(field => (
-                                    <div key={field}>
-                                        <label className={styles.label}>{field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</label>
-                                        <div className={styles.inputWrapper}>
-                                            <span className={styles.inputIcon}>$</span>
-                                            <input type="number" name={field} value={formData[field as keyof typeof formData]} onChange={handleChange} step="0.01" className={`${styles.input} ${styles.inputWithIcon} ${styles.fontMono}`} />
-                                        </div>
+                            <h3 className={styles.sectionTitle}>
+                                <div className={`${styles.sectionIcon} ${styles.iconGreen}`}><i className="fas fa-tags"></i></div>
+                                Pricing Details (USD)
+                            </h3>
+                            <div className={styles.grid}>
+                                {/* Base Price Highlighting */}
+                                <div className={styles.premiumField}>
+                                    <label className={styles.label}>Base Price (Main Benchmark)</label>
+                                    <div className={styles.inputWrapper}>
+                                        <span className={styles.inputIcon}>$</span>
+                                        <input type="number" name="value" value={formData.value} onChange={handleChange} step="0.01" className={`${styles.input} ${styles.inputWithIcon} ${styles.fontMono} ${styles.highlightInput}`} />
                                     </div>
-                                ))}
+                                </div>
+
+                                <div className={styles.gridCols3}>
+                                    {['portSudan', 'dmtChina', 'dmtUae', 'dmtMersing', 'dmtIndia'].map(field => (
+                                        <div key={field}>
+                                            <label className={styles.label}>{field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</label>
+                                            <div className={styles.inputWrapper}>
+                                                <span className={styles.inputIcon}>$</span>
+                                                <input type="number" name={field} value={formData[field as keyof typeof formData]} onChange={handleChange} step="0.01" className={`${styles.input} ${styles.inputWithIcon} ${styles.fontMono}`} />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </section>
 
                         <section className={styles.section}>
-                            <h3><span className={`${styles.sectionIcon} ${styles.iconPurple}`}><i className="fas fa-chart-line"></i></span>Market Status</h3>
-                            <div className={`${styles.grid} ${styles.gridCols3}`}>
+                            <h3 className={styles.sectionTitle}>
+                                <div className={`${styles.sectionIcon} ${styles.iconPurple}`}><i className="fas fa-chart-line"></i></div>
+                                Market Status & Trends
+                            </h3>
+                            <div className={styles.gridCols3}>
                                 <div>
                                     <label className={styles.label}>Status</label>
                                     <select name="status" value={formData.status} onChange={handleChange} className={styles.select}>
@@ -258,24 +272,35 @@ export default function EditMarketData() {
                                         <option value="Falling">Falling</option>
                                     </select>
                                 </div>
-                                {/* The Trend (%) input field is removed as it's now calculated automatically */}
+                                <div>
+                                    <label className={styles.label}>Calculated Trend</label>
+                                    <div className={`${styles.trendPreview} ${calculatedTrend > 0 ? styles.trendUp : calculatedTrend < 0 ? styles.trendDown : styles.trendStable}`}>
+                                        {calculatedTrend > 0 ? '↑' : calculatedTrend < 0 ? '↓' : '→'} {Math.abs(calculatedTrend)}%
+                                        <span className={styles.trendHelpText}> Auto-update</span>
+                                    </div>
+                                </div>
                             </div>
                         </section>
 
                         <section className={styles.section}>
-                            <h3><span className={`${styles.sectionIcon} ${styles.iconOrange}`}><i className="fas fa-cogs"></i></span>Technical Specifications (JSON)</h3>
+                            <h3 className={styles.sectionTitle}>
+                                <div className={`${styles.sectionIcon} ${styles.iconOrange}`}><i className="fas fa-microchip"></i></div>
+                                Technical Data & Specifications
+                            </h3>
                             <div className={styles.grid}>
                                 <div>
-                                    <label className={styles.label}>Specifications <span className={styles.labelHelpText}>e.g. {"{"}"purity": "99% spaz"{"}"}</span></label>
+                                    <label className={styles.label}>Specifications (JSON) <span className={styles.labelHelpText}>e.g. {"{"}"purity": "99%"{"}"}</span></label>
                                     <textarea name="specifications" value={formData.specifications} onChange={handleChange} rows={3} className={`${styles.textarea} ${styles.jsonTextarea}`} />
                                 </div>
-                                <div>
-                                    <label className={styles.label}>Details List <span className={styles.labelHelpText}>e.g. ["Origin: Sudan"]</span></label>
-                                    <textarea name="details" value={formData.details} onChange={handleChange} rows={3} className={`${styles.textarea} ${styles.jsonTextarea}`} />
-                                </div>
-                                <div>
-                                    <label className={styles.label}>Availability <span className={styles.labelHelpText}>e.g. {"{"}"Jan": "high"{"}"}</span></label>
-                                    <textarea name="availability" value={formData.availability} onChange={handleChange} rows={3} className={`${styles.textarea} ${styles.jsonTextarea}`} />
+                                <div className={styles.gridCols2}>
+                                    <div>
+                                        <label className={styles.label}>Details (Array) <span className={styles.labelHelpText}>e.g. ["Origin: Sudan"]</span></label>
+                                        <textarea name="details" value={formData.details} onChange={handleChange} rows={3} className={`${styles.textarea} ${styles.jsonTextarea}`} />
+                                    </div>
+                                    <div>
+                                        <label className={styles.label}>Availability (JSON) <span className={styles.labelHelpText}>e.g. {"{"}"Jan": "high"{"}"}</span></label>
+                                        <textarea name="availability" value={formData.availability} onChange={handleChange} rows={3} className={`${styles.textarea} ${styles.jsonTextarea}`} />
+                                    </div>
                                 </div>
                             </div>
                         </section>

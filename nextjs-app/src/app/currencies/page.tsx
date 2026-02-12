@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import styles from './currencies.module.css'
 import {
     Chart as ChartJS,
@@ -14,6 +15,7 @@ import {
     Filler
 } from 'chart.js'
 import { Line } from 'react-chartjs-2'
+import PremiumModal from '@/components/PremiumModal'
 
 ChartJS.register(
     CategoryScale,
@@ -50,15 +52,21 @@ export default function CurrenciesPage() {
     const [history, setHistory] = useState<any[]>([])
     const [historyLoading, setHistoryLoading] = useState(false)
     const [searchTerm, setSearchTerm] = useState('')
+    const [userPlan, setUserPlan] = useState<'free' | 'plus'>('free')
+    const [showPremiumModal, setShowPremiumModal] = useState(false)
 
-    // Fetch currencies from API
+    // Fetch currencies and user plan
     useEffect(() => {
         const fetchCurrencies = async () => {
             try {
                 setLoading(true)
-                const response = await fetch('/api/currencies')
-                if (response.ok) {
-                    const data = await response.json()
+                const [currencyRes, planRes] = await Promise.all([
+                    fetch('/api/currencies'),
+                    fetch('/api/user/plan')
+                ])
+
+                if (currencyRes.ok) {
+                    const data = await currencyRes.json()
                     setCurrencies(data)
                     // Set default currencies if they exist in the data
                     if (data.length > 0) {
@@ -69,8 +77,14 @@ export default function CurrenciesPage() {
                         if (usd) setBaseCurrency(usd.code)
                     }
                 }
+
+                if (planRes.ok) {
+                    const planData = await planRes.json()
+                    setUserPlan(planData.plan)
+                }
+
             } catch (error) {
-                console.error('Error fetching currencies:', error)
+                console.error('Error fetching data:', error)
             } finally {
                 setLoading(false)
             }
@@ -153,6 +167,25 @@ export default function CurrenciesPage() {
         return rate.toFixed(2)
     }
 
+    const getFlagSrc = (code: string) => {
+        const countryMap: { [key: string]: string } = {
+            'USD': 'us',
+            'AED': 'ae',
+            'SDG': 'sd',
+            'INR': 'in',
+            'CNY': 'cn',
+            'TRY': 'tr',
+            'EUR': 'eu',
+            'GBP': 'gb',
+            'SAR': 'sa',
+            'QAR': 'qa',
+            'KWD': 'kw',
+            'JOD': 'jo'
+        }
+        const isoCode = countryMap[code] || code.toLowerCase().slice(0, 2)
+        return `https://flagcdn.com/w80/${isoCode}.webp`
+    }
+
     const calculateTrend = (currency: Currency) => {
         // Mock trend calculation - in real app, this would come from historical data
         return (Math.random() - 0.5) * 5
@@ -177,12 +210,28 @@ export default function CurrenciesPage() {
                     <p className={styles.subtitle}>Live exchange rates and trends for major currencies</p>
                 </header>
 
-                <div className={`${styles.card} ${styles.converterCard}`}>
+                <div
+                    className={`${styles.card} ${styles.converterCard} ${userPlan === 'free' ? styles.lockedCard : ''}`}
+                    onClick={() => userPlan === 'free' && setShowPremiumModal(true)}
+                >
+                    {userPlan === 'free' && (
+                        <div className={styles.lockOverlay}>
+                            <div className={styles.lockContent}>
+                                <i className="fas fa-lock fa-3x"></i>
+                                <h3>Currency Converter</h3>
+                                <p>Unlock live currency conversion with SudaStock Plus.</p>
+                                <button onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShowPremiumModal(true);
+                                }} className="upgrade-cta-btn">Upgrade to Plus</button>
+                            </div>
+                        </div>
+                    )}
                     <h2 className={styles.cardHeader}>
                         <i className="fas fa-exchange-alt"></i>
-                        Currency Converter
+                        Currency Converter <span className="plus-badge-inline" style={{ marginLeft: '10px' }}>✦ PLUS</span>
                     </h2>
-                    <div className={styles.converterGrid}>
+                    <div className={styles.converterGrid} style={userPlan === 'free' ? { filter: 'blur(4px)', pointerEvents: 'none' } : {}}>
                         <div className={styles.currencyBox}>
                             <label className={styles.label}>From</label>
                             <div className={styles.inputGroup}>
@@ -226,7 +275,7 @@ export default function CurrenciesPage() {
                             </div>
                         </div>
                     </div>
-                    <div className={styles.rateDisplay}>
+                    <div className={styles.rateDisplay} style={userPlan === 'free' ? { filter: 'blur(4px)' } : {}}>
                         <p className={styles.rateText}>1 {fromCurrency} = {conversionRate.toFixed(4)} {toCurrency}</p>
                     </div>
                 </div>
@@ -329,8 +378,12 @@ export default function CurrenciesPage() {
                                         <tr key={currency.code} className={styles.dataTableRow}>
                                             <td>
                                                 <div className={styles.currencyCell}>
-                                                    <div className={styles.currencyIcon}>
-                                                        <span>{currency.code.substring(0, 2)}</span>
+                                                    <div className={styles.flagIconWrapper}>
+                                                        <img
+                                                            src={getFlagSrc(currency.code)}
+                                                            alt=""
+                                                            className={styles.flagIcon}
+                                                        />
                                                     </div>
                                                     <span className={styles.currencyName}>{currency.name}</span>
                                                 </div>
@@ -368,6 +421,8 @@ export default function CurrenciesPage() {
                         </div>
                     </div>
                 </div>
+
+                <PremiumModal isOpen={showPremiumModal} onClose={() => setShowPremiumModal(false)} />
             </div>
         </div>
     )

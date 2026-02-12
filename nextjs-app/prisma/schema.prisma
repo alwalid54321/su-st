@@ -48,10 +48,13 @@ model User {
   lastLogin      DateTime       @updatedAt @map("last_login")
   profileImage   String?        @map("profile_image")
   emailVerified  Boolean        @default(false) @map("email_verified")
+  plan           String         @default("free") // "free" or "plus"
   
   // Relations
   emailOTPs      EmailOTP[]
   settings       UserSettings?
+  priceAlerts    PriceAlert[] @relation("UserPriceAlerts")
+  pushSubscriptions PushSubscription[] @relation("UserPushSubscriptions")
   
   @@map("core_user")
 }
@@ -80,6 +83,8 @@ model MarketData {
   lastUpdate     DateTime @updatedAt @map("last_update")
   createdAt      DateTime @default(now()) @map("created_at")
   
+  priceAlerts    PriceAlert[]
+
   @@map("core_marketdata")
 }
 
@@ -222,4 +227,35 @@ model UserSettings {
   user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   @@map("core_usersettings")
+}
+
+// Price Alert model
+model PriceAlert {
+  id           Int        @id @default(autoincrement())
+  userId       Int        @map("user_id")
+  marketDataId Int        @map("market_data_id")
+  targetPrice  Float      @map("target_price")
+  condition    String     // "ABOVE" or "BELOW"
+  isActive     Boolean    @default(true) @map("is_active")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  lastTriggered DateTime? @map("last_triggered")
+
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade, name: "UserPriceAlerts")
+  marketData   MarketData @relation(fields: [marketDataId], references: [id], onDelete: Cascade)
+
+  @@map("core_pricealert")
+}
+
+// Push Subscription model
+model PushSubscription {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  endpoint  String   @unique
+  auth      String
+  p256dh    String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, name: "UserPushSubscriptions")
+
+  @@map("core_pushsubscription")
 }

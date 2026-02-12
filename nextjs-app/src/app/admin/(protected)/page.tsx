@@ -28,6 +28,7 @@ import {
     TrendingDown as DownIcon,
     Notifications as AnnouncementIcon,
     FlashOn as ActionIcon,
+    ShowChart as MarketIcon,
 } from '@mui/icons-material';
 import {
     Chart as ChartJS,
@@ -70,17 +71,32 @@ export default function AdminDashboard() {
     React.useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                // Fetch Stats
-                const statsRes = await fetch('/api/admin/stats');
+                // Fetch All Dashboard Stats
+                const statsRes = await fetch('/api/admin/dashboard-stats');
                 if (statsRes.ok) {
                     const data = await statsRes.json();
-                    setStatsData(data);
-                }
+                    setStatsData(data.stats);
 
-                setActivities([
-                    { title: 'System Online', time: 'Just now', desc: 'Secure Admin Portal Initialized', icon: <ProductIcon />, type: 'success' },
-                    { title: 'Database Connected', time: '1 min ago', desc: 'Active records synchronized', icon: <ActionIcon />, type: 'info' },
-                ]);
+                    // Add icons back to activities
+                    const enrichedActivities = data.activities.map((act: any) => ({
+                        ...act,
+                        icon: act.title.includes('Price') ? <MarketIcon /> : <ActionIcon />
+                    }));
+                    setActivities(enrichedActivities);
+
+                    // Update Chart Data if real labels exist
+                    if (data.chart) {
+                        setChartDataState({
+                            labels: data.chart.labels,
+                            datasets: [
+                                {
+                                    ...chartDataTemplate.datasets[0],
+                                    data: data.chart.data
+                                }
+                            ]
+                        });
+                    }
+                }
             } catch (error) {
                 console.error('Failed to fetch dashboard data:', error);
             } finally {
@@ -98,7 +114,7 @@ export default function AdminDashboard() {
         { label: 'Currencies', value: statsData.totalCurrencies.toString(), change: '+0%', icon: <CurrencyIcon />, color: goldColor },
     ];
 
-    const chartData = {
+    const chartDataTemplate = {
         labels: ['01 Feb', '02 Feb', '03 Feb', '04 Feb', '05 Feb', '06 Feb', '07 Feb'],
         datasets: [
             {
@@ -113,6 +129,8 @@ export default function AdminDashboard() {
             },
         ],
     };
+
+    const [chartDataState, setChartDataState] = React.useState(chartDataTemplate);
 
     const chartOptions = {
         responsive: true,
@@ -206,7 +224,7 @@ export default function AdminDashboard() {
                             </Button>
                         </Box>
                         <Box sx={{ height: 320 }}>
-                            <Line data={chartData} options={chartOptions} />
+                            <Line data={chartDataState} options={chartOptions} />
                         </Box>
                     </Paper>
                 </Grid>

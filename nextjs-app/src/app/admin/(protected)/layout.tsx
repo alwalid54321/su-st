@@ -16,20 +16,8 @@ export default async function AdminLayout({
     }
 
     return (
-        <div className={styles.adminLayoutWrapper}> {/* Use module class for overall layout */}
-            <ClientAdminLayout />
-
-            {/* Main Content Wrapper */}
-            <div className={styles.mainContentWrapper}>
-
-
-                {/* Main Content Area */}
-                <main className={styles.mainContentArea}>
-                    <div className={styles.mainContentInner}>
-                        {children}
-                    </div>
-                </main>
-            </div>
-        </div>
+        <ClientAdminLayout>
+            {children}
+        </ClientAdminLayout>
     )
 }

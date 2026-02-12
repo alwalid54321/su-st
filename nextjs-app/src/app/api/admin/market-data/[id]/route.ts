@@ -68,6 +68,14 @@ export async function PUT(
             })
         }
 
+        // Calculate trend automatically based on value change
+        let calculatedTrend = parseInt(body.trend) || 0;
+        if (currentData && currentData.value > 0) {
+            const newValue = parseFloat(body.value) || 0;
+            const oldValue = currentData.value;
+            calculatedTrend = Math.round(((newValue - oldValue) / oldValue) * 100);
+        }
+
         // Update the market data
         const updated = await prisma.marketData.update({
             where: { id },
@@ -81,7 +89,7 @@ export async function PUT(
                 dmtIndia: parseFloat(body.dmt_india || body.dmtIndia) || 0,
                 status: body.status || 'Active',
                 forecast: body.forecast || 'Stable',
-                trend: parseInt(body.trend) || 0,
+                trend: calculatedTrend,
                 imageUrl: body.image_url || body.imageUrl,
                 category: body.category,
                 description: body.description,

@@ -72,7 +72,7 @@ async function main() {
         dmtIndia: dmtIndia,
         status: statusChoices[Math.floor(Math.random() * statusChoices.length)],
         forecast: forecastChoices[Math.floor(Math.random() * forecastChoices.length)],
-        imageUrl: i % 2 === 0 ? `/images/commodity_${i + 1}.png` : null,
+        imageUrl: i % 2 === 0 ? `/images/products/commodity_${i + 1}.png` : null,
       },
     });
     marketDataItems.push(marketData);
@@ -108,7 +108,7 @@ async function main() {
           trend: marketData.trend,
           imageUrl: marketData.imageUrl,
           archivedAt: new Date(),
-          lastUpdate: marketData.updatedAt,
+          lastUpdate: marketData.lastUpdate,
           createdAt: marketData.createdAt,
         },
       });

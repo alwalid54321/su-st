@@ -33,11 +33,21 @@ export default function VerticalProductCard({
         }
     }
 
+    // Sanitize image URL to prevent Next.js runtime errors
+    let sanitizedImageUrl = imageUrl || '/images/placeholder.jpg'
+    // Replace backslashes with forward slashes first
+    sanitizedImageUrl = sanitizedImageUrl.replace(/\\/g, '/')
+
+    if (sanitizedImageUrl && !sanitizedImageUrl.startsWith('http')) {
+        // Remove any leading slashes and add exactly one
+        sanitizedImageUrl = '/' + sanitizedImageUrl.replace(/^\/+/, '')
+    }
+
     return (
         <div className="vertical-card">
             <div className="card-image-wrapper">
                 <Image
-                    src={imageUrl || '/images/placeholder.jpg'}
+                    src={sanitizedImageUrl}
                     alt={name}
                     fill
                     style={{ objectFit: 'cover' }}

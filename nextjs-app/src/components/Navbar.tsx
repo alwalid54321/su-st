@@ -137,8 +137,8 @@ export default function Navbar() {
     ];
 
     // Determine if navbar should be transparent
-    const isTransparent = !scrolled && pathname === '/';
-    const navBgColor = isTransparent ? 'rgba(0, 0, 0, 0.10)' : 'rgba(255, 255, 255, 0.95)';
+    const isTransparent = !scrolled;
+    const navBgColor = isTransparent ? 'rgba(0, 0, 0, 0.15)' : 'rgba(255, 255, 255, 0.98)';
     const navShadow = scrolled ? '0 4px 20px rgba(0,0,0,0.1)' : 'none';
     const navHeight = scrolled ? '70px' : '100px';
     const logoScale = scrolled ? 0.85 : 1;
@@ -313,7 +313,7 @@ export default function Navbar() {
                         }}>
                             <Link href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
                                 <Image
-                                    src="/logo.png"
+                                    src="/images/branding/logo.png"
                                     alt="Logo"
                                     width={180}
                                     height={60}

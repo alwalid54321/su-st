@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import styles from './CurrencyCards.module.css'
 
 interface Currency {
     id?: number
@@ -37,28 +38,32 @@ export default function CurrencyCards() {
     }, [])
 
     const getFlagSrc = (code: string) => {
-        switch (code) {
-            case 'USD': return '/images/flags/us.png'
-            case 'AED': return '/images/flags/ae.png'
-            case 'SDG': return '/images/flags/sd.png'
-            case 'INR': return '/images/flags/inr.png'
-            case 'CNY': return '/images/flags/cny.png'
-            case 'TRY': return '/images/flags/tr.png'
-            case 'EUR': return '/images/flags/eu.png'
-            case 'GBP': return '/images/flags/gb.png'
-            default: return null
+        const countryMap: { [key: string]: string } = {
+            'USD': 'us',
+            'AED': 'ae',
+            'SDG': 'sd',
+            'INR': 'in',
+            'CNY': 'cn',
+            'TRY': 'tr',
+            'EUR': 'eu',
+            'GBP': 'gb',
+            'SAR': 'sa',
+            'QAR': 'qa',
+            'KWD': 'kw',
+            'JOD': 'jo'
         }
+        const isoCode = countryMap[code] || code.toLowerCase().slice(0, 2)
+        // Using FlagCDN for highly optimized WebP flags in correct aspect ratio
+        return `https://flagcdn.com/w80/${isoCode}.webp`
     }
 
     const formatDate = (dateString: Date | string | undefined) => {
         if (!dateString) return 'N/A'
         const date = new Date(dateString)
-        return date.toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric',
+        return date.toLocaleTimeString('en-US', {
             hour: '2-digit',
-            minute: '2-digit'
+            minute: '2-digit',
+            hour12: true
         })
     }
 
@@ -68,96 +73,100 @@ export default function CurrencyCards() {
 
     if (loading) {
         return (
-            <section className="currency-data-section">
-                <div className="currency-loading">
-                    <div className="currency-spinner"></div>
-                    <p>Loading currency rates...</p>
+            <section className={styles.sectionContainer}>
+                <div className={styles.sectionHeader}>
+                    <div className={styles.titleGroup}>
+                        <h2 className={styles.title}>Real-Time Exchange Rates</h2>
+                    </div>
+                </div>
+                <div className={styles.grid}>
+                    {[...Array(4)].map((_, i) => (
+                        <div key={i} className={styles.loadingSkeleton}></div>
+                    ))}
                 </div>
             </section>
         )
     }
 
     return (
-        <section className="currency-data-section">
-            <div className="section-header">
-                <h2 className="section-title">Currency Exchange Rates</h2>
-                <span className="section-update-time">
-                    Last update: {currencies[0] ? formatDate(getLastUpdate(currencies[0])) : 'N/A'}
-                </span>
+        <section className={styles.sectionContainer}>
+            <div className={styles.sectionHeader}>
+                <div className={styles.titleGroup}>
+                    <h2 className={styles.title}>Global Exchange Rates</h2>
+                    <p style={{ color: '#6b7280', maxWidth: '600px' }}>
+                        Live currency rates against the Sudanese Pound (SDG). Updated in real-time.
+                    </p>
+                </div>
+                <div className={styles.lastUpdate}>
+                    <div className={styles.liveIndicator}></div>
+                    <span>Live Updates</span>
+                </div>
             </div>
-            <div className="currency-cards-container">
-                {currencies.map((currency, index) => {
-                    const trend = (Math.random() - 0.5) * 5 // Mock trend for visual effect
+
+            <div className={styles.grid}>
+                {currencies.map((currency) => {
+                    const trend = (Math.random() - 0.5) * 5 // Mock trend
+                    const flagSrc = getFlagSrc(currency.code)
+
                     return (
-                        <div
-                            key={currency.code}
-                            className="currency-card"
-                            style={{ animationDelay: `${index * 0.1}s` }}
-                        >
-                            <div className="currency-content">
-                                <div className="currency-header">
-                                    {getFlagSrc(currency.code) ? (
-                                        <div className="currency-flag-wrapper">
+                        <Link href="/currencies" key={currency.code} className={styles.card}>
+                            <div className={styles.cardHeader}>
+                                <div className={styles.currencyIdentifier}>
+                                    <div className={styles.flagWrapper}>
+                                        {flagSrc ? (
                                             <Image
-                                                src={getFlagSrc(currency.code)!}
-                                                alt={`${currency.code} Flag`}
-                                                width={32}
-                                                height={32}
-                                                className="currency-flag"
+                                                src={flagSrc}
+                                                alt={currency.code}
+                                                width={36}
+                                                height={24}
+                                                className={styles.flagImage}
                                             />
-                                        </div>
-                                    ) : (
-                                        <div className="currency-flag-placeholder">
-                                            {currency.code.slice(0, 2)}
-                                        </div>
-                                    )}
-                                    <div className="currency-info">
-                                        <span className="currency-code">{currency.code}</span>
-                                        {currency.name && (
-                                            <span className="currency-name">{currency.name}</span>
+                                        ) : (
+                                            <span>{currency.code.slice(0, 2)}</span>
                                         )}
                                     </div>
-                                </div>
-                                <div className="currency-rate">
-                                    <div className="currency-rate-row">
-                                        <span className="rate-label">1.00 {currency.code}</span>
-                                        <span className="currency-arrow">→</span>
-                                        <div className="rate-result">
-                                            <span className="target-code">SDG</span>
-                                            <span className="target-value">{Number(currency.rate).toFixed(2)}</span>
-                                        </div>
-                                    </div>
-                                    <div className="currency-trend">
-                                        <span className={`trend-indicator ${trend > 0 ? 'up' : trend < 0 ? 'down' : 'stable'}`}>
-                                            {trend > 0 ? '↑' : trend < 0 ? '↓' : '→'} {Math.abs(trend).toFixed(2)}%
-                                        </span>
+                                    <div className={styles.codeInfo}>
+                                        <span className={styles.code}>{currency.code}</span>
+                                        <span className={styles.name}>{currency.name || 'Currency'}</span>
                                     </div>
                                 </div>
-                                <div className="currency-footer">
-                                    <div className="currency-updated">
-                                        <span className="update-label">Updated:</span>
-                                        <span className="update-time">
-                                            {new Date(getLastUpdate(currency) || Date.now()).toLocaleDateString('en-GB', {
-                                                day: 'numeric',
-                                                month: 'short',
-                                                year: 'numeric'
-                                            })}
-                                        </span>
-                                    </div>
-                                    <Link href="/currencies" className="currency-more-btn">
-                                        View Details
-                                        <i className="fas fa-arrow-right"></i>
-                                    </Link>
+                                {/* Mini SVG Trend Line Placeholder */}
+                                <svg viewBox="0 0 100 40" className={styles.miniChart}>
+                                    <path
+                                        d={`M0 20 Q 25 ${20 - trend * 2} 50 20 T 100 ${20 + trend * 2}`}
+                                        fill="none"
+                                        stroke={trend > 0 ? '#10b981' : '#ef4444'}
+                                        strokeWidth="3"
+                                        strokeLinecap="round"
+                                    />
+                                </svg>
+                            </div>
+
+                            <div className={styles.rateArea}>
+                                <div className={styles.rateRow}>
+                                    <span className={styles.conversion}>1 {currency.code} =</span>
+                                    <span className={styles.rateValue}>{Number(currency.rate).toFixed(2)} <span style={{ fontSize: '1rem', color: '#9ca3af' }}>SDG</span></span>
+                                </div>
+                                <div className={styles.trendRow}>
+                                    <span
+                                        className={trend > 0 ? styles.trendUp : trend < 0 ? styles.trendDown : styles.trendStable}
+                                    >
+                                        {trend > 0 ? '↗' : trend < 0 ? '↘' : '→'} {Math.abs(trend).toFixed(2)}%
+                                    </span>
+                                    <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>
+                                        Updated: {formatDate(getLastUpdate(currency))}
+                                    </span>
                                 </div>
                             </div>
-                        </div>
+                        </Link>
                     )
                 })}
             </div>
-            <div className="currency-cta">
-                <Link href="/currencies" className="view-all-btn">
-                    View All Exchange Rates
-                    <i className="fas fa-chevron-right"></i>
+
+            <div className={styles.ctaContainer}>
+                <Link href="/currencies" className={styles.viewAllBtn}>
+                    View All & Converter
+                    <i className="fas fa-arrow-right" style={{ fontSize: '0.8rem', opacity: 0.7 }}></i>
                 </Link>
             </div>
         </section>

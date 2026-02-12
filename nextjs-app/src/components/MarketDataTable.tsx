@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import PriceAlertModal from './PriceAlertModal'
 
 interface MarketData {
     id: number
@@ -28,8 +29,11 @@ export default function MarketDataTable() {
     const [selectedCurrency, setSelectedCurrency] = useState<string>('USD')
     const [exchangeRate, setExchangeRate] = useState<number>(1)
     const [loading, setLoading] = useState(true)
-
     const [isMounted, setIsMounted] = useState(false)
+
+    // Alert Modal State
+    const [alertModalOpen, setAlertModalOpen] = useState(false)
+    const [selectedProduct, setSelectedProduct] = useState<MarketData | null>(null)
 
     useEffect(() => {
         setIsMounted(true)
@@ -202,8 +206,35 @@ export default function MarketDataTable() {
                                                 </div>
                                             </td>
                                             <td className="action-column">
-                                                <Link href={`/sample?product=${product.name}`} className="action-btn sample-btn">SAMPLE</Link>
-                                                <Link href={`/quote?product=${product.name}`} className="action-btn quote-btn">QUOTE</Link>
+                                                <div className="action-row">
+                                                    <Link href={`/sample?product=${product.name}`} className="action-btn sample-btn">SAMPLE</Link>
+                                                    <Link href={`/quote?product=${product.name}`} className="action-btn quote-btn">QUOTE</Link>
+                                                </div>
+                                                <button
+                                                    onClick={() => {
+                                                        setSelectedProduct(product)
+                                                        setAlertModalOpen(true)
+                                                    }}
+                                                    className="action-btn alert-btn"
+                                                    style={{
+                                                        marginTop: '8px',
+                                                        width: '100%',
+                                                        backgroundColor: 'var(--accent)',
+                                                        color: 'white',
+                                                        border: 'none',
+                                                        borderRadius: '4px',
+                                                        padding: '6px',
+                                                        fontSize: '0.8rem',
+                                                        fontWeight: 'bold',
+                                                        cursor: 'pointer',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        gap: '5px'
+                                                    }}
+                                                >
+                                                    <i className="fas fa-bell"></i> SET ALERT
+                                                </button>
                                             </td>
                                         </tr>
                                     ))}
@@ -213,6 +244,16 @@ export default function MarketDataTable() {
                     </>
                 )}
             </div>
+
+            {selectedProduct && (
+                <PriceAlertModal
+                    isOpen={alertModalOpen}
+                    onClose={() => setAlertModalOpen(false)}
+                    productName={selectedProduct.name}
+                    productId={selectedProduct.id}
+                    currentPrice={selectedProduct.portSudan}
+                />
+            )}
         </section>
     )
 }

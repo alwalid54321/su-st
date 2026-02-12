@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -10,9 +11,12 @@ import {
     Title,
     Tooltip,
     Legend,
+    Filler // Add Filler for gradients
 } from 'chart.js'
 import { Line } from 'react-chartjs-2'
 import styles from './market-data.module.css'
+import PremiumModal from '@/components/PremiumModal'
+import PriceAlertModal from '@/components/PriceAlertModal'
 
 ChartJS.register(
     CategoryScale,
@@ -21,7 +25,8 @@ ChartJS.register(
     LineElement,
     Title,
     Tooltip,
-    Legend
+    Legend,
+    Filler
 )
 
 interface MarketDataItem {
@@ -67,17 +72,39 @@ export default function MarketDataPage() {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
     const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
+    const [userPlan, setUserPlan] = useState<'free' | 'plus'>('free')
+    const [planLimits, setPlanLimits] = useState<any>(null)
+    const [showPremiumModal, setShowPremiumModal] = useState(false)
+    const [showAlertModal, setShowAlertModal] = useState(false)
 
-    // Fetch all products on mount
+    // Fetch user plan + products on mount
     useEffect(() => {
         fetchProducts()
-        // Set default date range (last 30 days)
+        fetchUserPlan()
+    }, [])
+
+    // Set default date range based on plan
+    useEffect(() => {
         const end = new Date()
         const start = new Date()
-        start.setMonth(start.getMonth() - 1)
+        // Free users default to 7 days, Plus to 30 days
+        start.setDate(start.getDate() - (userPlan === 'plus' ? 30 : 7))
         setEndDate(end.toISOString().split('T')[0])
         setStartDate(start.toISOString().split('T')[0])
-    }, [])
+    }, [userPlan])
+
+    const fetchUserPlan = async () => {
+        try {
+            const res = await fetch('/api/user/plan')
+            if (res.ok) {
+                const data = await res.json()
+                setUserPlan(data.plan)
+                setPlanLimits(data.limits)
+            }
+        } catch (err) {
+            console.error('Failed to fetch user plan:', err)
+        }
+    }
 
     const fetchProducts = async () => {
         try {
@@ -146,11 +173,32 @@ export default function MarketDataPage() {
     }
 
     const setQuickDateRange = (days: number) => {
+        // Enforce server limits — free users can only go back 7 days
+        const maxDays = userPlan === 'plus' ? 150 : 7
+        const effectiveDays = Math.min(days, maxDays)
         const end = new Date()
         const start = new Date()
-        start.setDate(start.getDate() - days)
+        start.setDate(start.getDate() - effectiveDays)
         setEndDate(end.toISOString().split('T')[0])
         setStartDate(start.toISOString().split('T')[0])
+    }
+
+    // Check if a quick filter is locked for free users
+    const isFilterLocked = (days: number) => userPlan !== 'plus' && days > 7
+
+    const handleQuickFilterClick = (days: number) => {
+        if (isFilterLocked(days)) {
+            setShowPremiumModal(true)
+        } else {
+            setQuickDateRange(days)
+        }
+    }
+
+    // Get the min date for the date picker based on plan
+    const getMinDate = () => {
+        const d = new Date()
+        d.setDate(d.getDate() - (userPlan === 'plus' ? 150 : 7))
+        return d.toISOString().split('T')[0]
     }
 
     const exportToCSV = () => {
@@ -193,22 +241,38 @@ export default function MarketDataPage() {
             legend: {
                 position: 'top' as const,
                 labels: {
-                    color: '#1B1464',
-                    font: { size: 12, weight: 'bold' as const }
+                    usePointStyle: true,
+                    boxWidth: 8,
+                    font: { family: "'Inter', sans-serif", size: 12 }
                 }
             },
-            title: { display: false },
+            tooltip: {
+                mode: 'index' as const,
+                intersect: false,
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                titleColor: '#1f2937',
+                bodyColor: '#1f2937',
+                borderColor: '#e5e7eb',
+                borderWidth: 1,
+                padding: 10,
+                displayColors: true,
+            }
         },
         scales: {
             y: {
                 beginAtZero: false,
-                grid: { color: 'rgba(27, 20, 100, 0.1)' },
-                ticks: { color: '#1B1464' }
+                grid: { color: '#f3f4f6' },
+                ticks: { color: '#6b7280', font: { size: 11 } }
             },
             x: {
                 grid: { display: false },
-                ticks: { color: '#1B1464' }
+                ticks: { color: '#6b7280', font: { size: 11 } }
             }
+        },
+        interaction: {
+            mode: 'nearest' as const,
+            axis: 'x' as const,
+            intersect: false
         }
     }
 
@@ -216,32 +280,32 @@ export default function MarketDataPage() {
         labels: history.map(h => new Date(h.archivedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
         datasets: [
             {
-                label: 'Port Sudan',
-                data: history.map(h => Number(h.portSudan)),
-                borderColor: '#D4AF37',
-                backgroundColor: (context: any) => {
-                    const ctx = context.chart.ctx;
-                    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-                    gradient.addColorStop(0, 'rgba(212, 175, 55, 0.4)');
-                    gradient.addColorStop(1, 'rgba(212, 175, 55, 0)');
-                    return gradient;
-                },
-                tension: 0.4,
-                fill: true,
-                borderWidth: 3,
-                pointRadius: 4,
-                pointBackgroundColor: '#D4AF37',
-            },
-            {
                 label: 'Global Average',
                 data: history.map(h => (Number(h.dmtChina) + Number(h.dmtUae) + Number(h.dmtIndia)) / 3),
                 borderColor: '#1B1464',
-                backgroundColor: 'transparent',
+                backgroundColor: (context: any) => {
+                    const ctx = context.chart.ctx;
+                    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                    gradient.addColorStop(0, 'rgba(27, 20, 100, 0.2)');
+                    gradient.addColorStop(1, 'rgba(27, 20, 100, 0)');
+                    return gradient;
+                },
+                fill: true,
                 tension: 0.4,
-                fill: false,
                 borderWidth: 2,
-                borderDash: [5, 5],
                 pointRadius: 0,
+                pointHoverRadius: 4
+            },
+            {
+                label: 'Port Sudan',
+                data: history.map(h => Number(h.portSudan)),
+                borderColor: '#D4AF37',
+                backgroundColor: 'transparent',
+                borderDash: [5, 5],
+                tension: 0.4,
+                borderWidth: 2,
+                pointRadius: 0,
+                pointHoverRadius: 4
             }
         ]
     } : null
@@ -252,73 +316,52 @@ export default function MarketDataPage() {
                 {/* Header Section */}
                 <header className={styles.header}>
                     <h1 className={styles.title}>Market Insights</h1>
-                    <p className={styles.subtitle}>Track Sudanese commodity prices and global market trends in real-time.</p>
+                    <p className={styles.subtitle}>Track Sudanese commodity prices and global market trends in real-time. Make data-driven decisions with our advanced analytics.</p>
                 </header>
 
-                {/* Market Summary Ticker/Cards */}
-                {products.length > 0 && (
-                    <div className={styles.summaryGrid}>
-                        {products.slice(0, 4).map(p => (
-                            <div key={p.id} className={styles.summaryCard} onClick={() => {
-                                setSelectedProduct(p.id);
-                                setTimeout(() => handleSearch(), 100);
-                            }}>
-                                <div className={styles.summaryInfo}>
-                                    <h3>{p.name}</h3>
-                                    <p>{formatCurrency(p.portSudan)}</p>
-                                </div>
-                                <div className={`${styles.miniTrend} ${getTrendClass(p.trend)}`}>
-                                    {getTrendIcon(p.trend)} {Math.abs(p.trend)}%
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
+
 
                 {/* Search Form Card */}
                 <div className={styles.card}>
-                    <h2 className={styles.cardTitle}>View Market Data</h2>
+                    <h2 className={styles.cardTitle}>
+                        <i className="fas fa-search-dollar" style={{ color: '#D4AF37' }}></i>
+                        Market Analysis
+                    </h2>
 
                     {error && (
-                        <div className={styles.errorAlert}>
-                            <i className="fas fa-exclamation-circle"></i>
-                            {error}
+                        <div style={{ padding: '1rem', background: '#fee2e2', color: '#ef4444', borderRadius: '8px', marginBottom: '1.5rem', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                            <i className="fas fa-exclamation-circle"></i> {error}
                         </div>
                     )}
 
                     <div className={styles.formGrid}>
                         <div>
-                            <label htmlFor="productSelect" className={styles.label}>
-                                Select Product
-                            </label>
+                            <label htmlFor="productSelect" className={styles.label}>Select Product</label>
                             <select
                                 id="productSelect"
                                 value={selectedProduct}
                                 onChange={(e) => setSelectedProduct(e.target.value ? Number(e.target.value) : '')}
                                 className={styles.select}
                             >
-                                <option value="">-- Select a Product --</option>
+                                <option value="">-- Choose a Commodity --</option>
                                 {products.map(p => (
                                     <option key={p.id} value={p.id}>{p.name}</option>
                                 ))}
                             </select>
                         </div>
                         <div>
-                            <label htmlFor="startDate" className={styles.label}>
-                                Start Date
-                            </label>
+                            <label htmlFor="startDate" className={styles.label}>Start Date</label>
                             <input
                                 type="date"
                                 id="startDate"
                                 value={startDate}
+                                min={getMinDate()}
                                 onChange={(e) => setStartDate(e.target.value)}
                                 className={styles.input}
                             />
                         </div>
                         <div>
-                            <label htmlFor="endDate" className={styles.label}>
-                                End Date
-                            </label>
+                            <label htmlFor="endDate" className={styles.label}>End Date</label>
                             <input
                                 type="date"
                                 id="endDate"
@@ -329,41 +372,54 @@ export default function MarketDataPage() {
                         </div>
                     </div>
 
-                    {/* Quick Date Filters */}
                     <div className={styles.quickFilters}>
                         <button onClick={() => setQuickDateRange(7)} className={styles.quickFilterBtn}>
                             Last 7 Days
                         </button>
-                        <button onClick={() => setQuickDateRange(30)} className={styles.quickFilterBtn}>
-                            Last 30 Days
+                        <button
+                            onClick={() => handleQuickFilterClick(30)}
+                            className={`${styles.quickFilterBtn} ${isFilterLocked(30) ? styles.lockedFilter : ''}`}
+                            title={isFilterLocked(30) ? 'Upgrade to Plus for extended history' : ''}
+                        >
+                            Last 30 Days {isFilterLocked(30) && <span className="plus-badge-inline">✦ PLUS</span>}
                         </button>
-                        <button onClick={() => setQuickDateRange(90)} className={styles.quickFilterBtn}>
-                            Last 3 Months
+                        <button
+                            onClick={() => handleQuickFilterClick(90)}
+                            className={`${styles.quickFilterBtn} ${isFilterLocked(90) ? styles.lockedFilter : ''}`}
+                            title={isFilterLocked(90) ? 'Upgrade to Plus for extended history' : ''}
+                        >
+                            Last 3 Months {isFilterLocked(90) && <span className="plus-badge-inline">✦ PLUS</span>}
                         </button>
                     </div>
+
+                    <PremiumModal isOpen={showPremiumModal} onClose={() => setShowPremiumModal(false)} />
+
+                    {/* Upgrade Banner for Free Users */}
+                    {userPlan === 'free' && (
+                        <div className={styles.upgradeBanner}>
+                            <div className={styles.upgradeBannerText}>
+                                <strong>Unlock 5 months of market history</strong>
+                                <p>Upgrade to SudaStock Plus for extended data, CSV exports, and more.</p>
+                            </div>
+                            <Link href="/pricing" className={styles.upgradeCta}>Upgrade to Plus</Link>
+                        </div>
+                    )}
 
                     <div className={styles.buttonGroup}>
                         <button
                             onClick={handleSearch}
                             disabled={loading}
-                            className={`${styles.button} ${styles.primaryButton}`}
+                            className={styles.primaryButton}
                         >
-                            <i className="fas fa-search"></i>
-                            {loading ? 'Searching...' : 'Analyze Market'}
+                            {loading ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-chart-line"></i>}
+                            {loading ? 'Analyzing...' : 'Generate Report'}
                         </button>
-                        <button
-                            onClick={fetchProducts}
-                            disabled={loading}
-                            className={`${styles.button} ${styles.refreshButton}`}
-                            title="Refresh product list"
-                        >
-                            <i className="fas fa-sync-alt"></i>
-                        </button>
+
                         {selectedProductData && (
                             <button
                                 onClick={exportToCSV}
                                 disabled={history.length === 0}
-                                className={`${styles.button} ${styles.secondaryButton}`}
+                                className={styles.secondaryButton}
                             >
                                 <i className="fas fa-download"></i>
                                 Export CSV
@@ -372,83 +428,78 @@ export default function MarketDataPage() {
                     </div>
                 </div>
 
-                {/* Loading State */}
-                {loading && (
-                    <div className={styles.loadingState}>
-                        <div className={styles.loader}></div>
-                        <p className={styles.loaderText}>Loading market data...</p>
-                    </div>
-                )}
-
                 {/* Results Section */}
                 {selectedProductData && !loading && (
                     <div className={styles.resultsSection}>
                         {/* Product Header */}
-                        <div className={styles.productHeaderCard}>
-                            <div className={styles.productHeaderContent}>
-                                <div>
-                                    <h2 className={styles.productName}>{selectedProductData.name}</h2>
-                                    <div className={styles.productMeta}>
-                                        <span className={styles.statusBadge}>
-                                            {selectedProductData.status}
+                        <div className={styles.productHeader}>
+                            <div className={styles.productTitle}>
+                                <h2>{selectedProductData.name}</h2>
+                                <div className={styles.metaTags}>
+                                    <span className={`${styles.tag} ${styles.tagStatus}`}>
+                                        <i className="fas fa-check-circle"></i> {selectedProductData.status}
+                                    </span>
+                                    <span className={`${styles.tag} ${styles.tagForecast}`}>
+                                        <i className="fas fa-binoculars"></i> {selectedProductData.forecast}
+                                    </span>
+                                    {lastUpdated && (
+                                        <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>
+                                            Updated: {lastUpdated.toLocaleTimeString()}
                                         </span>
-                                        <span className={styles.forecastText}>
-                                            Forecast: <strong>{selectedProductData.forecast}</strong>
-                                        </span>
-                                        {lastUpdated && (
-                                            <span className={styles.lastUpdateTag}>
-                                                <i className="fas fa-clock"></i> Updated: {lastUpdated.toLocaleTimeString()}
-                                            </span>
-                                        )}
-                                    </div>
+                                    )}
                                 </div>
-                                <div className={`${styles.trendDisplay} ${getTrendClass(selectedProductData.trend)}`}>
-                                    {getTrendIcon(selectedProductData.trend)} {Math.abs(selectedProductData.trend)}%
+                            </div>
+
+                            <div className={styles.productActions}>
+                                <button
+                                    onClick={() => setShowAlertModal(true)}
+                                    className={`${styles.secondaryButton} ${styles.alertBtn}`}
+                                    title="Set Price Alert"
+                                >
+                                    <i className="fas fa-bell"></i> Set Alert
+                                </button>
+                                <div className={styles.mainTrend}>
+                                    <span className={styles.trendValue}>
+                                        {getTrendIcon(selectedProductData.trend)} {Math.abs(selectedProductData.trend)}%
+                                    </span>
+                                    <span style={{ fontSize: '0.9rem', color: '#6b7280' }}>24h Trend</span>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Chart */}
-                        {chartData && (
-                            <div className={styles.chartCard}>
-                                <div className={styles.chartCardHeader}>
-                                    <h3 className={styles.chartCardTitle}>Price Trends</h3>
-                                    <i className={`fas fa-chart-line ${styles.chartCardIcon}`}></i>
-                                </div>
-                                <div className={styles.chartArea}>
-                                    <div className={styles.chartAreaDiv}>
-                                        <Line data={chartData} options={chartOptions} />
-                                    </div>
-                                </div>
-                            </div>
+                        {selectedProductData && (
+                            <PriceAlertModal
+                                isOpen={showAlertModal}
+                                onClose={() => setShowAlertModal(false)}
+                                productName={selectedProductData.name}
+                                productId={selectedProductData.id}
+                                currentPrice={selectedProductData.value}
+                            />
                         )}
 
-                        {/* No History Message */}
-                        {history.length === 0 && (
-                            <div className={styles.emptyState}>
-                                <i className="fas fa-chart-line fa-3x"></i>
-                                <p>No historical data available for this product yet.</p>
-                                <p className={styles.emptyStateSubtext}>Data will appear here once the product is updated over time.</p>
+                        {/* Data Grid: Chart & Prices */}
+                        <div className={styles.dataGrid}>
+                            {/* Left: Chart */}
+                            <div className={styles.chartContainer}>
+                                {chartData ? (
+                                    <Line data={chartData} options={chartOptions} />
+                                ) : (
+                                    <div className={styles.emptyState}>No chart data available</div>
+                                )}
                             </div>
-                        )}
 
-                        {/* Price Cards */}
-                        <div>
-                            <h3 className={styles.cardTitle}>Current Prices by Destination</h3>
-                            <div className={styles.priceCardsContainer}>
+                            {/* Right: Prices */}
+                            <div className={styles.priceList}>
                                 {[
-                                    { label: 'Port Sudan', value: selectedProductData.portSudan },
-                                    { label: 'China', value: selectedProductData.dmtChina },
-                                    { label: 'UAE', value: selectedProductData.dmtUae },
-                                    { label: 'Mersing', value: selectedProductData.dmtMersing },
-                                    { label: 'India', value: selectedProductData.dmtIndia }
+                                    { label: 'Port Sudan (FOB)', value: selectedProductData.portSudan },
+                                    { label: 'Avg Global Price', value: selectedProductData.value },
+                                    { label: 'China (DMT)', value: selectedProductData.dmtChina },
+                                    { label: 'UAE (DMT)', value: selectedProductData.dmtUae },
+                                    { label: 'India (DMT)', value: selectedProductData.dmtIndia }
                                 ].map((item, idx) => (
-                                    <div key={idx} className={styles.priceCard}>
-                                        <div className={styles.priceCardLabel}>{item.label}</div>
-                                        <div className={styles.priceCardValue}>{formatCurrency(item.value)}</div>
-                                        <div className={`${styles.priceCardTrend} ${getTrendClass(selectedProductData.trend)}`}>
-                                            {getTrendIcon(selectedProductData.trend)} {Math.abs(selectedProductData.trend)}%
-                                        </div>
+                                    <div key={idx} className={styles.priceRow}>
+                                        <span className={styles.priceLabel}>{item.label}</span>
+                                        <span className={styles.priceValue}>{formatCurrency(item.value)}</span>
                                     </div>
                                 ))}
                             </div>
@@ -456,14 +507,14 @@ export default function MarketDataPage() {
                     </div>
                 )}
 
-                {/* Empty State - No Product Selected */}
+                {/* Empty State / Loading */}
                 {!selectedProductData && !loading && (
                     <div className={styles.emptyState}>
-                        <i className="fas fa-database fa-3x"></i>
-                        <p>Select a product and date range to view market data</p>
+                        <i className="fas fa-search-dollar fa-3x" style={{ marginBottom: '1rem', color: '#d1d5db' }}></i>
+                        <p>Select a product above to start analyzing market trends.</p>
                     </div>
                 )}
             </div>
-        </div>
+        </div >
     )
 }

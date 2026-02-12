@@ -7,6 +7,8 @@ import MarketDataTable from '@/components/MarketDataTable'
 import CurrencyCards from '@/components/CurrencyCards'
 import GallerySlider from '@/components/GallerySlider'
 import AnnouncementsSection from '@/components/AnnouncementsSection'
+import PremiumPromoSection from '@/components/PremiumPromoSection'
+import PartnersSection from '@/components/PartnersSection'
 
 interface MarketTickerItem {
   id: number
@@ -44,18 +46,36 @@ export default function Home() {
           loop
           playsInline
           preload="auto"
-          poster="/images/hero.jpg"
+          poster="/images/hero/hero.webp"
         >
           {/* <source src="/videos/bg_vid.mp4" type="video/mp4" /> */}
           {/* Fallback handled by CSS if video fails or poster is shown */}
         </video>
         <div className="hero-content">
+          <div className="hero-brand">
+            <h1 className="brand-title">SudaStock</h1>
+            <div className="brand-logo-icon">
+              <Image
+                src="/images/branding/logo.png"
+                alt="SudaStock Logo"
+                width={120}
+                height={120}
+                className="hero-logo-img"
+                priority
+              />
+            </div>
+            <h2 className="brand-arabic">سودا ستوك</h2>
+          </div>
+
+          <h1 className="hero-main-title">Premium Sudanese Agricultural Commodities</h1>
+          <p className="hero-subtitle">Access real-time market data, global price benchmarks, and direct sourcing from Sudan's richest agricultural hubs.</p>
+
           <div className="hero-actions">
             <Link href="/register" className="hero-btn hero-btn-primary">
-              Get Started
+              Begin Trading
             </Link>
             <Link href="/market-data" className="hero-btn hero-btn-secondary">
-              View Market Data
+              Market Insights
             </Link>
           </div>
         </div>
@@ -97,10 +117,49 @@ export default function Home() {
       <MarketDataTable />
 
       {/* Currency Data Section */}
+      {/* Currency Cards Section */}
       <CurrencyCards />
+
+      {/* Smart Price Alerts Promo - High End Restyle */}
+      <section className="premium-alerts-section">
+        <div className="container">
+          <div className="premium-alert-glass">
+            <div className="alert-glow"></div>
+            <div className="alert-content-wrapper">
+              <div className="alert-visual">
+                <div className="bell-container">
+                  <i className="fas fa-bell bounce-on-hover"></i>
+                  <div className="notification-ring"></div>
+                </div>
+              </div>
+              <div className="alert-text-content">
+                <span className="premium-badge">REAL-TIME INTELLIGENCE</span>
+                <h3>NEVER MISS A MARKET MOVE</h3>
+                <p>Stay ahead of global price shifts. Set custom target alerts for your preferred commodities and receive instant push notifications the moment the market moves in your favor.</p>
+                <div className="alert-features">
+                  <span><i className="fas fa-check-circle"></i> SMS & Push</span>
+                  <span><i className="fas fa-check-circle"></i> Target Price Triggers</span>
+                  <span><i className="fas fa-check-circle"></i> History Tracking</span>
+                </div>
+              </div>
+              <div className="alert-action-premium">
+                <Link href="/market-data" className="premium-btn-gold">
+                  Setup My Alerts <i className="fas fa-arrow-right"></i>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Premium Promo Section */}
+      <PremiumPromoSection />
 
       {/* Gallery Slider Section */}
       <GallerySlider />
+
+
+
 
 
       {/* Call to Action Section */}
@@ -156,32 +215,7 @@ export default function Home() {
       <AnnouncementsSection />
 
       {/* Partners Section */}
-      <section className="partners-section">
-        <div className="container">
-          <div className="section-header">
-            <h2 className="gradient-text">EXPERIENCE THE DIFFERENCE</h2>
-            <h3>OUR TRUSTED PARTNERS</h3>
-          </div>
-
-          <div className="partners-grid">
-            <div className="partner-logo">
-              <Image src="/images/partners/partner1.jpg" alt="Shabour Sons Logistics" width={150} height={100} style={{ objectFit: 'contain' }} />
-            </div>
-            <div className="partner-logo">
-              <Image src="/images/partners/partner2.jpg" alt="Pure Agri" width={150} height={100} style={{ objectFit: 'contain' }} />
-            </div>
-            <div className="partner-logo">
-              <Image src="/images/partners/partner3.jpg" alt="Wadee" width={150} height={100} style={{ objectFit: 'contain' }} />
-            </div>
-            <div className="partner-logo">
-              <Image src="/images/partners/partner4.jpg" alt="Altaif" width={150} height={100} style={{ objectFit: 'contain' }} />
-            </div>
-            <div className="partner-logo">
-              <Image src="/images/partners/partner5.jpg" alt="WSG" width={150} height={100} style={{ objectFit: 'contain' }} />
-            </div>
-          </div>
-        </div>
-      </section>
+      <PartnersSection />
     </div>
   )
 }

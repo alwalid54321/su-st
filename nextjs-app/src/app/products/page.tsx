@@ -1,11 +1,10 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, Suspense, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import './products.css'
-import './modal-filter-styles.css'
 import VerticalProductCard from '@/components/VerticalProductCard'
 
 interface Product {
@@ -29,6 +28,14 @@ interface ParsedProduct extends Omit<Product, 'specifications' | 'details' | 'av
     availability: Record<string, string>
 }
 
+const CATEGORIES = [
+    { id: 'all', label: 'All Products' },
+    { id: 'sesame', label: 'Sesame Seeds' },
+    { id: 'gum', label: 'Gum Arabic' },
+    { id: 'cotton', label: 'Cotton' },
+    { id: 'others', label: 'Others' }
+]
+
 function ProductsContent() {
     const searchParams = useSearchParams()
     const categoryParam = searchParams.get('category')
@@ -36,6 +43,8 @@ function ProductsContent() {
     const [products, setProducts] = useState<ParsedProduct[]>([])
     const [loading, setLoading] = useState(true)
     const [selectedProduct, setSelectedProduct] = useState<ParsedProduct | null>(null)
+    const [isMenuSticky, setIsMenuSticky] = useState(false)
+    const filterRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
         async function fetchProducts() {
@@ -43,37 +52,22 @@ function ProductsContent() {
                 const response = await fetch('/api/market-data')
                 if (response.ok) {
                     const data: Product[] = await response.json()
-                    // Parse JSON fields
-                    // Parse JSON fields safely
                     const parsedData = data.map(p => {
                         let specifications = {}
                         let details = []
                         let availability = {}
+                        try { specifications = p.specifications ? JSON.parse(p.specifications) : {} } catch (e) { }
+                        try { details = p.details ? JSON.parse(p.details) : [] } catch (e) { }
+                        try { availability = p.availability ? JSON.parse(p.availability) : {} } catch (e) { }
 
-                        try {
-                            specifications = p.specifications ? JSON.parse(p.specifications) : {}
-                        } catch (e) {
-                            console.warn(`Failed to parse specifications for product ${p.id}`, e)
+                        // Sanitize Image URL
+                        let imageUrl = p.imageUrl || '/images/placeholder.jpg'
+                        imageUrl = imageUrl.replace(/\\/g, '/')
+                        if (imageUrl && !imageUrl.startsWith('http')) {
+                            imageUrl = '/' + imageUrl.replace(/^\/+/, '')
                         }
 
-                        try {
-                            details = p.details ? JSON.parse(p.details) : []
-                        } catch (e) {
-                            console.warn(`Failed to parse details for product ${p.id}`, e)
-                        }
-
-                        try {
-                            availability = p.availability ? JSON.parse(p.availability) : {}
-                        } catch (e) {
-                            console.warn(`Failed to parse availability for product ${p.id}`, e)
-                        }
-
-                        return {
-                            ...p,
-                            specifications,
-                            details,
-                            availability
-                        }
+                        return { ...p, imageUrl, specifications, details, availability }
                     })
                     setProducts(parsedData)
                 }
@@ -92,12 +86,27 @@ function ProductsContent() {
         }
     }, [categoryParam])
 
+    useEffect(() => {
+        const handleScroll = () => {
+            if (filterRef.current) {
+                setIsMenuSticky(window.scrollY > filterRef.current.offsetTop - 100)
+            }
+        }
+        window.addEventListener('scroll', handleScroll)
+        return () => window.removeEventListener('scroll', handleScroll)
+    }, [])
+
     const filteredProducts = filter === 'all'
         ? products
         : products.filter(p => p.category === filter)
 
     if (loading) {
-        return <div className="min-h-screen flex items-center justify-center">Loading products...</div>
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-white">
+                <div className="w-16 h-16 border-4 border-[#1B1464] border-t-transparent rounded-full animate-spin mb-4"></div>
+                <p className="text-[#1B1464] font-bold animate-pulse">Loading Premium Products...</p>
+            </div>
+        )
     }
 
     return (
@@ -106,22 +115,22 @@ function ProductsContent() {
             <div className="products-hero">
                 <div className="hero-content">
                     <h1>Our Premium Products</h1>
-                    <p>Discover Sudan's finest agricultural treasures</p>
+                    <p>Experience the excellence of Sudan's agricultural heritage, sourced with integrity and delivered with quality.</p>
                 </div>
             </div>
 
             {/* Why Our Products */}
-            <div className="why-products-section">
-                <h2>WHY OUR PRODUCTS</h2>
+            <section className="why-products-section">
+                <h2>Why Choose SudaStock?</h2>
                 <div className="why-products-content">
                     <div className="why-products-left">
                         <div className="why-product-item">
                             <h3>Direct from Sudan</h3>
-                            <p>Our products are meticulously sourced from Sudan, where they are cultivated, harvested, processed, and shipped from their origin.</p>
+                            <p>Our products are meticulously sourced from Sudan, where they are cultivated, harvested, and processed at their origin to ensure peak freshness.</p>
                         </div>
                         <div className="why-product-item">
                             <h3>Transparent Pricing</h3>
-                            <p>We provide prices that reflect the current market rates without any hidden profit margin. Samples can be requested.</p>
+                            <p>We provide prices that reflect real-time market rates. No hidden margins—just honest values that help you make better business decisions.</p>
                         </div>
                     </div>
 
@@ -130,7 +139,7 @@ function ProductsContent() {
                             src="/images/products-center.jpg"
                             alt="Featured Product"
                             width={400}
-                            height={300}
+                            height={500}
                             className="center-image"
                         />
                     </div>
@@ -138,11 +147,11 @@ function ProductsContent() {
                     <div className="why-products-right">
                         <div className="why-product-item">
                             <h3>Quality Standards</h3>
-                            <p>Our products are sourced from Sudan, known for its exceptional agricultural conditions and high standards.</p>
+                            <p>Every product undergoes rigorous quality checks. We uphold Sudan's reputation for world-class agricultural commodities.</p>
                         </div>
                         <div className="why-product-item">
-                            <h3>Customer Focus</h3>
-                            <p>We provide information on seasonal availability and trends in pricing, to ease your plan for purchasing taking advantage of lower prices or higher-quality products.</p>
+                            <h3>Strategic Insights</h3>
+                            <p>Beyond trading, we provide seasonal availability and trend analysis to help you optimize your procurement strategy.</p>
                         </div>
                     </div>
                 </div>
@@ -150,74 +159,72 @@ function ProductsContent() {
                 <div className="products-cta">
                     <div className="cta-box">
                         <h3>Reach Out</h3>
-                        <p>Get a personalized quotation on our featured products</p>
-                        <Link href="/quote" className="cta-button">Get Quote</Link>
+                        <p>Get a personalized quotation tailored to your specific volume and logistics requirements.</p>
+                        <Link href="/quote" className="cta-button">Get Detailed Quote</Link>
                     </div>
                     <div className="cta-box">
-                        <h3>Discover</h3>
-                        <p>Request a trial today of any of our products and experience the quality for yourself</p>
+                        <h3>Experience Quality</h3>
+                        <p>Request a physical sample today to verify the grade and quality of our agricultural treasures.</p>
                         <Link href="/sample" className="cta-button">Request Sample</Link>
                     </div>
                 </div>
-            </div>
+            </section>
 
             {/* Filter Section */}
-            <div className="products-filter">
-                <button
-                    className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
-                    onClick={() => setFilter('all')}
-                >
-                    All Products
-                </button>
-                <button
-                    className={`filter-btn ${filter === 'sesame' ? 'active' : ''}`}
-                    onClick={() => setFilter('sesame')}
-                >
-                    Sesame Seeds
-                </button>
-                <button
-                    className={`filter-btn ${filter === 'gum' ? 'active' : ''}`}
-                    onClick={() => setFilter('gum')}
-                >
-                    Gum Arabic
-                </button>
-                <button
-                    className={`filter-btn ${filter === 'cotton' ? 'active' : ''}`}
-                    onClick={() => setFilter('cotton')}
-                >
-                    Cotton
-                </button>
-                <button
-                    className={`filter-btn ${filter === 'others' ? 'active' : ''}`}
-                    onClick={() => setFilter('others')}
-                >
-                    Others
-                </button>
-            </div>
-
-            {/* Products Grid using VerticalProductCard */}
-            <div className="products-grid" id="products-grid">
-                {filteredProducts.map(product => (
-                    <VerticalProductCard
-                        key={product.id}
-                        id={product.id}
-                        name={product.name}
-                        category={product.category}
-                        imageUrl={product.imageUrl}
-                        price={product.portSudan || product.value}
-                        status={product.status}
-                        description={product.description}
-                        trend={product.trend}
-                        onViewDetails={() => setSelectedProduct(product)}
-                    />
+            <div ref={filterRef} className={`products-filter ${isMenuSticky ? 'sticky' : ''}`}>
+                {CATEGORIES.map(cat => (
+                    <button
+                        key={cat.id}
+                        className={`filter-btn ${filter === cat.id ? 'active' : ''}`}
+                        onClick={() => {
+                            setFilter(cat.id)
+                            window.scrollTo({
+                                top: (filterRef.current?.offsetTop || 0) - 100,
+                                behavior: 'smooth'
+                            })
+                        }}
+                    >
+                        {cat.label}
+                    </button>
                 ))}
             </div>
+
+            {/* Products Grid */}
+            <section className="products-grid-section bg-[#f8f9fa]">
+                <div className="products-grid">
+                    {filteredProducts.length > 0 ? (
+                        filteredProducts.map((product, index) => (
+                            <div key={product.id} style={{ animationDelay: `${index * 0.1}s` }}>
+                                <VerticalProductCard
+                                    id={product.id}
+                                    name={product.name}
+                                    category={product.category}
+                                    imageUrl={product.imageUrl}
+                                    price={product.portSudan || product.value}
+                                    status={product.status}
+                                    description={product.description}
+                                    trend={product.trend}
+                                    onViewDetails={() => setSelectedProduct(product)}
+                                />
+                            </div>
+                        ))
+                    ) : (
+                        <div className="col-span-full py-20 text-center">
+                            <i className="fas fa-search fa-3x text-gray-300 mb-4"></i>
+                            <h3 className="text-2xl font-bold text-gray-500">No products found for this category</h3>
+                            <button onClick={() => setFilter('all')} className="mt-4 text-[#1B1464] font-bold hover:underline">
+                                View all products
+                            </button>
+                        </div>
+                    )}
+                </div>
+            </section>
 
             {/* Product Details Modal */}
             {selectedProduct && (
                 <div className="modal-overlay" onClick={() => setSelectedProduct(null)}>
                     <div className="modal-container" onClick={e => e.stopPropagation()}>
-                        <button className="modal-close" onClick={() => setSelectedProduct(null)}>
+                        <button className="modal-close" aria-label="Close modal" onClick={() => setSelectedProduct(null)}>
                             <i className="fas fa-times"></i>
                         </button>
 
@@ -228,6 +235,7 @@ function ProductsContent() {
                                     alt={selectedProduct.name}
                                     fill
                                     style={{ objectFit: 'cover' }}
+                                    priority
                                 />
                             </div>
 
@@ -242,17 +250,17 @@ function ProductsContent() {
                                 <div className="modal-price-status">
                                     <div className="modal-price">
                                         <span className="price-amount">${(selectedProduct.portSudan || selectedProduct.value).toLocaleString()}</span>
-                                        <span className="price-unit">/ MT</span>
+                                        <span className="price-unit">/ Metric Ton</span>
                                     </div>
                                     <div className={`modal-status ${selectedProduct.status === 'In Stock' || selectedProduct.status === 'Active' ? 'status-active' : 'status-inactive'}`}>
-                                        <i className="fas fa-circle"></i>
+                                        <i className="fas fa-circle animate-pulse"></i>
                                         {selectedProduct.status}
                                     </div>
                                 </div>
 
                                 {selectedProduct.description && (
                                     <div className="modal-description">
-                                        <h3>Description</h3>
+                                        <h3>The Commodity</h3>
                                         <p>{selectedProduct.description}</p>
                                     </div>
                                 )}
@@ -288,11 +296,11 @@ function ProductsContent() {
                                 <div className="modal-actions">
                                     <Link href={`/quote?product=${selectedProduct.id}`} className="action-btn primary-btn">
                                         <i className="fas fa-file-invoice"></i>
-                                        Get Quote
+                                        Get Export Quote
                                     </Link>
                                     <Link href={`/sample?product=${selectedProduct.id}`} className="action-btn secondary-btn">
                                         <i className="fas fa-box-open"></i>
-                                        Request Sample
+                                        Request Quality Sample
                                     </Link>
                                 </div>
                             </div>
@@ -300,7 +308,6 @@ function ProductsContent() {
                     </div>
                 </div>
             )}
-
         </div>
     )
 }
@@ -312,3 +319,4 @@ export default function ProductsPage() {
         </Suspense>
     )
 }
+

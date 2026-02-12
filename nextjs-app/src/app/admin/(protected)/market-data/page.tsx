@@ -8,6 +8,11 @@ interface MarketData {
     id: number
     name: string
     value: number
+    portSudan: number
+    dmtChina: number
+    dmtUae: number
+    dmtMersing: number
+    dmtIndia: number
     status: string
     trend: number
     lastUpdate: string
@@ -29,7 +34,16 @@ export default function MarketDataList() {
             const res = await fetch('/api/admin/market-data')
             if (res.ok) {
                 const data = await res.json()
-                setMarketData(data)
+                // Ensure data is mapped correctly if keys diff
+                const mappedData = data.map((item: any) => ({
+                    ...item,
+                    portSudan: item.portSudan || item.port_sudan || 0,
+                    dmtChina: item.dmtChina || item.dmt_china || 0,
+                    dmtUae: item.dmtUae || item.dmt_uae || 0,
+                    dmtMersing: item.dmtMersing || item.dmt_mersing || 0,
+                    dmtIndia: item.dmtIndia || item.dmt_india || 0,
+                }))
+                setMarketData(mappedData)
             }
         } catch (error) {
             console.error('Failed to fetch market data', error)
@@ -56,7 +70,7 @@ export default function MarketDataList() {
             <header className={styles.header}>
                 <div>
                     <h1 className={styles.title}>Market Data</h1>
-                    <p className={styles.subtitle}>Manage product prices and market trends</p>
+                    <p className={styles.subtitle}>Manage product prices and market trends across all ports</p>
                 </div>
                 <Link href="/admin/market-data/new" className={styles.addButton}>
                     <i className="fas fa-plus"></i> Add New Product
@@ -84,7 +98,12 @@ export default function MarketDataList() {
                         <thead>
                             <tr>
                                 <th>Product Name</th>
-                                <th>Price</th>
+                                <th>Base Price</th>
+                                <th>Port Sudan</th>
+                                <th>China</th>
+                                <th>UAE</th>
+                                <th>Mersing</th>
+                                <th>India</th>
                                 <th>Trend</th>
                                 <th>Status</th>
                                 <th className={styles.actionsCell}>Actions</th>
@@ -99,9 +118,12 @@ export default function MarketDataList() {
                                         </div>
                                         <span className={styles.productName}>{item.name}</span>
                                     </td>
-                                    <td>
-                                        <span className={styles.price}>{Number(item.value).toLocaleString()} SDG</span>
-                                    </td>
+                                    <td><span className={styles.priceValue}>{Number(item.value).toLocaleString()}</span></td>
+                                    <td><span className={styles.priceValue}>{Number(item.portSudan).toLocaleString()}</span></td>
+                                    <td><span className={styles.priceValue}>{Number(item.dmtChina).toLocaleString()}</span></td>
+                                    <td><span className={styles.priceValue}>{Number(item.dmtUae).toLocaleString()}</span></td>
+                                    <td><span className={styles.priceValue}>{Number(item.dmtMersing).toLocaleString()}</span></td>
+                                    <td><span className={styles.priceValue}>{Number(item.dmtIndia).toLocaleString()}</span></td>
                                     <td>
                                         <span className={`${styles.trendBadge} ${item.trend > 0 ? styles.trendUp : item.trend < 0 ? styles.trendDown : styles.trendStable}`}>
                                             {item.trend > 0 ? '↑' : item.trend < 0 ? '↓' : '→'} {Math.abs(item.trend)}%
@@ -121,7 +143,7 @@ export default function MarketDataList() {
                             ))}
                             {filteredData.length === 0 && (
                                 <tr>
-                                    <td colSpan={5} className={styles.noResults}>
+                                    <td colSpan={10} className={styles.noResults}>
                                         <div className={styles.noResultsContent}>
                                             <i className={`fas fa-search ${styles.noResultsIcon}`}></i>
                                             <p>No products found matching "{searchTerm}"</p>

@@ -23,6 +23,7 @@ import {
     useMediaQuery,
     useTheme,
     Fade,
+    alpha,
 } from '@mui/material';
 import {
     Menu as MenuIcon,
@@ -74,132 +75,165 @@ export function ClientAdminLayout({ children }: { children: React.ReactNode }) {
     };
 
     const drawerContent = (
-        <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', bgcolor: navyColor, color: '#fff' }}>
-            <Box sx={{ p: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Box sx={{
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            bgcolor: navyColor,
+            color: '#fff',
+            backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%)',
+        }}>
+            <Box sx={{ p: 3, display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                 <Box
                     sx={{
-                        width: 42,
-                        height: 42,
-                        bgcolor: 'rgba(255,255,255,0.1)',
-                        borderRadius: 1.5,
+                        width: 44,
+                        height: 44,
+                        bgcolor: 'rgba(255,255,255,0.08)',
+                        borderRadius: '12px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        border: '1px solid rgba(255,255,255,0.2)'
+                        border: '1px solid rgba(255,255,255,0.15)',
+                        boxShadow: '0 4px 10px rgba(0,0,0,0.2)'
                     }}
                 >
-                    <DashboardIcon sx={{ color: goldColor }} />
+                    <DashboardIcon sx={{ color: goldColor, fontSize: 26 }} />
                 </Box>
                 <Box>
-                    <Typography variant="h6" sx={{ fontWeight: 800, lineHeight: 1.2, letterSpacing: -0.5 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 800, lineHeight: 1, letterSpacing: -0.5, mb: 0.5 }}>
                         SudaStock
                     </Typography>
-                    <Typography variant="caption" sx={{ color: goldColor, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
-                        Admin Portal
+                    <Typography variant="caption" sx={{
+                        color: goldColor,
+                        fontWeight: 800,
+                        textTransform: 'uppercase',
+                        letterSpacing: 1.5,
+                        fontSize: '0.65rem',
+                        opacity: 0.9
+                    }}>
+                        Admin Center
                     </Typography>
                 </Box>
             </Box>
 
-            <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)' }} />
-
-            <List sx={{ px: 2, py: 3, flex: 1 }}>
+            <List sx={{ px: 1.5, py: 1, flex: 1, '& .MuiListItem-root': { mb: 0.5 } }}>
                 {navItems.map((item) => (
-                    <ListItem key={item.name} disablePadding sx={{ mb: 1 }}>
+                    <ListItem key={item.name} disablePadding>
                         <ListItemButton
                             component={Link}
                             href={item.path}
                             selected={isActive(item.path)}
                             sx={{
-                                borderRadius: 2,
-                                transition: 'all 0.2s',
+                                borderRadius: '10px',
+                                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                                py: 1.2,
                                 '&.Mui-selected': {
-                                    bgcolor: 'rgba(255,255,255,0.1)',
+                                    bgcolor: alpha(goldColor, 0.15),
                                     color: goldColor,
-                                    '& .MuiListItemIcon-root': { color: goldColor },
-                                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                                    '& .MuiListItemIcon-root': {
+                                        color: goldColor,
+                                        transform: 'scale(1.1)'
+                                    },
+                                    '&::after': {
+                                        content: '""',
+                                        position: 'absolute',
+                                        right: 8,
+                                        width: 4,
+                                        height: 20,
+                                        bgcolor: goldColor,
+                                        borderRadius: 2
+                                    }
                                 },
                                 '&:hover': {
-                                    bgcolor: 'rgba(255,255,255,0.05)',
-                                    transform: 'translateX(4px)'
+                                    bgcolor: 'rgba(255,255,255,0.08)',
+                                    transform: 'translateX(6px)'
                                 }
                             }}
                         >
-                            <ListItemIcon sx={{ minWidth: 40, color: 'rgba(255,255,255,0.5)' }}>
+                            <ListItemIcon sx={{ minWidth: 40, color: 'rgba(255,255,255,0.4)', transition: 'all 0.2s' }}>
                                 {item.icon}
                             </ListItemIcon>
                             <ListItemText
                                 primary={item.name}
-                                primaryTypographyProps={{ fontWeight: isActive(item.path) ? 700 : 500, fontSize: '0.9rem' }}
+                                primaryTypographyProps={{
+                                    fontWeight: isActive(item.path) ? 700 : 500,
+                                    fontSize: '0.875rem',
+                                    letterSpacing: 0.2
+                                }}
                             />
                         </ListItemButton>
                     </ListItem>
                 ))}
             </List>
 
-            <Box sx={{ p: 2 }}>
+            <Box sx={{ p: 2, mb: 1 }}>
                 <Button
                     fullWidth
                     component={Link}
                     href="/"
-                    variant="outlined"
+                    variant="text"
                     startIcon={<ExternalIcon />}
                     sx={{
-                        borderColor: 'rgba(255,255,255,0.2)',
-                        color: 'rgba(255,255,255,0.7)',
+                        color: 'rgba(255,255,255,0.5)',
                         textTransform: 'none',
-                        borderRadius: 2,
+                        borderRadius: '10px',
+                        justifyContent: 'flex-start',
+                        py: 1,
+                        px: 2,
                         '&:hover': {
-                            borderColor: goldColor,
                             color: goldColor,
                             bgcolor: 'rgba(255,255,255,0.05)'
                         }
                     }}
                 >
-                    Live Site
+                    Visit Main Site
                 </Button>
             </Box>
 
-            <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)' }} />
+            <Divider sx={{ borderColor: 'rgba(255,255,255,0.05)' }} />
 
-            <Box sx={{ p: 2, bgcolor: 'rgba(0,0,0,0.2)' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2, px: 1 }}>
+            <Box sx={{ p: 2, m: 1.5, borderRadius: '16px', bgcolor: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2, px: 0.5 }}>
                     <Avatar
                         sx={{
-                            width: 36,
-                            height: 36,
+                            width: 38,
+                            height: 38,
                             bgcolor: goldColor,
                             color: navyColor,
-                            fontWeight: 700,
-                            fontSize: '0.9rem'
+                            fontWeight: 800,
+                            fontSize: '0.9rem',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
                         }}
                     >
                         {session?.user?.name?.[0] || 'A'}
                     </Avatar>
                     <Box sx={{ overflow: 'hidden' }}>
-                        <Typography variant="body2" sx={{ fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                            {session?.user?.name || 'Admin'}
+                        <Typography variant="body2" sx={{ fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: '#fff' }}>
+                            {session?.user?.name || 'Administrator'}
                         </Typography>
-                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', display: 'block' }}>
-                            {session?.user?.email}
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', display: 'block', mt: -0.2 }}>
+                            Super Admin Role
                         </Typography>
                     </Box>
                 </Box>
                 <Button
                     fullWidth
-                    startIcon={<LogoutIcon />}
+                    startIcon={<LogoutIcon fontSize="small" />}
                     onClick={handleSignOut}
                     sx={{
-                        color: 'rgba(255,255,255,0.5)',
+                        color: 'rgba(255,255,255,0.4)',
                         textTransform: 'none',
                         justifyContent: 'flex-start',
-                        px: 1.5,
+                        borderRadius: '8px',
+                        py: 0.8,
+                        fontSize: '0.8rem',
                         '&:hover': {
-                            color: '#ff4d4d',
-                            bgcolor: 'transparent'
+                            color: '#ff5c5c',
+                            bgcolor: 'rgba(255,92,92,0.05)'
                         }
                     }}
                 >
-                    Sign Out
+                    Secure Sign Out
                 </Button>
             </Box>
         </Box>

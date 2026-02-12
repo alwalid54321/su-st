@@ -1,16 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { rateLimit } from '@/lib/api-limiter'
 
 export async function GET(
     request: NextRequest,
     context: { params: Promise<{ id: string }> }
 ) {
+    // 1. Rate Limiting Protection (50 req/min/IP)
+    const limiter = rateLimit(request, { limit: 50, windowMs: 60000 })
+    if (!limiter.success) {
+        return NextResponse.json(
+            { error: 'Too many requests' },
+            { status: 429, headers: { 'Retry-After': String(limiter.reset) } }
+        )
+    }
+
     try {
         const params = await context.params
         const id = parseInt(params.id)
 
-        if (isNaN(id)) {
-            return NextResponse.json({ error: 'Invalid ID' }, { status: 400 })
+        // 2. Strict Input Validation
+        if (isNaN(id) || id <= 0) {
+            return NextResponse.json({ error: 'Invalid product ID' }, { status: 400 })
         }
 
         const marketData = await prisma.marketData.findUnique({
@@ -24,6 +35,6 @@ export async function GET(
         return NextResponse.json(marketData)
     } catch (err) {
         console.error('Error fetching market data:', err)
-        return NextResponse.json({ error: 'Failed to fetch market data' }, { status: 500 })
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }
 }

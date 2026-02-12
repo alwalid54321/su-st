@@ -28,7 +28,16 @@ export default function AnnouncementsSection() {
                 const response = await fetch('/api/announcements')
                 if (response.ok) {
                     const data = await response.json()
-                    setAnnouncements(data)
+                    // Sanitize image URLs
+                    const sanitizedData = data.map((item: Announcement) => {
+                        let imageUrl = item.imageUrl || ''
+                        imageUrl = imageUrl.replace(/\\/g, '/')
+                        if (imageUrl && !imageUrl.startsWith('http')) {
+                            imageUrl = '/' + imageUrl.replace(/^\/+/, '')
+                        }
+                        return { ...item, imageUrl }
+                    })
+                    setAnnouncements(sanitizedData)
                 }
             } catch (error) {
                 console.error('Error fetching announcements:', error)

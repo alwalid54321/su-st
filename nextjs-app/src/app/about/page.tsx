@@ -28,26 +28,28 @@ export default function AboutPage() {
                 {/* <meta property="og:image" content="https://www.sudastock.com/images/about-hero.jpg" /> */}
                 <script
                     type="application/ld+json"
-                    dangerouslySetInnerHTML={{ __html: JSON.stringify({
-                        "@context": "https://schema.org",
-                        "@type": "AboutPage",
-                        "name": "About Us - SudaStock",
-                        "url": "https://www.sudastock.com/about",
-                        "description": "Learn about SudaStock: our mission to provide accurate agricultural data and market insights in Sudan.",
-                        "mainEntityOfPage": {
-                            "@type": "WebPage",
-                            "@id": "https://www.sudastock.com/about"
-                        },
-                        "mentions": [
-                            "agricultural data",
-                            "market insights",
-                            "Sudan",
-                            "farming",
-                            "trade",
-                            "investment",
-                            "SudaStock"
-                        ]
-                    })}}
+                    dangerouslySetInnerHTML={{
+                        __html: JSON.stringify({
+                            "@context": "https://schema.org",
+                            "@type": "AboutPage",
+                            "name": "About Us - SudaStock",
+                            "url": "https://www.sudastock.com/about",
+                            "description": "Learn about SudaStock: our mission to provide accurate agricultural data and market insights in Sudan.",
+                            "mainEntityOfPage": {
+                                "@type": "WebPage",
+                                "@id": "https://www.sudastock.com/about"
+                            },
+                            "mentions": [
+                                "agricultural data",
+                                "market insights",
+                                "Sudan",
+                                "farming",
+                                "trade",
+                                "investment",
+                                "SudaStock"
+                            ]
+                        })
+                    }}
                 />
             </Head>
             <main>
@@ -55,7 +57,7 @@ export default function AboutPage() {
                 <Box
                     sx={{
                         position: 'relative',
-                        backgroundImage: 'url(/images/about-hero.jpg)',
+                        backgroundImage: 'url(/images/hero/about-hero.jpg)',
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
                         height: '100vh',
@@ -184,7 +186,7 @@ export default function AboutPage() {
 
                         <Grid container spacing={4} justifyContent="center" sx={{ marginTop: '2rem', marginBottom: '3rem' }}>
                             {/* Feature 1 */}
-                            <Grid item xs={12} sm={6} md={3}>
+                            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                                 <Card
                                     sx={{
                                         borderRadius: '10px',
@@ -219,7 +221,7 @@ export default function AboutPage() {
                                             justifyContent: 'center',
                                         }}>
                                             <Image
-                                                src="/images/team.webp"
+                                                src="/images/sections/about/team.webp"
                                                 alt="Reliable Data"
                                                 width={60}
                                                 height={60}
@@ -238,7 +240,7 @@ export default function AboutPage() {
                             </Grid>
 
                             {/* Feature 2 */}
-                            <Grid item xs={12} sm={6} md={3}>
+                            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                                 <Card
                                     sx={{
                                         borderRadius: '10px',
@@ -273,7 +275,7 @@ export default function AboutPage() {
                                             justifyContent: 'center',
                                         }}>
                                             <Image
-                                                src="/images/trust.webp"
+                                                src="/images/sections/about/trust.webp"
                                                 alt="Market Expertise"
                                                 width={60}
                                                 height={60}
@@ -292,7 +294,7 @@ export default function AboutPage() {
                             </Grid>
 
                             {/* Feature 3 */}
-                            <Grid item xs={12} sm={6} md={3}>
+                            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                                 <Card
                                     sx={{
                                         borderRadius: '10px',
@@ -327,7 +329,7 @@ export default function AboutPage() {
                                             justifyContent: 'center',
                                         }}>
                                             <Image
-                                                src="/images/growth.webp"
+                                                src="/images/sections/about/growth.webp"
                                                 alt="Growth Opportunities"
                                                 width={60}
                                                 height={60}
@@ -346,7 +348,7 @@ export default function AboutPage() {
                             </Grid>
 
                             {/* Feature 4 */}
-                            <Grid item xs={12} sm={6} md={3}>
+                            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                                 <Card
                                     sx={{
                                         borderRadius: '10px',
@@ -381,7 +383,7 @@ export default function AboutPage() {
                                             justifyContent: 'center',
                                         }}>
                                             <Image
-                                                src="/images/market-data.webp"
+                                                src="/images/sections/about/market-data.webp"
                                                 alt="Comprehensive Coverage"
                                                 width={60}
                                                 height={60}
@@ -401,8 +403,6 @@ export default function AboutPage() {
                         </Grid>
 
                         <Link href="/contact">
-                            {/* @next-codemod-error This Link previously used the now removed `legacyBehavior` prop, and has a child that might not be an anchor. The codemod bailed out of lifting the child props to the Link. Check that the child component does not render an anchor, and potentially move the props manually to Link. */
-                            }
                             <Button
                                 variant="contained"
                                 color="primary"

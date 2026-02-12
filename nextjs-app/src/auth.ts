@@ -70,7 +70,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                         name: user.username,
                         username: user.username,
                         isStaff: user.isStaff,
-                        isSuperuser: user.isSuperuser
+                        isSuperuser: user.isSuperuser,
+                        plan: user.plan || 'free'
                     } as User
                 } catch (error) {
                     console.error('Login error:', error)
@@ -86,6 +87,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 token.username = (user as any).username
                 token.isStaff = (user as any).isStaff
                 token.isSuperuser = (user as any).isSuperuser
+                token.plan = (user as any).plan || 'free'
             }
             return token
         },
@@ -95,6 +97,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     ; (session.user as any).username = token.username
                     ; (session.user as any).isStaff = token.isStaff
                     ; (session.user as any).isSuperuser = token.isSuperuser
+                    ; (session.user as any).plan = token.plan || 'free'
             }
             return session
         }
@@ -155,7 +158,8 @@ export const authOptions = {
                     name: user.username,
                     username: user.username,
                     isStaff: user.isStaff,
-                    isSuperuser: user.isSuperuser
+                    isSuperuser: user.isSuperuser,
+                    plan: user.plan || 'free'
                 }
             }
         })
@@ -167,6 +171,7 @@ export const authOptions = {
                 token.username = user.username
                 token.isStaff = user.isStaff
                 token.isSuperuser = user.isSuperuser
+                token.plan = user.plan || 'free'
             }
             return token
         },
@@ -176,6 +181,7 @@ export const authOptions = {
                 session.user.username = token.username
                 session.user.isStaff = token.isStaff
                 session.user.isSuperuser = token.isSuperuser
+                session.user.plan = token.plan || 'free'
             }
             return session
         }

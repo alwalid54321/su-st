@@ -33,7 +33,7 @@ export default function RootLayout({
               "@type": "Organization",
               "name": "SudaStock",
               "url": "https://www.sudastock.com",
-              "logo": "https://www.sudastock.com/images/logo-icon.png",
+              "logo": "https://www.sudastock.com/images/branding/logo-icon.png",
               "contactPoint": {
                 "@type": "ContactPoint",
                 "telephone": "+971 502 330 481",

@@ -4,6 +4,9 @@ import { requireAdmin } from '@/lib/auth-helpers'
 
 // GET - List all gallery images
 export async function GET(request: NextRequest) {
+    const { error } = await requireAdmin()
+    if (error) return error
+
     try {
         const images = await prisma.galleryImage.findMany({
             where: { isCurrent: true },

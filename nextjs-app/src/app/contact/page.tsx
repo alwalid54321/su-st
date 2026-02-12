@@ -148,7 +148,7 @@ export default function ContactPage() {
                 <Box
                     sx={{
                         position: 'relative',
-                        backgroundImage: 'url(/images/contact-hero.jpg)',
+                        backgroundImage: 'url(/images/hero/contact-hero.jpg)',
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
                         height: '100vh',
@@ -306,8 +306,6 @@ export default function ContactPage() {
                                 {/* Social Media Links */}
                                 <Box sx={{ display: 'flex', justifyContent: { xs: 'center', md: 'flex-start' }, gap: '20px', marginTop: '30px' }}>
                                     <Link href="#" target="_blank" rel="noopener noreferrer">
-                                        {/* @next-codemod-error This Link previously used the now removed `legacyBehavior` prop, and has a child that might not be an anchor. The codemod bailed out of lifting the child props to the Link. Check that the child component does not render an anchor, and potentially move the props manually to Link. */
-                                        }
                                         <Button
                                             variant="outlined"
                                             sx={{
@@ -321,8 +319,6 @@ export default function ContactPage() {
                                         </Button>
                                     </Link>
                                     <Link href="#" target="_blank" rel="noopener noreferrer">
-                                        {/* @next-codemod-error This Link previously used the now removed `legacyBehavior` prop, and has a child that might not be an anchor. The codemod bailed out of lifting the child props to the Link. Check that the child component does not render an anchor, and potentially move the props manually to Link. */
-                                        }
                                         <Button
                                             variant="outlined"
                                             sx={{
@@ -336,8 +332,6 @@ export default function ContactPage() {
                                         </Button>
                                     </Link>
                                     <Link href="#" target="_blank" rel="noopener noreferrer">
-                                        {/* @next-codemod-error This Link previously used the now removed `legacyBehavior` prop, and has a child that might not be an anchor. The codemod bailed out of lifting the child props to the Link. Check that the child component does not render an anchor, and potentially move the props manually to Link. */
-                                        }
                                         <Button
                                             variant="outlined"
                                             sx={{
@@ -351,8 +345,6 @@ export default function ContactPage() {
                                         </Button>
                                     </Link>
                                     <Link href="#" target="_blank" rel="noopener noreferrer">
-                                        {/* @next-codemod-error This Link previously used the now removed `legacyBehavior` prop, and has a child that might not be an anchor. The codemod bailed out of lifting the child props to the Link. Check that the child component does not render an anchor, and potentially move the props manually to Link. */
-                                        }
                                         <Button
                                             variant="outlined"
                                             sx={{

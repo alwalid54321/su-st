@@ -31,7 +31,16 @@ export default function GallerySlider() {
                 if (res.ok) {
                     const data: GalleryImage[] = await res.json()
                     if (data.length > 0) {
-                        setImages(data)
+                        // Sanitize paths
+                        const sanitizedData = data.map(img => {
+                            let url = img.imageUrl || '';
+                            url = url.replace(/\\/g, '/');
+                            if (url && !url.startsWith('http')) {
+                                url = '/' + url.replace(/^\/+/, '');
+                            }
+                            return { ...img, imageUrl: url };
+                        });
+                        setImages(sanitizedData)
                     } else {
                         // Use default slides if no active images
                         setImages(defaultSlides.map((url, idx) => ({

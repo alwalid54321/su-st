@@ -16,8 +16,10 @@ interface GalleryItem {
 export default function GalleryList() {
     const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([])
     const [loading, setLoading] = useState(true)
+    const [mounted, setMounted] = useState(false)
 
     useEffect(() => {
+        setMounted(true)
         fetchGalleryItems()
     }, [])
 
@@ -50,6 +52,8 @@ export default function GalleryList() {
             </div>
         )
     }
+
+    if (!mounted) return null
 
     return (
         <div className={styles.container}>
