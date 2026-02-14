@@ -2,7 +2,8 @@ import type { NextConfig } from "next";
 import withPWA from 'next-pwa';
 
 const nextConfig: NextConfig = {
-  reactCompiler: true,
+  output: 'standalone',
+  reactCompiler: false, // Disable experimental compiler for stability on Netlify
   images: {
     remotePatterns: [
       {
@@ -49,15 +50,7 @@ const nextConfig: NextConfig = {
       }
     ];
   },
-  // @ts-ignore - Turbopack config is required to silence the build error with webpack plugins
-  turbopack: {
-    root: '.',
-  },
 };
 
-export default withPWA({
-  dest: 'public',
-  disable: process.env.NODE_ENV === 'development',
-  register: true,
-  skipWaiting: true,
-})(nextConfig as any);
+export default nextConfig;
+
