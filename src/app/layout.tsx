@@ -66,7 +66,9 @@ export default function RootLayout({
               <ConditionalNavbar />
               <ConditionalWrapper>
                 <ErrorBoundary>
-                  {children}
+                  <main suppressHydrationWarning>
+                    {children}
+                  </main>
                 </ErrorBoundary>
               </ConditionalWrapper>
             </Providers>

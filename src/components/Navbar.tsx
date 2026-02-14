@@ -400,6 +400,7 @@ export default function Navbar() {
                                         type="text"
                                         placeholder="Search products..."
                                         autoFocus
+                                        suppressHydrationWarning
                                         style={{
                                             background: 'transparent',
                                             border: 'none',
