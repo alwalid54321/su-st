@@ -3,7 +3,6 @@ import withPWA from 'next-pwa';
 
 const nextConfig: NextConfig = {
   output: 'standalone',
-  reactCompiler: false, // Disable experimental compiler for stability on Netlify
   images: {
     remotePatterns: [
       {
