@@ -3,7 +3,11 @@
   publish = ".next"
 
 [build.environment]
-  NEXT_USE_NETLIFY_EDGE = "true"
+  NODE_VERSION = "20"
+  AUTH_TRUST_HOST = "true"
+  NEXT_USE_NETLIFY_EDGE = "false"
+  SECRETS_SCAN_OMIT_KEYS = "ADMIN_USERNAME,ADMIN_EMAIL,ADMIN_PASSWORD,NODE_ENV,NEXTAUTH_SECRET,AUTH_SECRET,PGSSLMODE,PGPASSWORD,PGUSER,PGHOST,PGDATABASE"
+  SECRETS_SCAN_OMIT_PATHS = ".netlify/**,.next/**,**/.agents/**,**/.claude/**,**/*.js.map,package-lock.json"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
