@@ -19,16 +19,7 @@ export default function LoginPage() {
         e.preventDefault()
         setLoading(true)
         setError('')
-
-        // Simulate API call to check if OTP is needed
-        setTimeout(() => {
-            if (password === 'otp') { // A mock condition to trigger OTP
-                setShowOtp(true)
-                setLoading(false)
-            } else {
-                performSignIn()
-            }
-        }, 1000)
+        await performSignIn()
     }
 
     const performSignIn = async () => {
