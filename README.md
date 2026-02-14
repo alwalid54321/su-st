@@ -1,137 +1,36 @@
-# SudaStock
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-A Django-based web application for tracking market data, currencies, and announcements.
+## Getting Started
 
-## Features
+First, run the development server:
 
-- User authentication (login, register, logout)
-- Market data management
-- Currency tracking
-- Announcements system
-- Admin dashboard
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-## Theme Colors
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-- **Primary Dark: #1B1464** (Dark blue from logo)
-- **Accent: #786D3C** (Gold accent from logo)
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-All UI elements follow this theme and are responsive.
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Requirements
+## Learn More
 
-- Python 3.8+
-- MySQL 5.7+
-- Node.js and npm (for frontend development)
+To learn more about Next.js, take a look at the following resources:
 
-## Installation
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-### Local Development Setup
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-1. Clone the repository:
-   ```
-   git clone https://github.com/yourusername/sudastock.git
-   cd sudastock
-   ```
+## Deploy on Vercel
 
-2. Install Python dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-3. Set up MySQL database:
-   ```
-   # For Linux/Mac:
-   chmod +x setup_database.sh
-   ./setup_database.sh
-   
-   # Or manually create the database and user in MySQL:
-   CREATE DATABASE sudastock CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-   CREATE USER 'sudastock'@'localhost' IDENTIFIED BY '#SQLpassword5592';
-   GRANT ALL PRIVILEGES ON sudastock.* TO 'sudastock'@'localhost';
-   FLUSH PRIVILEGES;
-   ```
-
-4. Run migrations to set up the database schema:
-   ```
-   python migrate_to_mysql.py
-   ```
-
-5. Create a superuser:
-   ```
-   python manage.py createsuperuser
-   ```
-
-6. Run the development server:
-   ```
-   python manage.py runserver
-   ```
-
-## Production Deployment (Linux)
-
-For production deployment on a Linux server, follow these steps:
-
-1. Copy all project files to your server
-
-2. Make the deployment script executable:
-   ```
-   chmod +x deploy_linux.sh
-   ```
-
-3. Run the deployment script as root:
-   ```
-   sudo ./deploy_linux.sh
-   ```
-
-4. The script will:
-   - Update system packages
-   - Install required dependencies (Python, MySQL, Nginx, Supervisor)
-   - Create a dedicated user for the application
-   - Set up the MySQL database
-   - Configure a Python virtual environment
-   - Run database migrations
-   - Set up Gunicorn with Supervisor
-   - Configure Nginx as a reverse proxy
-   - Set up automated database backups
-
-5. After deployment, your site will be available at your server's IP address.
-
-6. For security, make sure to:
-   - Set up SSL/TLS with Let's Encrypt
-   - Configure a firewall
-   - Change default passwords
-
-## API Endpoints
-
-### Authentication
-
-- `POST /api/auth/login/` - Login
-- `POST /api/auth/register/` - Register
-- `POST /api/auth/logout/` - Logout
-
-### Market Data
-
-- `GET /api/market-data/` - List all market data
-- `GET /api/market-data/<id>/` - Get specific market data
-- `POST /api/market-data/` - Create market data (admin only)
-- `PUT /api/market-data/<id>/` - Update market data (admin only)
-- `DELETE /api/market-data/<id>/` - Delete market data (admin only)
-
-### Currencies
-
-- `GET /api/currencies/` - List all currencies
-- `GET /api/currencies/<id>/` - Get specific currency
-- `POST /api/currencies/` - Create currency (admin only)
-- `PUT /api/currencies/<id>/` - Update currency (admin only)
-- `DELETE /api/currencies/<id>/` - Delete currency (admin only)
-
-### Announcements
-
-- `GET /api/announcements/` - List all announcements
-- `GET /api/announcements/<id>/` - Get specific announcement
-- `POST /api/announcements/` - Create announcement (admin only)
-- `PUT /api/announcements/<id>/` - Update announcement (admin only)
-- `DELETE /api/announcements/<id>/` - Delete announcement (admin only)
-
-## Admin Dashboard
-
-Access the admin dashboard at `/admin/` with your superuser credentials.
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

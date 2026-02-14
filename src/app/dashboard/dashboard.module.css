@@ -1,0 +1,102 @@
+/* src/app/dashboard/dashboard.module.css */
+
+.mainContentHeader {
+    margin-bottom: 2rem;
+    padding: 0 1.5rem; /* Add padding to match layout */
+}
+
+.mainContentTitle {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #1B1464;
+}
+
+.mainContentSubtitle {
+    font-size: 1rem;
+    color: #6b7280; /* text-gray-500 */
+}
+
+.dashboardGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem; /* gap-6 */
+    padding: 0 1.5rem; /* Add padding to match layout */
+}
+
+.card {
+    background-color: #fff;
+    border-radius: 12px; /* rounded-xl */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* shadow-lg */
+    padding: 1.5rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid #e5e7eb; /* border-gray-100 */
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.cardHeader {
+    margin-bottom: 1rem;
+}
+
+.cardTitle {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937; /* text-gray-800 */
+}
+
+.cardContent p {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1B1464;
+}
+
+.chartContainer {
+    height: 300px;
+}
+
+.recentUpdatesList, .announcementsList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.recentUpdatesList li, .announcementsList li {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f3f4f6;
+    color: #374151; /* text-gray-700 */
+    font-size: 0.95rem;
+}
+
+.recentUpdatesList li:last-child, .announcementsList li:last-child {
+    border-bottom: none;
+}
+
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 16rem; /* h-64 */
+}
+
+.spinner {
+    animation: spin 1s linear infinite;
+    border-radius: 50%;
+    width: 3rem; /* h-12 w-12 */
+    height: 3rem;
+    border-top: 2px solid #1B1464;
+    border-bottom: 2px solid #1B1464;
+    border-left: 2px solid transparent;
+    border-right: 2px solid transparent;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
