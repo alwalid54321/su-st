@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(alert, { status: 201 })
     } catch (error) {
         if (error instanceof z.ZodError) {
-            return NextResponse.json({ error: 'Invalid input', details: error.errors }, { status: 400 })
+            return NextResponse.json({ error: 'Invalid input', details: error.issues }, { status: 400 })
         }
         console.error('Error creating alert:', error)
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
