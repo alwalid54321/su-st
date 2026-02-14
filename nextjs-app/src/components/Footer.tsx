@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import styles from './footer.module.css' // Import the CSS module
+import SystemStatus from './SystemStatus'
+import ScrollToTop from './ScrollToTop'
 
 export default function Footer() {
     return (
@@ -88,8 +90,12 @@ export default function Footer() {
                         Our Terms
                     </Link>
                 </div>
-                <p className={styles.copyright}>&copy; {new Date().getFullYear()} SudaStock. All rights reserved.</p>
+                <div className="flex flex-col items-center gap-2 mt-4 md:mt-0">
+                    <p className={styles.copyright}>&copy; {new Date().getFullYear()} SudaStock. All rights reserved.</p>
+                    <SystemStatus />
+                </div>
             </div>
+            <ScrollToTop />
         </footer>
     )
 }

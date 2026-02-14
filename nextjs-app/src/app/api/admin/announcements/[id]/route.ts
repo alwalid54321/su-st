@@ -5,8 +5,9 @@ import { requireAdmin } from '@/lib/auth-helpers'
 // GET - Get single announcement (Admin only)
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    props: { params: Promise<{ id: string }> }
 ) {
+    const params = await props.params;
     const { error } = await requireAdmin()
     if (error) return error
 
@@ -30,8 +31,9 @@ export async function GET(
 // PUT - Update announcement (Admin only)
 export async function PUT(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    props: { params: Promise<{ id: string }> }
 ) {
+    const params = await props.params;
     const { error } = await requireAdmin()
     if (error) return error
 
@@ -63,8 +65,9 @@ export async function PUT(
 // DELETE - Delete announcement (Admin only)
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    props: { params: Promise<{ id: string }> }
 ) {
+    const params = await props.params;
     const { error } = await requireAdmin()
     if (error) return error
 

@@ -51,25 +51,8 @@ export default function Home() {
           {/* <source src="/videos/bg_vid.mp4" type="video/mp4" /> */}
           {/* Fallback handled by CSS if video fails or poster is shown */}
         </video>
+        <div className="hero-glow"></div>
         <div className="hero-content">
-          <div className="hero-brand">
-            <h1 className="brand-title">SudaStock</h1>
-            <div className="brand-logo-icon">
-              <Image
-                src="/images/branding/logo.png"
-                alt="SudaStock Logo"
-                width={120}
-                height={120}
-                className="hero-logo-img"
-                priority
-              />
-            </div>
-            <h2 className="brand-arabic">سودا ستوك</h2>
-          </div>
-
-          <h1 className="hero-main-title">Premium Sudanese Agricultural Commodities</h1>
-          <p className="hero-subtitle">Access real-time market data, global price benchmarks, and direct sourcing from Sudan's richest agricultural hubs.</p>
-
           <div className="hero-actions">
             <Link href="/register" className="hero-btn hero-btn-primary">
               Begin Trading

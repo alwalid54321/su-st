@@ -5,8 +5,9 @@ import { requireAdmin } from '@/lib/auth-helpers'
 // PUT - Update gallery image (Admin only)
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    props: { params: Promise<{ id: string }> }
 ) {
+    const params = await props.params;
     const { error } = await requireAdmin()
     if (error) return error
 
@@ -42,7 +43,7 @@ export async function GET(
 // PUT - No longer supported for direct updates; use POST to /api/admin/gallery for versioned updates
 export async function PUT(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    props: { params: Promise<{ id: string }> }
 ) {
     return NextResponse.json({ error: 'PUT method not allowed for versioned updates. Use POST to /api/admin/gallery to create a new version.' }, { status: 405 });
 }

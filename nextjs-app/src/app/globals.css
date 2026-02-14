@@ -159,12 +159,38 @@ h6 {
 .hero-section {
   position: relative;
   height: 100vh;
-  /* Updated to 100vh */
   min-height: 600px;
   overflow: hidden;
   margin-bottom: 4rem;
   background-color: var(--primary-dark);
   z-index: 1;
+}
+
+.hero-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100vw;
+  height: 100vw;
+  background: radial-gradient(circle, rgba(120, 109, 60, 0.15) 0%, transparent 70%);
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  pointer-events: none;
+  animation: breathe 8s ease-in-out infinite;
+}
+
+@keyframes breathe {
+
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.5;
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+    opacity: 0.8;
+  }
 }
 
 .hero-video {
@@ -211,11 +237,22 @@ h6 {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  /* Centered content for better branding visibility */
   align-items: center;
   text-align: center;
-  padding: 100px 20px 0 20px;
-  /* Add bottom padding to lift buttons slightly from edge */
+  padding: 20px;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 24px;
+  animation: fadeInUp 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  border-radius: 24px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
 }
 
 .hero-main-title {

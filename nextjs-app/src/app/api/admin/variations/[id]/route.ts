@@ -4,8 +4,9 @@ import { auth } from '@/auth'
 
 export async function PUT(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    props: { params: Promise<{ id: string }> }
 ) {
+    const params = await props.params;
     try {
         const session = await auth()
         if (!session || !((session.user as any).isStaff || (session.user as any).isSuperuser)) {
@@ -34,8 +35,9 @@ export async function PUT(
 
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    props: { params: Promise<{ id: string }> }
 ) {
+    const params = await props.params;
     try {
         const session = await auth()
         if (!session || !((session.user as any).isStaff || (session.user as any).isSuperuser)) {
