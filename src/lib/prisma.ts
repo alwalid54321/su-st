@@ -1,28 +1,51 @@
-import { Pool } from '@neondatabase/serverless'
+import { Pool, neonConfig } from '@neondatabase/serverless'
 import { PrismaNeon } from '@prisma/adapter-neon'
 import { PrismaClient } from '@prisma/client'
+import ws from 'ws'
+
+// Required for Neon adapter in some Node environments
+if (process.env.NODE_ENV === 'production') {
+    neonConfig.webSocketConstructor = ws
+}
 
 const globalForPrisma = globalThis as unknown as {
     prisma: PrismaClient | undefined
 }
 
-const connectionString = process.env.DATABASE_URL
+// Netlify sometimes needs a clean DATABASE_URL from process.env
+const connectionString = `${process.env.DATABASE_URL || ''}`
 
 let prisma: PrismaClient
 
-// Ensure we use the serverless adapter in production ONLY if a valid string is present
-if (connectionString && process.env.NODE_ENV === 'production') {
+// Detect production or serverless environments
+const isProduction = process.env.NODE_ENV === 'production' || !!process.env.NETLIFY
+
+if (connectionString && connectionString.startsWith('postgres') && isProduction) {
     try {
-        const pool = new Pool({ connectionString: connectionString })
+        console.log(`[Prisma] Initializing Neon Serverless Adapter...`)
+
+        const pool = new Pool({ connectionString })
         const adapter = new PrismaNeon(pool)
-        prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter })
+
+        prisma = globalForPrisma.prisma ?? new PrismaClient({
+            adapter,
+            datasourceUrl: connectionString
+        })
     } catch (e) {
-        console.error('Failed to initialize Prisma with Neon adapter:', e)
-        prisma = globalForPrisma.prisma ?? new PrismaClient()
+        console.error('[Prisma] Error with adapter, attempting standard client:', e)
+        prisma = globalForPrisma.prisma ?? new PrismaClient({
+            datasourceUrl: connectionString
+        })
     }
 } else {
+    if (!connectionString) {
+        console.error('[Prisma] CRITICAL: DATABASE_URL is missing!')
+    }
+
     // Standard TCP connection for development
-    prisma = globalForPrisma.prisma ?? new PrismaClient()
+    prisma = globalForPrisma.prisma ?? new PrismaClient(
+        connectionString ? { datasourceUrl: connectionString } : undefined
+    )
 }
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
