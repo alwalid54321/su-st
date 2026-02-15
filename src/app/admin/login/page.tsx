@@ -69,6 +69,7 @@ export default function AdminLoginPage() {
                             type="email"
                             autoComplete="email"
                             required
+                            suppressHydrationWarning
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="admin@sudastock.com"
@@ -82,6 +83,7 @@ export default function AdminLoginPage() {
                             type="password"
                             autoComplete="current-password"
                             required
+                            suppressHydrationWarning
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Enter admin password"
