@@ -1,7 +1,8 @@
-
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
+import { useSession } from 'next-auth/react'
 import styles from './PriceAlertModal.module.css'
 import { usePushNotifications } from '@/hooks/usePushNotifications'
 
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export default function PriceAlertModal({ isOpen, onClose, productName, productId, currentPrice }: Props) {
+    const { data: session } = useSession()
     const [targetPrice, setTargetPrice] = useState(currentPrice)
     const [condition, setCondition] = useState<'ABOVE' | 'BELOW'>('ABOVE')
     const [loading, setLoading] = useState(false)
@@ -66,7 +68,19 @@ export default function PriceAlertModal({ isOpen, onClose, productName, productI
                     <button onClick={onClose} className={styles.closeBtn}>&times;</button>
                 </div>
 
-                {success ? (
+                {!session ? (
+                    <div className={styles.authPrompt}>
+                        <div className={styles.authIcon}>
+                            <i className="fas fa-user-lock"></i>
+                        </div>
+                        <h4>Sign In Required</h4>
+                        <p>You must be signed in to set price alerts and receive real-time notifications.</p>
+                        <div className={styles.authActions}>
+                            <Link href="/login" className={styles.loginBtn}>Sign In</Link>
+                            <Link href="/register" className={styles.registerBtn}>Create Account</Link>
+                        </div>
+                    </div>
+                ) : success ? (
                     <div className={styles.successMessage}>
                         <i className="fas fa-check-circle"></i> Alert Set Successfully!
                     </div>
