@@ -14,7 +14,7 @@ export default auth((req) => {
 
   // Redirect /dashboard/login to /admin/login
   if (req.nextUrl.pathname.startsWith("/dashboard/login")) {
-    return NextResponse.redirect(new URL("/admin/login", req.nextUrl))
+    return NextResponse.redirect(new URL("/admin/login", req.url))
   }
 
   // Redirect logged-in users away from login/register pages
@@ -23,9 +23,9 @@ export default auth((req) => {
       // Check if admin to redirect to dashboard, else user dashboard
       const user = req.auth?.user as any
       if (user?.isStaff || user?.isSuperuser) {
-        return NextResponse.redirect(new URL("/admin", req.nextUrl))
+        return NextResponse.redirect(new URL("/admin", req.url))
       }
-      return NextResponse.redirect(new URL("/user", req.nextUrl))
+      return NextResponse.redirect(new URL("/user", req.url))
     }
     return null
   }
@@ -35,10 +35,10 @@ export default auth((req) => {
     if (isLoggedIn) {
       const user = req.auth?.user as any
       if (user?.isStaff || user?.isSuperuser) {
-        return NextResponse.redirect(new URL("/admin", req.nextUrl))
+        return NextResponse.redirect(new URL("/admin", req.url))
       }
       // If regular user tries to access admin login, redirect to user dashboard
-      return NextResponse.redirect(new URL("/user", req.nextUrl))
+      return NextResponse.redirect(new URL("/user", req.url))
     }
     return null
   }
@@ -46,25 +46,27 @@ export default auth((req) => {
   // Redirect /dashboard routes to /admin (except login which is handled above)
   if (isDashboardPage && !isAdminAuthPage) {
     const newPath = req.nextUrl.pathname.replace("/dashboard", "/admin");
-    return NextResponse.redirect(new URL(newPath, req.nextUrl));
+    return NextResponse.redirect(new URL(newPath, req.url));
   }
 
   // Protect /admin routes - admin only
   if (isAdminPage && !req.nextUrl.pathname.startsWith("/admin/login")) {
     if (!isLoggedIn) {
-      return NextResponse.redirect(new URL("/admin/login", req.nextUrl))
+      return NextResponse.redirect(new URL("/admin/login", req.url))
     }
 
     const user = req.auth?.user as any
     if (!user?.isStaff && !user?.isSuperuser) {
-      return NextResponse.redirect(new URL("/user", req.nextUrl))
+      return NextResponse.redirect(new URL("/user", req.url))
     }
   }
 
   // Protect /user routes - authenticated users only
   if (isUserDashboardPage) {
     if (!isLoggedIn) {
-      return NextResponse.redirect(new URL("/login", req.nextUrl))
+      const loginUrl = new URL("/login", req.url)
+      loginUrl.searchParams.set("callbackUrl", req.nextUrl.pathname)
+      return NextResponse.redirect(loginUrl)
     }
   }
 

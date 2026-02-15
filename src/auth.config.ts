@@ -1,6 +1,7 @@
 import type { NextAuthConfig } from "next-auth"
 
 export const authConfig = {
+    trustHost: true,
     pages: {
         signIn: "/login",
     },
@@ -28,7 +29,8 @@ export const authConfig = {
     },
     providers: [], // Providers are added in the main auth.ts
     session: {
-        strategy: "jwt",
+        strategy: "jwt" as const,
         maxAge: 24 * 60 * 60,
-    }
+    },
+    secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
 } satisfies NextAuthConfig
