@@ -47,10 +47,13 @@ export function usePushNotifications() {
             const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
 
             if (!vapidKey) {
-                console.error('VAPID public key not found')
+                const errorMsg = 'VAPID public key not found in environment variables.'
+                console.error('Push Notification Error:', errorMsg)
+                alert('Notification system is still initializing. Please try again in a few moments.')
                 return
             }
 
+            console.log('Attempting push subscription...')
             const sub = await registration.pushManager.subscribe({
                 userVisibleOnly: true,
                 applicationServerKey: urlBase64ToUint8Array(vapidKey)

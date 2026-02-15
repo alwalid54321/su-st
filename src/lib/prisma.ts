@@ -10,11 +10,13 @@ const connectionString = process.env.DATABASE_URL
 
 let prisma: PrismaClient
 
-if (connectionString) {
+// Only use the Neon adapter in production/serverless environments
+if (connectionString && process.env.NODE_ENV === 'production') {
     const pool = new Pool({ connectionString })
     const adapter = new PrismaNeon(pool)
     prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter })
 } else {
+    // Standard TCP connection for development
     prisma = globalForPrisma.prisma ?? new PrismaClient()
 }
 

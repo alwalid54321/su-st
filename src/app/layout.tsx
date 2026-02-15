@@ -29,9 +29,19 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                  for(let registration of registrations) {
-                    registration.unregister();
+                window.addEventListener('load', function() {
+                  const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                  const isHttps = window.location.protocol === 'https:';
+                  
+                  if (isHttps || isLocalhost) {
+                    navigator.serviceWorker.register('/sw.js').then(
+                      function(registration) {
+                        console.log('SW Registered:', registration.scope);
+                      },
+                      function(err) {
+                        console.error('SW Failed:', err);
+                      }
+                    );
                   }
                 });
               }
