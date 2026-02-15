@@ -100,10 +100,9 @@ export default function Home() {
       <MarketDataTable />
 
       {/* Currency Data Section */}
-      {/* Currency Cards Section */}
       <CurrencyCards />
 
-      {/* Smart Price Alerts Promo - High End Restyle */}
+      {/* Smart Price Alerts Promo */}
       <section className="premium-alerts-section">
         <div className="container">
           <div className="premium-alert-glass">
@@ -138,12 +137,11 @@ export default function Home() {
       {/* Premium Promo Section */}
       <PremiumPromoSection />
 
+      {/* Announcements Section */}
+      <AnnouncementsSection />
+
       {/* Gallery Slider Section */}
       <GallerySlider />
-
-
-
-
 
       {/* Call to Action Section */}
       <section className="cta-section">
@@ -193,9 +191,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* Announcements Section */}
-      <AnnouncementsSection />
 
       {/* Partners Section */}
       <PartnersSection />

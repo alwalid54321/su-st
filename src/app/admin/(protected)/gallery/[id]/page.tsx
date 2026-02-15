@@ -54,9 +54,14 @@ export default function EditGalleryImage() {
         }
     }, [isNew, id])
 
+    const [successMessage, setSuccessMessage] = useState('')
+    const [errorMessage, setErrorMessage] = useState('')
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setSaving(true)
+        setSuccessMessage('')
+        setErrorMessage('')
 
         try {
             const url = '/api/admin/gallery'; // Always POST to base URL for new versions
@@ -73,15 +78,20 @@ export default function EditGalleryImage() {
                 body: JSON.stringify(dataToSend)
             })
 
+            const responseData = await res.json()
+
             if (res.ok) {
-                router.push('/admin/gallery')
-                router.refresh()
+                setSuccessMessage(responseData.message || 'Gallery image saved successfully!')
+                setTimeout(() => {
+                    router.push('/admin/gallery')
+                    router.refresh()
+                }, 1500)
             } else {
-                alert('Failed to save image')
+                setErrorMessage(responseData.error || 'Failed to save image')
             }
         } catch (error) {
             console.error('Error saving data', error)
-            alert('Error saving data')
+            setErrorMessage('An unexpected error occurred.')
         } finally {
             setSaving(false)
         }
@@ -129,6 +139,16 @@ export default function EditGalleryImage() {
             </header>
 
             <form onSubmit={handleSubmit} className={styles.form}>
+                {successMessage && (
+                    <div className={styles.successAlert}>
+                        <i className="fas fa-check-circle"></i> {successMessage}
+                    </div>
+                )}
+                {errorMessage && (
+                    <div className={styles.errorAlert}>
+                        <i className="fas fa-exclamation-triangle"></i> {errorMessage}
+                    </div>
+                )}
                 <div className={styles.section}>
                     <h3 className={styles.sectionTitle}>
                         <i className="fas fa-image"></i> Image Details

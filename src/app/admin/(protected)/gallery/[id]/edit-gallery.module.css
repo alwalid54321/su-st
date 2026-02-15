@@ -1,7 +1,8 @@
 /* src/app/admin/(protected)/gallery/[id]/edit-gallery.module.css */
 
 .container {
-    max-width: 56rem; /* 896px */
+    max-width: 56rem;
+    /* 896px */
     margin: 2rem auto;
     padding: 2rem;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -47,20 +48,58 @@
 }
 
 .form {
-    background-color: white;
-    padding: 2rem;
-    border-radius: 1rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-    border: 1px solid #f3f4f6;
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 1.5rem;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.successAlert,
+.errorAlert {
+    margin: 1.5rem 2rem 0;
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    animation: slideDown 0.3s ease-out;
+}
+
+.successAlert {
+    background: #f0fdf4;
+    color: #166534;
+    border: 1px solid #bbfc7c;
+}
+
+.errorAlert {
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .section {
     border-bottom: 1px solid #f3f4f6;
     padding-bottom: 2rem;
 }
+
 .section:last-child {
     border-bottom: none;
     padding-bottom: 0;
@@ -76,6 +115,7 @@
     align-items: center;
     gap: 0.5rem;
 }
+
 .sectionTitle i {
     color: #1B1464;
 }
@@ -101,7 +141,8 @@
     margin-bottom: 0.5rem;
 }
 
-.input, .textarea {
+.input,
+.textarea {
     width: 100%;
     padding: 0.75rem 1rem;
     background-color: #f9fafb;
@@ -110,7 +151,9 @@
     transition: all 0.2s ease-in-out;
     font-size: 1rem;
 }
-.input:focus, .textarea:focus {
+
+.input:focus,
+.textarea:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba(27, 20, 100, 0.15);
     border-color: #1B1464;
@@ -142,7 +185,8 @@
 .toggleContainer {
     display: flex;
     align-items: center;
-    padding-top: 1.75rem; /* Eşitlemek için */
+    padding-top: 1.75rem;
+    /* Eşitlemek için */
 }
 
 .toggleLabel {
@@ -189,11 +233,11 @@
     border-radius: 50%;
 }
 
-.toggleInput:checked + .toggleSlider {
+.toggleInput:checked+.toggleSlider {
     background-color: #1B1464;
 }
 
-.toggleInput:checked + .toggleSlider:before {
+.toggleInput:checked+.toggleSlider:before {
     transform: translateX(1.25rem);
 }
 
@@ -216,7 +260,8 @@
     padding-top: 1.5rem;
 }
 
-.cancelButton, .saveButton {
+.cancelButton,
+.saveButton {
     padding: 0.75rem 1.5rem;
     border-radius: 0.75rem;
     font-weight: 600;
@@ -262,9 +307,9 @@
     width: 1rem;
     height: 1rem;
     border-radius: 50%;
-    border-top: 2px solid rgba(255,255,255,0.5);
-    border-right: 2px solid rgba(255,255,255,0.5);
-    border-bottom: 2px solid rgba(255,255,255,0.5);
+    border-top: 2px solid rgba(255, 255, 255, 0.5);
+    border-right: 2px solid rgba(255, 255, 255, 0.5);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.5);
     border-left: 2px solid white;
 }
 
@@ -284,6 +329,11 @@
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }

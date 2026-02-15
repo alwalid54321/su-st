@@ -1,6 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { requireAdmin } from '@/lib/auth-helpers'
+import { z } from 'zod'
+
+const AnnouncementSchema = z.object({
+    title: z.string().min(1),
+    content: z.string().min(1),
+    priority: z.enum(['low', 'medium', 'high']).default('medium'),
+    isActive: z.boolean().default(true),
+    isFeatured: z.boolean().default(false),
+    imageUrl: z.string().nullable().optional(),
+    externalLink: z.string().nullable().optional(),
+    category: z.enum(['news', 'alert', 'update', 'promotion']).default('news'),
+})
 
 // GET - List all announcements (Admin only)
 export async function GET(request: NextRequest) {
@@ -34,27 +46,22 @@ export async function POST(request: NextRequest) {
     if (error) return error
 
     try {
-        const body = await request.json()
-
-        if (!body.title || !body.content) {
-            return NextResponse.json({ error: 'Title and content are required' }, { status: 400 })
-        }
+        const json = await request.json()
+        const validatedData = AnnouncementSchema.parse(json)
 
         const announcement = await prisma.announcement.create({
-            data: {
-                title: body.title,
-                content: body.content,
-                priority: body.priority || 'medium',
-                isActive: body.isActive ?? true,
-                isFeatured: body.isFeatured ?? false,
-                imageUrl: body.imageUrl || null,
-                externalLink: body.externalLink || null,
-                category: body.category || 'news',
-            }
+            data: validatedData
         })
 
-        return NextResponse.json(announcement, { status: 201 })
+        return NextResponse.json({
+            message: 'Announcement created successfully!',
+            data: announcement
+        }, { status: 201 })
     } catch (err) {
+        if (err instanceof z.ZodError) {
+            return NextResponse.json({ error: 'Invalid input data', details: err.errors }, { status: 400 })
+        }
+
         console.error('Error creating announcement:', err)
         return NextResponse.json({ error: 'Failed to create announcement' }, { status: 500 })
     }

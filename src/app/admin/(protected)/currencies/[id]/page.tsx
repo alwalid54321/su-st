@@ -84,19 +84,23 @@ export default function CurrencyFormPage() {
         }
     }
 
+    const [successMessage, setSuccessMessage] = useState('')
+    const [errorMessage, setErrorMessage] = useState('')
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setSaving(true)
+        setErrorMessage('')
+        setSuccessMessage('')
 
         try {
             const url = isNew ? '/api/admin/currencies' : `/api/admin/currencies/${id}/`
             const method = isNew ? 'POST' : 'PUT'
 
             const dataToSend = {
-                code: formData.code,
+                code: formData.code.toUpperCase(),
                 name: formData.name,
                 rate: formData.rate
-                // isBase is not sent as it's not in the model
             };
 
             const res = await fetch(url, {
@@ -105,16 +109,20 @@ export default function CurrencyFormPage() {
                 body: JSON.stringify(dataToSend)
             })
 
+            const responseData = await res.json()
+
             if (res.ok) {
-                router.push('/admin/currencies')
-                router.refresh()
+                setSuccessMessage(responseData.message || 'Currency saved successfully!')
+                setTimeout(() => {
+                    router.push('/admin/currencies')
+                    router.refresh()
+                }, 1500)
             } else {
-                const errorData = await res.json()
-                alert(`Failed to save currency: ${errorData.error || 'Unknown error'}`)
+                setErrorMessage(responseData.error || 'Failed to save currency')
             }
         } catch (error) {
             console.error('Error saving currency', error)
-            alert('Error saving currency')
+            setErrorMessage('An unexpected error occurred while saving.')
         } finally {
             setSaving(false)
         }
@@ -171,6 +179,16 @@ export default function CurrencyFormPage() {
 
             {activeTab === 'details' ? (
                 <form onSubmit={handleSubmit} className={styles.form}>
+                    {successMessage && (
+                        <div className={styles.successAlert}>
+                            <i className="fas fa-check-circle"></i> {successMessage}
+                        </div>
+                    )}
+                    {errorMessage && (
+                        <div className={styles.errorAlert}>
+                            <i className="fas fa-exclamation-triangle"></i> {errorMessage}
+                        </div>
+                    )}
                     <div className={styles.formContent}>
                         <div>
                             <label className={styles.formLabel}>Currency Code</label>

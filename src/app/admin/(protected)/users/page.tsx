@@ -45,11 +45,16 @@ const UsersPage = () => {
         }
     }
 
+    const [successMessage, setSuccessMessage] = useState('')
+    const [errorMessage, setErrorMessage] = useState('')
+
     const handleTogglePlan = async (user: User) => {
         const newPlan = user.plan === 'plus' ? 'free' : 'plus'
         if (!confirm(`Are you sure you want to change ${user.username}'s plan to ${newPlan.toUpperCase()}?`)) return
 
         setActionLoading(user.id)
+        setSuccessMessage('')
+        setErrorMessage('')
         try {
             const res = await fetch(`/api/admin/users/${user.id}`, {
                 method: 'PUT',
@@ -57,17 +62,19 @@ const UsersPage = () => {
                 body: JSON.stringify({ plan: newPlan })
             })
 
+            const data = await res.json()
             if (res.ok) {
-                // Optimistic update
                 setUsers(users.map(u => u.id === user.id ? { ...u, plan: newPlan } : u))
+                setSuccessMessage(data.message || 'User plan updated successfully')
             } else {
-                alert('Failed to update plan')
+                setErrorMessage(data.error || 'Failed to update plan')
             }
         } catch (error) {
             console.error('Error updating plan:', error)
-            alert('Error updating plan')
+            setErrorMessage('Error updating plan')
         } finally {
             setActionLoading(null)
+            setTimeout(() => setSuccessMessage(''), 3000)
         }
     }
 
@@ -77,6 +84,8 @@ const UsersPage = () => {
         if (!confirm(`Are you sure you want to ${action} ${user.username}?`)) return
 
         setActionLoading(user.id)
+        setSuccessMessage('')
+        setErrorMessage('')
         try {
             const res = await fetch(`/api/admin/users/${user.id}`, {
                 method: 'PUT',
@@ -84,17 +93,19 @@ const UsersPage = () => {
                 body: JSON.stringify({ isActive: newStatus })
             })
 
+            const data = await res.json()
             if (res.ok) {
                 setUsers(users.map(u => u.id === user.id ? { ...u, isActive: newStatus } : u))
+                setSuccessMessage(data.message || `User ${newStatus ? 'activated' : 'deactivated'} successfully`)
             } else {
-                const data = await res.json()
-                alert(data.error || 'Failed to update status')
+                setErrorMessage(data.error || 'Failed to update status')
             }
         } catch (error) {
             console.error('Error updating status:', error)
-            alert('Error updating status')
+            setErrorMessage('Error updating status')
         } finally {
             setActionLoading(null)
+            setTimeout(() => setSuccessMessage(''), 3000)
         }
     }
 
@@ -114,6 +125,17 @@ const UsersPage = () => {
                 <h1 className={styles.mainContentTitle}>User Management</h1>
                 <p className={styles.mainContentSubtitle}>Manage registered users and subscription plans.</p>
             </header>
+
+            {successMessage && (
+                <div className={styles.successAlert}>
+                    <i className="fas fa-check-circle"></i> {successMessage}
+                </div>
+            )}
+            {errorMessage && (
+                <div className={styles.errorAlert}>
+                    <i className="fas fa-exclamation-triangle"></i> {errorMessage}
+                </div>
+            )}
 
             <div className={styles.card}>
                 <div className={styles.cardHeader}>

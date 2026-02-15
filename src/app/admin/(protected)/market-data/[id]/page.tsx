@@ -113,9 +113,14 @@ export default function EditMarketData() {
         }
     }
 
+    const [successMessage, setSuccessMessage] = useState('')
+    const [errorMessage, setErrorMessage] = useState('')
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setSaving(true)
+        setErrorMessage('')
+        setSuccessMessage('')
 
         try {
             const url = isNew ? '/api/admin/market-data' : `/api/admin/market-data/${id}/`
@@ -132,17 +137,20 @@ export default function EditMarketData() {
                 body: JSON.stringify(dataToSend)
             })
 
+            const responseData = await res.json();
+
             if (res.ok) {
-                const responseData = await res.json();
-                router.push('/admin/market-data') // Redirect to the list view after successful operation
-                router.refresh()
+                setSuccessMessage(responseData.message || 'Market data saved successfully!')
+                setTimeout(() => {
+                    router.push('/admin/market-data')
+                    router.refresh()
+                }, 1500)
             } else {
-                const errorData = await res.json();
-                alert(`Failed to save data: ${errorData.error || 'Unknown error'}`);
+                setErrorMessage(responseData.error || 'Failed to save data')
             }
         } catch (error) {
             console.error('Error saving data', error)
-            alert('Error saving data')
+            setErrorMessage('An unexpected error occurred while saving.')
         } finally {
             setSaving(false)
         }
@@ -187,6 +195,16 @@ export default function EditMarketData() {
 
             {activeTab === 'details' ? (
                 <form onSubmit={handleSubmit} className={styles.form}>
+                    {successMessage && (
+                        <div className={styles.successAlert}>
+                            <i className="fas fa-check-circle"></i> {successMessage}
+                        </div>
+                    )}
+                    {errorMessage && (
+                        <div className={styles.errorAlert}>
+                            <i className="fas fa-exclamation-triangle"></i> {errorMessage}
+                        </div>
+                    )}
                     <div className={styles.formContent}>
                         <section className={styles.section}>
                             <h3 className={styles.sectionTitle}>

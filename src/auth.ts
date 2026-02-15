@@ -2,11 +2,11 @@ import NextAuth, { User } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
-
+import { authConfig } from "./auth.config"
 import { checkRateLimit, recordFailedAttempt, clearAttempts } from "@/lib/rate-limit"
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-    trustHost: true,
+    ...authConfig,
     providers: [
         CredentialsProvider({
             name: "Credentials",
@@ -77,33 +77,4 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             }
         })
     ],
-    callbacks: {
-        async jwt({ token, user }) {
-            if (user) {
-                token.id = user.id
-                token.username = (user as any).username
-                token.isStaff = (user as any).isStaff
-                token.isSuperuser = (user as any).isSuperuser
-                token.plan = (user as any).plan || 'free'
-            }
-            return token
-        },
-        async session({ session, token }) {
-            if (session.user) {
-                session.user.id = token.id as string;
-                (session.user as any).username = token.username;
-                (session.user as any).isStaff = token.isStaff;
-                (session.user as any).isSuperuser = token.isSuperuser;
-                (session.user as any).plan = token.plan || 'free'
-            }
-            return session
-        }
-    },
-    pages: {
-        signIn: "/login",
-    },
-    session: {
-        strategy: "jwt",
-        maxAge: 24 * 60 * 60,
-    }
 })

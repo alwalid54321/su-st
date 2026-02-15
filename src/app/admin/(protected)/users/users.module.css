@@ -17,8 +17,45 @@
 }
 
 .mainContentSubtitle {
-    font-size: 1rem;
-    color: #6b7280;
+    color: #64748b;
+    margin-top: 0.5rem;
+}
+
+.successAlert,
+.errorAlert {
+    margin-top: 1.5rem;
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    animation: slideDown 0.3s ease-out;
+}
+
+.successAlert {
+    background: #f0fdf4;
+    color: #166534;
+    border: 1px solid #bbfc7c;
+}
+
+.errorAlert {
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .card {
@@ -27,7 +64,8 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     padding: 1.5rem;
     border: 1px solid #e5e7eb;
-    margin: 0 1.5rem; /* Add horizontal margin to match layout */
+    margin: 0 1.5rem;
+    /* Add horizontal margin to match layout */
 }
 
 .cardHeader {
@@ -61,6 +99,7 @@
     text-align: left;
     border-bottom: 1px solid #ddd;
 }
+
 .usersTable th {
     font-weight: 600;
     background-color: #f8f9fa;
@@ -68,10 +107,12 @@
     text-transform: uppercase;
     font-size: 0.85rem;
 }
+
 .usersTable td {
     font-size: 0.95rem;
     color: #343a40;
 }
+
 .usersTable tbody tr:hover {
     background-color: #f0f2f5;
 }
@@ -87,22 +128,26 @@
     height: 32px;
     border-radius: 50%;
     object-fit: cover;
-    background-color: #e0e0e0; /* Placeholder background */
+    background-color: #e0e0e0;
+    /* Placeholder background */
 }
 
 .userCellDetails div:first-child {
     font-weight: 500;
     color: #1f2937;
 }
+
 .userCellDetails div:last-child {
     font-size: 0.85rem;
     color: #6b7280;
 }
 
 
-.roleBadge, .statusBadge {
+.roleBadge,
+.statusBadge {
     padding: 0.25rem 0.75rem;
-    border-radius: 1rem; /* pill shape */
+    border-radius: 1rem;
+    /* pill shape */
     font-size: 0.75rem;
     font-weight: 600;
     text-transform: capitalize;
@@ -110,28 +155,38 @@
 }
 
 .roleAdmin {
-    background-color: #fbe9e7; /* Light Red */
-    color: #d32f2f; /* Dark Red */
+    background-color: #fbe9e7;
+    /* Light Red */
+    color: #d32f2f;
+    /* Dark Red */
 }
 
 .roleEditor {
-    background-color: #fff3e0; /* Light Orange */
-    color: #ef6c00; /* Dark Orange */
+    background-color: #fff3e0;
+    /* Light Orange */
+    color: #ef6c00;
+    /* Dark Orange */
 }
 
 .roleUser {
-    background-color: #e3f2fd; /* Light Blue */
-    color: #1565c0; /* Dark Blue */
+    background-color: #e3f2fd;
+    /* Light Blue */
+    color: #1565c0;
+    /* Dark Blue */
 }
 
 .statusActive {
-    background-color: #e8f5e9; /* Light Green */
-    color: #2e7d32; /* Dark Green */
+    background-color: #e8f5e9;
+    /* Light Green */
+    color: #2e7d32;
+    /* Dark Green */
 }
 
 .statusInactive {
-    background-color: #fbe9e7; /* Light Red */
-    color: #d32f2f; /* Dark Red */
+    background-color: #fbe9e7;
+    /* Light Red */
+    color: #d32f2f;
+    /* Dark Red */
 }
 
 .actionsButtons {

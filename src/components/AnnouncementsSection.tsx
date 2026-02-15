@@ -74,7 +74,7 @@ export default function AnnouncementsSection() {
             <section className="announcements-section">
                 <div className="announcements-loading">
                     <div className="announcements-spinner"></div>
-                    <p>Loading announcements...</p>
+                    <p>Fetching platform broadcasts...</p>
                 </div>
             </section>
         )
@@ -82,71 +82,60 @@ export default function AnnouncementsSection() {
 
     if (announcements.length === 0) return null
 
+    // For seamless infinite scroll, we repeat the items
+    const tickerItems = [...announcements, ...announcements]
+
     return (
         <section className="announcements-section">
             <div className="announcements-header">
-                <h2 className="announcements-title">Latest News & Announcements</h2>
-                <p className="announcements-subtitle">Stay updated with our latest news and important updates</p>
+                <div>
+                    <h2 className="announcements-title">Announcements</h2>
+                </div>
+                <Link href="/announcements" className="box-link">
+                    View All <i className="fas fa-arrow-right"></i>
+                </Link>
             </div>
 
-            <div className="announcements-grid">
-                {announcements.map((announcement, index) => (
-                    <div
-                        key={announcement.id}
-                        className={`announcement-card ${announcement.isFeatured ? 'featured' : ''}`}
-                        style={{ animationDelay: `${index * 0.1}s` }}
-                    >
-                        {announcement.imageUrl && (
-                            <div className="announcement-image">
-                                <Image
-                                    src={announcement.imageUrl}
-                                    alt={announcement.title}
-                                    fill
-                                    className="announcement-img"
-                                />
-                            </div>
-                        )}
-
-                        <div className="announcement-content">
-                            <div className="announcement-meta">
-                                <span className={`category-badge category-${getCategoryColor(announcement.category)}`}>
+            <div className="announcements-ticker-container">
+                <div className="announcements-track">
+                    {tickerItems.map((announcement, index) => (
+                        <div
+                            key={`${announcement.id}-${index}`}
+                            className={`announcement-box ${announcement.isFeatured ? 'featured' : ''}`}
+                        >
+                            <div className="box-meta">
+                                <span className={`box-category category-${getCategoryColor(announcement.category)}`}>
                                     {announcement.category}
                                 </span>
                                 {announcement.isFeatured && (
                                     <span className="featured-badge">
-                                        <i className="fas fa-star"></i> Featured
+                                        <i className="fas fa-star"></i>
                                     </span>
                                 )}
-                                <span className="announcement-date">{formatDate(announcement.createdAt)}</span>
                             </div>
 
-                            <h3 className="announcement-title-text">{announcement.title}</h3>
-                            <p className="announcement-excerpt">{truncateContent(announcement.content)}</p>
+                            <h3 className="box-title">{announcement.title}</h3>
+                            <p className="box-excerpt">{truncateContent(announcement.content, 100)}</p>
 
-                            {announcement.externalLink ? (
-                                <a
-                                    href={announcement.externalLink}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="announcement-link"
-                                >
-                                    Read More <i className="fas fa-external-link-alt"></i>
-                                </a>
-                            ) : (
-                                <Link href={`/announcements/${announcement.id}`} className="announcement-link">
-                                    Read More <i className="fas fa-arrow-right"></i>
-                                </Link>
-                            )}
+                            <div className="box-footer">
+                                {announcement.externalLink ? (
+                                    <a
+                                        href={announcement.externalLink}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="box-link"
+                                    >
+                                        Details <i className="fas fa-external-link-alt"></i>
+                                    </a>
+                                ) : (
+                                    <Link href={`/announcements/${announcement.id}`} className="box-link">
+                                        Details <i className="fas fa-arrow-right"></i>
+                                    </Link>
+                                )}
+                            </div>
                         </div>
-                    </div>
-                ))}
-            </div>
-
-            <div className="announcements-cta">
-                <Link href="/announcements" className="view-all-announcements-btn">
-                    View All Announcements
-                    <i className="fas fa-chevron-right"></i>
-                </Link>
+                    ))}
+                </div>
             </div>
         </section>
     )
