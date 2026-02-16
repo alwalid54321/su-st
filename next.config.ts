@@ -60,7 +60,19 @@ const nextConfig = withPWA({
   dest: 'public',
   register: true,
   skipWaiting: true,
-  disable: process.env.NODE_ENV === 'development'
+  disable: process.env.NODE_ENV === 'development',
+  buildExcludes: [
+    /middleware-manifest\.json$/,
+    /_middleware\.js$/,
+    /_middleware\.js\.map$/,
+    /middleware-runtime\.js$/,
+    /server\/middleware-runtime\.js$/,
+    /server\/middleware-runtime\.js\.map$/,
+  ],
+  cacheOnFrontEndNav: true,
+  sw: 'sw.js',
+  exclude: [/middleware-manifest\.json$/],
+  maximumFileSizeToCacheInBytes: 10000000,
 })(config);
 
 export default nextConfig;

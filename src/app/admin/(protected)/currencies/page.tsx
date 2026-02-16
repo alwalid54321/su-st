@@ -12,12 +12,14 @@ interface Currency {
     rate: number
     symbol: string
     isBase: boolean
+    isAutoUpdate: boolean
     updatedAt: string
 }
 
 export default function CurrencyList() {
     const [currencies, setCurrencies] = useState<Currency[]>([])
     const [loading, setLoading] = useState(true)
+    const [syncing, setSyncing] = useState(false)
 
     useEffect(() => {
         fetchCurrencies()
@@ -37,6 +39,39 @@ export default function CurrencyList() {
         }
     }
 
+    const handleSync = async () => {
+        setSyncing(true)
+        try {
+            const res = await fetch('/api/admin/currencies/sync', { method: 'POST' })
+            if (res.ok) {
+                await fetchCurrencies()
+                alert('Currencies synced successfully')
+            } else {
+                alert('Failed to sync currencies')
+            }
+        } catch (error) {
+            console.error('Sync failed', error)
+            alert('Sync failed')
+        } finally {
+            setSyncing(false)
+        }
+    }
+
+    const toggleAutoUpdate = async (id: number, currentValue: boolean) => {
+        try {
+            const res = await fetch(`/api/admin/currencies/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ isAutoUpdate: !currentValue })
+            })
+            if (res.ok) {
+                fetchCurrencies()
+            }
+        } catch (error) {
+            console.error('Failed to toggle auto-update', error)
+        }
+    }
+
     if (loading) {
         return (
             <div className={styles.loaderContainer}>
@@ -53,9 +88,19 @@ export default function CurrencyList() {
                     <h1 className={styles.title}>Currencies</h1>
                     <p className={styles.subtitle}>Manage exchange rates and supported currencies</p>
                 </div>
-                <Link href="/admin/currencies/new" className={styles.addButton}>
-                    <i className="fas fa-plus"></i> Add Currency
-                </Link>
+                <div className={styles.headerActions}>
+                    <button
+                        onClick={handleSync}
+                        className={styles.syncButton}
+                        disabled={syncing}
+                    >
+                        <i className={`fas fa-sync ${syncing ? 'fa-spin' : ''}`}></i>
+                        {syncing ? ' Syncing...' : ' Sync Now'}
+                    </button>
+                    <Link href="/admin/currencies/new" className={styles.addButton}>
+                        <i className="fas fa-plus"></i> Add Currency
+                    </Link>
+                </div>
             </header>
 
             {/* Data Table */}
@@ -67,6 +112,7 @@ export default function CurrencyList() {
                                 <th>Currency</th>
                                 <th>Code</th>
                                 <th>Exchange Rate</th>
+                                <th>Auto Update</th>
                                 <th>Last Updated</th>
                                 <th className={styles.actionsCell}>Actions</th>
                             </tr>
@@ -105,9 +151,19 @@ export default function CurrencyList() {
                                     <td>
                                         <span className={styles.codeBadge}>{currency.code}</span>
                                     </td>
-                                    <td>
-                                        <span className={styles.rate}>{Number(currency.rate).toFixed(4)}</span>
+                                    <td className={styles.rate}>
+                                        <span className={styles.rateValue}>{Number(currency.rate).toFixed(4)}</span>
                                         <span className={styles.rateUnit}>per USD</span>
+                                    </td>
+                                    <td>
+                                        <label className={styles.switch}>
+                                            <input
+                                                type="checkbox"
+                                                checked={currency.isAutoUpdate}
+                                                onChange={() => toggleAutoUpdate(currency.id, currency.isAutoUpdate)}
+                                            />
+                                            <span className={styles.slider}></span>
+                                        </label>
                                     </td>
                                     <td className={styles.date}>
                                         {new Date(currency.updatedAt).toLocaleDateString()}

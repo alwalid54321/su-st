@@ -1,5 +1,6 @@
 
 import nodemailer from 'nodemailer'
+// @ts-ignore
 import webpush from 'web-push'
 
 // Configure Web Push with VAPID keys from env

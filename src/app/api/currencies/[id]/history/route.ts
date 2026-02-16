@@ -5,9 +5,12 @@ import { rateLimit } from '@/lib/api-limiter'
 
 // Plan-based history limits (in days)
 const PLAN_LIMITS = {
-    free: 7,      // Free users: 7 days
-    plus: 150     // Plus users: ~5 months
+    free: 14,     // Free users: 14 days
+    plus: 150,     // Plus users: ~5 months
+    premium: 365   // Premium users: 1 year
 }
+
+type PlanType = keyof typeof PLAN_LIMITS;
 
 export async function GET(
     request: NextRequest,
@@ -28,7 +31,8 @@ export async function GET(
 
         // Determine user plan and enforce date limit server-side
         const { plan } = await getUserPlan()
-        const maxDays = PLAN_LIMITS[plan] || PLAN_LIMITS.free
+        const userPlan = (plan as PlanType) || 'free'
+        const maxDays = PLAN_LIMITS[userPlan] || PLAN_LIMITS.free
         const dateLimit = new Date()
         dateLimit.setDate(dateLimit.getDate() - maxDays)
 

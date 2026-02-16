@@ -68,6 +68,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                         username: user.username,
                         isStaff: user.isStaff,
                         isSuperuser: user.isSuperuser,
+                        isActive: user.isActive,
                         plan: user.plan || 'free'
                     } as User
                 } catch (error: any) {

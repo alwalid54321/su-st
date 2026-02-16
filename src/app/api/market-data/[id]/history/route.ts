@@ -3,10 +3,14 @@ import { prisma } from '@/lib/prisma'
 import { getUserPlan } from '@/lib/auth-helpers'
 import { rateLimit } from '@/lib/api-limiter'
 
+// Extend window.User or similar if needed, but here just defining limits
+type PlanType = 'free' | 'plus' | 'premium'
+
 // Plan-based history limits (in days)
 const PLAN_LIMITS = {
-    free: 7,      // Free users: 7 days
-    plus: 150     // Plus users: ~5 months
+    free: 14,     // Free users: 14 days
+    plus: 150,     // Plus users: ~5 months
+    premium: 365   // Premium users: 1 year
 }
 
 export async function GET(
@@ -33,7 +37,8 @@ export async function GET(
 
         // 3. User Plan & Server-Side Enforcement
         const { plan } = await getUserPlan()
-        const maxDays = PLAN_LIMITS[plan] || PLAN_LIMITS.free
+        const userPlan = (plan as PlanType) || 'free'
+        const maxDays = PLAN_LIMITS[userPlan] || PLAN_LIMITS.free
         const dateLimit = new Date()
         dateLimit.setDate(dateLimit.getDate() - maxDays)
 

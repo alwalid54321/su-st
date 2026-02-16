@@ -6,21 +6,24 @@ import styles from './PremiumPromoSection.module.css'
 
 export default function PremiumPromoSection() {
     const [isVisible, setIsVisible] = useState(false)
+    const [plan, setPlan] = useState('free')
 
     useEffect(() => {
-        // Only show to non-plus users
+        // Only show to users who aren't on high-tier plans
         const checkPlan = async () => {
             try {
                 const res = await fetch('/api/user/plan')
                 if (res.ok) {
                     const data = await res.json()
-                    if (data.plan !== 'plus') {
+                    setPlan(data.plan)
+                    // If plan is 'premium', definitely don't show the promo
+                    if (data.plan !== 'premium' && data.plan !== 'plus') {
                         setIsVisible(true)
                     }
                 }
             } catch (err) {
                 console.error(err)
-                setIsVisible(true) // Show on error (likely unauthenticated)
+                setIsVisible(true)
             }
         }
         checkPlan()
@@ -37,32 +40,32 @@ export default function PremiumPromoSection() {
                             <i className="fas fa-gem"></i> Premium Access
                         </div>
                         <h2 className={styles.title}>
-                            Unlock Deeper Market Insights with <span className={styles.highlight}>SudaStock Plus</span>
+                            Level Up Your Analysis with <span className={styles.highlight}>Plus & Premium</span>
                         </h2>
                         <p className={styles.description}>
-                            Upgrade your plan to access 5 months of historical market data, advanced currency conversion tools, and export capabilities.
+                            Don't miss out on deep market trends. Upgrade to extend your data access and unlock professional tools.
                         </p>
-                        <ul className={styles.featuresList}>
-                            <li>
-                                <i className="fas fa-check-circle"></i>
-                                <span>Extended History (5 Months)</span>
-                            </li>
-                            <li>
-                                <i className="fas fa-check-circle"></i>
-                                <span>Advanced Currency Converter</span>
-                            </li>
-                            <li>
-                                <i className="fas fa-check-circle"></i>
-                                <span>CSV Data Exports</span>
-                            </li>
-                            <li>
-                                <i className="fas fa-check-circle"></i>
-                                <span>Priority Support</span>
-                            </li>
-                        </ul>
+                        <div className={styles.featuresWrapper}>
+                            <div className={styles.featureGroup}>
+                                <h4>Plus Benefits</h4>
+                                <ul className={styles.featuresList}>
+                                    <li><i className="fas fa-check-circle"></i> 5 Months Market History</li>
+                                    <li><i className="fas fa-check-circle"></i> Currency Converter</li>
+                                    <li><i className="fas fa-check-circle"></i> CSV Exports</li>
+                                </ul>
+                            </div>
+                            <div className={styles.featureGroup}>
+                                <h4>Premium Power</h4>
+                                <ul className={styles.featuresList}>
+                                    <li><i className="fas fa-check-circle"></i> 1 Full Year History</li>
+                                    <li><i className="fas fa-check-circle"></i> Priority Alert Handling</li>
+                                    <li><i className="fas fa-check-circle"></i> Unlimited Data Exports</li>
+                                </ul>
+                            </div>
+                        </div>
                         <div className={styles.actions}>
                             <Link href="/pricing" className={styles.primaryBtn}>
-                                Upgrade Now
+                                Explore Plans
                             </Link>
                             <Link href="/contact" className={styles.secondaryBtn}>
                                 Contact Sales

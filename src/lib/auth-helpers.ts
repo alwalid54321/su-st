@@ -1,6 +1,8 @@
 import { auth } from '@/auth'
 import { NextResponse } from 'next/server'
 
+export type PlanType = 'free' | 'plus' | 'premium'
+
 export async function requireAuth() {
     const session = await auth()
 
@@ -37,7 +39,8 @@ export async function requirePlus() {
     if (error) return { error, session: null }
 
     const user = session.user as any
-    if (user.plan !== 'plus') {
+    // Allow plus, premium, and superusers
+    if (user.plan !== 'plus' && user.plan !== 'premium' && !user.isSuperuser) {
         return {
             error: NextResponse.json(
                 { error: 'Plus subscription required', upgrade: true },
@@ -51,11 +54,17 @@ export async function requirePlus() {
 }
 
 // Non-blocking helper: returns plan without rejecting free users
-export async function getUserPlan(): Promise<{ plan: 'free' | 'plus'; session: any }> {
+export async function getUserPlan(): Promise<{ plan: PlanType; session: any }> {
     const session = await auth()
     if (!session || !session.user) {
         return { plan: 'free', session: null }
     }
+
     const user = session.user as any
-    return { plan: user.plan === 'plus' ? 'plus' : 'free', session }
+    // Superusers always get premium benefits
+    if (user.isSuperuser) return { plan: 'premium', session }
+
+    // Normalize plan
+    const plan = (user.plan as string || 'free').toLowerCase() as PlanType
+    return { plan: ['free', 'plus', 'premium'].includes(plan) ? plan : 'free', session }
 }

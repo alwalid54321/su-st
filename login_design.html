@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - SudaStock</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Inter:wght@400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            /* Exact gradients from Figma data */
+            --bg-gradient: conic-gradient(from 180deg at 47% 50%, #03064C 14%, #5B4A05 62%);
+            --button-gradient: linear-gradient(90deg, #6D6235 0%, #01054F 100%);
+            --card-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25),
+                0px 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-gradient);
+            background-repeat: no-repeat;
+            background-size: cover;
+            overflow: hidden;
+            background-position: center;
+        }
+
+        .login-card {
+            background: #FFFFFF;
+            width: 90%;
+            max-width: 580px;
+            padding: 50px 40px;
+            border-radius: 40px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Premium CSS Logo */
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-box {
+            width: 70px;
+            height: 70px;
+            background: var(--button-gradient);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 20px rgba(109, 98, 53, 0.3);
+            margin-bottom: 12px;
+            transform: rotate(-10deg);
+            transition: transform 0.3s ease;
+        }
+
+        .logo-box:hover {
+            transform: rotate(0deg) scale(1.1);
+        }
+
+        .logo-icon {
+            color: white;
+            font-size: 36px;
+            font-weight: 800;
+            font-family: 'Comfortaa', cursive;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 800;
+            color: #03064C;
+            letter-spacing: 2px;
+        }
+
+        .logo-text span {
+            color: #6D6235;
+        }
+
+        h1 {
+            font-family: 'Comfortaa', cursive;
+            font-size: 48px;
+            font-weight: 700;
+            color: #000000;
+            letter-spacing: 0.08em;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+        }
+
+        .input-group {
+            width: 100%;
+            max-width: 444px;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .input-field {
+            width: 100%;
+            height: 61px;
+            border-radius: 20px;
+            border: 1px solid #000000;
+            padding: 0 25px;
+            font-size: 20px;
+            font-family: 'Inter', sans-serif;
+            color: #363636;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            border-color: #6D6235;
+            box-shadow: 0 0 8px rgba(109, 98, 53, 0.3);
+        }
+
+        .input-field::placeholder {
+            color: #363636;
+            opacity: 0.7;
+        }
+
+        .forgot-password {
+            font-size: 14px;
+            color: #000000;
+            text-decoration: none;
+            margin-top: -10px;
+            margin-bottom: 40px;
+            align-self: center;
+            font-weight: 400;
+        }
+
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+
+        .sign-in-btn {
+            width: 100%;
+            max-width: 273px;
+            height: 61px;
+            border-radius: 20px;
+            border: none;
+            background: var(--button-gradient);
+            color: #FFFFFF;
+            font-size: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            letter-spacing: 0.05em;
+        }
+
+        .sign-in-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .sign-in-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Responsive scaling */
+        @media (max-width: 768px) {
+            .login-card {
+                padding: 40px 20px;
+                border-radius: 30px;
+            }
+
+            h1 {
+                font-size: 32px;
+            }
+
+            .logo {
+                width: 100px;
+                height: 96px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-card">
+        <!-- Premium CSS Logo -->
+        <div class="logo-container">
+            <div class="logo-box">
+                <div class="logo-icon">S</div>
+            </div>
+            <div class="logo-text">SUDA<span>STOCK</span></div>
+        </div>
+
+        <h1>Log In</h1>
+
+        <div class="input-group">
+            <input type="text" class="input-field" placeholder="Username">
+        </div>
+
+        <div class="input-group">
+            <input type="password" class="input-field" placeholder="Password">
+        </div>
+
+        <a href="#" class="forgot-password">Forgot your password?</a>
+
+        <button class="sign-in-btn">SIGN IN</button>
+    </div>
+
+    <!-- Micro-animations -->
+    <script>
+        document.querySelectorAll('.input-field').forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.style.transform = 'scale(1.02)';
+            });
+            input.addEventListener('blur', () => {
+                input.parentElement.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body>
+
+</html>

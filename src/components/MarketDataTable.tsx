@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import PriceAlertModal from './PriceAlertModal'
+import Skeleton from './Skeleton'
 
 interface MarketData {
     id: number
@@ -24,6 +26,7 @@ interface Currency {
 }
 
 export default function MarketDataTable() {
+    const router = useRouter()
     const [marketData, setMarketData] = useState<MarketData[]>([])
     const [currencies, setCurrencies] = useState<Currency[]>([])
     const [selectedCurrency, setSelectedCurrency] = useState<string>('USD')
@@ -98,7 +101,40 @@ export default function MarketDataTable() {
                     </div>
                 </div>
 
-                {loading && <div className="text-center py-10 text-gray-500">Loading market data...</div>}
+                {loading && (
+                    <div className="market-table-container">
+                        <table className="market-table">
+                            <thead>
+                                <tr>
+                                    <th>PRODUCT</th>
+                                    <th>PORT SUDAN</th>
+                                    <th>CNF CHINA</th>
+                                    <th>CNF UAE</th>
+                                    <th>CNF MERSING</th>
+                                    <th>CNF INDIA</th>
+                                    <th>STATUS</th>
+                                    <th>TREND</th>
+                                    <th className="action-column">REQUEST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {[...Array(5)].map((_, i) => (
+                                    <tr key={i}>
+                                        <td><Skeleton className="h-6 w-32" /></td>
+                                        <td><Skeleton className="h-6 w-20" /></td>
+                                        <td><Skeleton className="h-6 w-20" /></td>
+                                        <td><Skeleton className="h-6 w-20" /></td>
+                                        <td><Skeleton className="h-6 w-20" /></td>
+                                        <td><Skeleton className="h-6 w-20" /></td>
+                                        <td><Skeleton className="h-6 w-16" /></td>
+                                        <td><Skeleton className="h-6 w-12" /></td>
+                                        <td><Skeleton className="h-8 w-24" /></td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
 
                 {!loading && marketData.length === 0 && (
                     <div className="text-center py-10 text-red-500">No market data available. Please check API connection.</div>
@@ -165,39 +201,48 @@ export default function MarketDataTable() {
                                 </thead>
                                 <tbody>
                                     {marketData.map((product) => (
-                                        <tr key={product.id}>
-                                            <td>
+                                        <tr
+                                            key={product.id}
+                                            onClick={(e) => {
+                                                // Prevent navigation if clicking on action buttons
+                                                if ((e.target as HTMLElement).closest('.action-btn') || (e.target as HTMLElement).closest('a')) return;
+                                                router.push(`/market-data?product=${product.id}`)
+                                            }}
+                                            style={{ cursor: 'pointer' }}
+                                            className="hover:bg-gray-50 transition-colors"
+                                        >
+                                            <td data-label="PRODUCT">
                                                 <div className="product-name-cell">
                                                     <span className="product-name">{product.name}</span>
                                                     <span className="base-currency">{selectedCurrency}</span>
                                                 </div>
                                             </td>
-                                            <td className="price-cell">
+                                            <td className="price-cell" data-label="PORT SUDAN">
                                                 <span className="currency-symbol">{getCurrencySymbol(selectedCurrency)}</span>
                                                 <span className="price-value">{convertPrice(product.portSudan)}</span>
                                             </td>
-                                            <td className="price-cell">
+                                            <td className="price-cell" data-label="CNF CHINA">
                                                 <span className="currency-symbol">{getCurrencySymbol(selectedCurrency)}</span>
                                                 <span className="price-value">{convertPrice(product.dmtChina)}</span>
                                             </td>
-                                            <td className="price-cell">
+                                            <td className="price-cell" data-label="CNF UAE">
                                                 <span className="currency-symbol">{getCurrencySymbol(selectedCurrency)}</span>
                                                 <span className="price-value">{convertPrice(product.dmtUae)}</span>
                                             </td>
-                                            <td className="price-cell">
+                                            <td className="price-cell" data-label="CNF MERSING">
                                                 <span className="currency-symbol">{getCurrencySymbol(selectedCurrency)}</span>
                                                 <span className="price-value">{convertPrice(product.dmtMersing)}</span>
                                             </td>
-                                            <td className="price-cell">
+                                            <td className="price-cell" data-label="CNF INDIA">
                                                 <span className="currency-symbol">{getCurrencySymbol(selectedCurrency)}</span>
                                                 <span className="price-value">{convertPrice(product.dmtIndia)}</span>
                                             </td>
-                                            <td>
+                                            <td data-label="STATUS">
                                                 <span className={`status-badge ${product.status.toLowerCase()}`}>
                                                     {product.status}
                                                 </span>
                                             </td>
-                                            <td>
+                                            <td data-label="TREND">
                                                 <div className="forecast-cell">
                                                     <span className={`forecast-trend ${product.trend > 0 ? 'up' : product.trend < 0 ? 'down' : ''}`}>
                                                         {product.trend > 0 ? '↑' : product.trend < 0 ? '↓' : '→'} {Math.abs(product.trend)}%
@@ -205,36 +250,21 @@ export default function MarketDataTable() {
                                                     <span>{product.forecast}</span>
                                                 </div>
                                             </td>
-                                            <td className="action-column">
+                                            <td className="action-column" data-label="REQUEST">
                                                 <div className="action-row">
-                                                    <Link href={`/sample?product=${product.name}`} className="action-btn sample-btn">SAMPLE</Link>
-                                                    <Link href={`/quote?product=${product.name}`} className="action-btn quote-btn">QUOTE</Link>
+                                                    <Link href={`/sample?product=${product.name}`} className="action-btn sample-btn" onClick={(e) => e.stopPropagation()}>SAMPLE</Link>
+                                                    <Link href={`/quote?product=${product.name}`} className="action-btn quote-btn" onClick={(e) => e.stopPropagation()}>QUOTE</Link>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation()
+                                                            setSelectedProduct(product)
+                                                            setAlertModalOpen(true)
+                                                        }}
+                                                        className="action-btn alert-btn"
+                                                    >
+                                                        <i className="fas fa-bell"></i> ALERT
+                                                    </button>
                                                 </div>
-                                                <button
-                                                    onClick={() => {
-                                                        setSelectedProduct(product)
-                                                        setAlertModalOpen(true)
-                                                    }}
-                                                    className="action-btn alert-btn"
-                                                    style={{
-                                                        marginTop: '8px',
-                                                        width: '100%',
-                                                        backgroundColor: 'var(--accent)',
-                                                        color: 'white',
-                                                        border: 'none',
-                                                        borderRadius: '4px',
-                                                        padding: '6px',
-                                                        fontSize: '0.8rem',
-                                                        fontWeight: 'bold',
-                                                        cursor: 'pointer',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        gap: '5px'
-                                                    }}
-                                                >
-                                                    <i className="fas fa-bell"></i> SET ALERT
-                                                </button>
                                             </td>
                                         </tr>
                                     ))}

@@ -162,7 +162,7 @@ export const PRODUCTS: Product[] = [
         availability: {
             'Jan': 'medium', 'Feb': 'low', 'Mar': 'none', 'Apr': 'none',
             'May': 'none', 'Jun': 'none', 'Jul': 'none', 'Aug': 'none',
-            'Sep': 'low', 'Oct': '  medium', 'Nov': 'high', 'Dec': 'medium'
+            'Sep': 'low', 'Oct': 'medium', 'Nov': 'high', 'Dec': 'medium'
         }
     }
 ]

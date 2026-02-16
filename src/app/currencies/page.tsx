@@ -52,7 +52,7 @@ export default function CurrenciesPage() {
     const [history, setHistory] = useState<any[]>([])
     const [historyLoading, setHistoryLoading] = useState(false)
     const [searchTerm, setSearchTerm] = useState('')
-    const [userPlan, setUserPlan] = useState<'free' | 'plus'>('free')
+    const [userPlan, setUserPlan] = useState<'free' | 'plus' | 'premium'>('free')
     const [showPremiumModal, setShowPremiumModal] = useState(false)
 
     // Fetch currencies and user plan
@@ -219,17 +219,19 @@ export default function CurrenciesPage() {
                             <div className={styles.lockContent}>
                                 <i className="fas fa-lock fa-3x"></i>
                                 <h3>Currency Converter</h3>
-                                <p>Unlock live currency conversion with SudaStock Plus.</p>
+                                <p>Unlock live currency conversion with SudaStock Plus or Premium.</p>
                                 <button onClick={(e) => {
                                     e.stopPropagation();
                                     setShowPremiumModal(true);
-                                }} className="upgrade-cta-btn">Upgrade to Plus</button>
+                                }} className="upgrade-cta-btn">Upgrade Now</button>
                             </div>
                         </div>
                     )}
                     <h2 className={styles.cardHeader}>
                         <i className="fas fa-exchange-alt"></i>
-                        Currency Converter <span className="plus-badge-inline" style={{ marginLeft: '10px' }}>✦ PLUS</span>
+                        Currency Converter <span className={userPlan === 'premium' ? "premium-badge-inline" : "plus-badge-inline"} style={{ marginLeft: '10px' }}>
+                            {userPlan === 'premium' ? "★ PREMIUM" : "✦ PLUS"}
+                        </span>
                     </h2>
                     <div className={styles.converterGrid} style={userPlan === 'free' ? { filter: 'blur(4px)', pointerEvents: 'none' } : {}}>
                         <div className={styles.currencyBox}>

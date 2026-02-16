@@ -50,8 +50,8 @@ export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
                             <i className="fas fa-history"></i>
                         </div>
                         <div className={styles.featureText}>
-                            <h3>5 Months History</h3>
-                            <p>Deep dive into market trends with extended historical data</p>
+                            <h3>Up to 1 Year History</h3>
+                            <p>Deep dive into market trends with Plus (5 months) or Premium (1 year) plans</p>
                         </div>
                     </div>
 
@@ -78,7 +78,7 @@ export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
 
                 <div className={styles.actions}>
                     <Link href="/pricing" className={styles.upgradeBtn}>
-                        Upgrade to Plus
+                        View Plans & Upgrade
                         <i className="fas fa-arrow-right"></i>
                     </Link>
                     <button className={styles.maybeLaterBtn} onClick={onClose}>

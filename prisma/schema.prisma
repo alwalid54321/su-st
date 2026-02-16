@@ -53,10 +53,14 @@ model User {
   plan           String         @default("free") // "free" or "plus"
   
   // Relations
-  emailOTPs      EmailOTP[]
-  settings       UserSettings?
-  priceAlerts    PriceAlert[] @relation("UserPriceAlerts")
-  pushSubscriptions PushSubscription[] @relation("UserPushSubscriptions")
+  emailOTPs            EmailOTP[]
+  settings             UserSettings?
+  priceAlerts          PriceAlert[] @relation("UserPriceAlerts")
+  pushSubscriptions    PushSubscription[] @relation("UserPushSubscriptions")
+  auditLogs            AuditLog[]
+  activities           UserActivity[]
+  permissions          RolePermission[] @relation("UserPermissions")
+  subscriptionHistory  SubscriptionHistory[]
   
   @@map("core_user")
 }
@@ -141,6 +145,7 @@ model Currency {
   name       String   @default("Currency")
   rate       Float    @default(1.0)
   isCurrent  Boolean  @default(true) @map("is_current")
+  isAutoUpdate Boolean @default(false) @map("is_auto_update")
   previousVersionId Int? @map("previous_version_id")
   lastUpdate DateTime @default(now()) @map("last_update")
   
@@ -261,3 +266,83 @@ model PushSubscription {
 
   @@map("core_pushsubscription")
 }
+
+// Audit Log for all admin and sensitive user actions
+model AuditLog {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  action      String   // "USER_UPDATE", "PLAN_CHANGE", "ROLE_GRANT", etc.
+  targetType  String   @map("target_type") // "User", "MarketData", "Currency"
+  targetId    Int?     @map("target_id")
+  changes     String?  // JSON string of what changed
+  ipAddress   String?  @map("ip_address")
+  userAgent   String?  @map("user_agent")
+  createdAt   DateTime @default(now()) @map("created_at")
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId, createdAt])
+  @@index([action])
+  @@map("core_auditlog")
+}
+
+// User Activity Tracking
+model UserActivity {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @map("user_id")
+  page       String   // Page visited or action performed
+  event      String   // "VIEW", "CLICK", "EXPORT", "API_CALL"
+  metadata   String?  // JSON string with additional data
+  ipAddress  String?  @map("ip_address")
+  createdAt  DateTime @default(now()) @map("created_at")
+  
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId, createdAt])
+  @@map("core_useractivity")
+}
+
+// Permission System (for granular RBAC)
+model Permission {
+  id              Int               @id @default(autoincrement())
+  name            String            @unique // "manage_users", "edit_prices", "view_analytics"
+  description     String?
+  category        String            // "users", "market_data", "system"
+  rolePermissions RolePermission[]
+  
+  @@map("core_permission")
+}
+
+// Role Permissions (Many-to-Many)
+model RolePermission {
+  id           Int        @id @default(autoincrement())
+  userId       Int        @map("user_id")
+  permissionId Int        @map("permission_id")
+  grantedBy    Int?       @map("granted_by")
+  grantedAt    DateTime   @default(now()) @map("granted_at")
+  
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade, name: "UserPermissions")
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, permissionId])
+  @@map("core_rolepermission")
+}
+
+// Subscription History
+model SubscriptionHistory {
+  id             Int      @id @default(autoincrement())
+  userId         Int      @map("user_id")
+  fromPlan       String   @map("from_plan")
+  toPlan         String   @map("to_plan")
+  reason         String?  // "upgrade", "downgrade", "admin_change"
+  prorated       Boolean  @default(false)
+  proratedAmount Float?   @map("prorated_amount")
+  changedBy      Int?     @map("changed_by") // Admin user ID if changed by admin
+  createdAt      DateTime @default(now()) @map("created_at")
+  
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@map("core_subscriptionhistory")
+}
+

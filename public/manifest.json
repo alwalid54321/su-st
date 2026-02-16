@@ -1,0 +1,20 @@
+{
+    "name": "SudaStock",
+    "short_name": "SudaStock",
+    "start_url": "/?source=pwa",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#111827",
+    "icons": [
+        {
+            "src": "/images/branding/logo-icon.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/images/branding/logo-icon.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

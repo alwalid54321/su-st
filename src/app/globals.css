@@ -3367,3 +3367,147 @@ h6 {
     margin-right: auto;
   }
 }
+
+/* Market Table Action Buttons */
+.action-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.action-btn {
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-decoration: none;
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  text-transform: uppercase;
+}
+
+.sample-btn {
+  background-color: #3b82f6;
+  /* Professional blue */
+  color: white;
+}
+
+.quote-btn {
+  background-color: var(--primary-dark);
+  color: white;
+}
+
+.alert-btn {
+  background-color: var(--accent);
+  color: white;
+}
+
+.action-btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Mobile Responsive Market Table */
+/* Mobile Professional Market Table (Trading Economics Style) */
+@media screen and (max-width: 768px) {
+  .market-data-section {
+    padding: 40px 0;
+  }
+
+  .market-data-section .container {
+    padding: 0;
+    /* Bleed to edges */
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .section-header {
+    padding: 0 15px;
+    /* Keep header text within safe area */
+    margin-bottom: 20px;
+  }
+
+  .market-table-container {
+    margin: 0;
+    border-radius: 0;
+    /* Remove corners for edge-to-edge feel */
+    box-shadow: none;
+    border-top: 1px solid #f1f5f9;
+    border-bottom: 1px solid #f1f5f9;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .market-table {
+    min-width: 800px;
+    /* Allow horizontal scroll to keep columns in line */
+    font-size: 0.85rem;
+  }
+
+  .market-table thead {
+    display: table-header-group;
+    /* Show header on mobile too */
+  }
+
+  .market-table th,
+  .market-table td {
+    display: table-cell;
+    padding: 12px 10px;
+    white-space: nowrap;
+  }
+
+  /* Sticky First Column (Product Name) */
+  .market-table th:first-child,
+  .market-table td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    background: white;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+    min-width: 140px;
+  }
+
+  .market-table th:first-child {
+    background: var(--primary-dark);
+  }
+
+  /* Compact Prices */
+  .price-cell {
+    text-align: center;
+  }
+
+  .price-value {
+    font-weight: 700;
+  }
+
+  /* Trend Icons Only for mobile if too tight */
+  .forecast-trend {
+    font-size: 0.75rem;
+    padding: 2px 4px;
+  }
+
+  /* Action columns on mobile */
+  .action-column {
+    min-width: 120px;
+  }
+
+  .action-row {
+    gap: 5px;
+  }
+
+  .action-btn {
+    padding: 4px 8px;
+    font-size: 0.7rem;
+  }
+
+  .alert-btn {
+    padding: 4px !important;
+    font-size: 0.7rem !important;
+  }
+}

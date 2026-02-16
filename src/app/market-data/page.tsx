@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
+import { useSearchParams, useRouter } from 'next/navigation'
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -62,9 +63,15 @@ interface HistoryItem {
     lastUpdate: string
 }
 
-export default function MarketDataPage() {
+function MarketDataContent() {
+    const searchParams = useSearchParams()
+    const router = useRouter()
+    const initialProductId = searchParams.get('product')
+
     const [products, setProducts] = useState<MarketDataItem[]>([])
-    const [selectedProduct, setSelectedProduct] = useState<number | ''>('')
+    const [selectedProduct, setSelectedProduct] = useState<number | ''>(
+        initialProductId ? Number(initialProductId) : ''
+    )
     const [selectedProductData, setSelectedProductData] = useState<MarketDataItem | null>(null)
     const [history, setHistory] = useState<HistoryItem[]>([])
     const [startDate, setStartDate] = useState('')
@@ -72,23 +79,48 @@ export default function MarketDataPage() {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
     const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
-    const [userPlan, setUserPlan] = useState<'free' | 'plus'>('free')
+    const [userPlan, setUserPlan] = useState<'free' | 'plus' | 'premium'>('free')
     const [planLimits, setPlanLimits] = useState<any>(null)
     const [showPremiumModal, setShowPremiumModal] = useState(false)
     const [showAlertModal, setShowAlertModal] = useState(false)
 
     // Fetch user plan + products on mount
     useEffect(() => {
-        fetchProducts()
-        fetchUserPlan()
+        const init = async () => {
+            await fetchProducts()
+            await fetchUserPlan()
+        }
+        init()
     }, [])
+
+    // Handle initial product selection from URL
+    useEffect(() => {
+        if (initialProductId && products.length > 0) {
+            const id = Number(initialProductId)
+            if (!isNaN(id) && products.some(p => p.id === id)) {
+                setSelectedProduct(id)
+            }
+        }
+    }, [initialProductId, products])
+
+    // Trigger search when selectedProduct changes (if it was set from URL or user)
+    useEffect(() => {
+        if (selectedProduct && typeof selectedProduct === 'number') {
+            handleSearch(selectedProduct)
+        }
+    }, [selectedProduct])
+
 
     // Set default date range based on plan
     useEffect(() => {
         const end = new Date()
         const start = new Date()
-        // Free users default to 7 days, Plus to 30 days
-        start.setDate(start.getDate() - (userPlan === 'plus' ? 30 : 7))
+        // Free: 14 days, Plus: 30 days default, Premium: 90 days default
+        let days = 14
+        if (userPlan === 'premium') days = 90
+        else if (userPlan === 'plus') days = 30
+
+        start.setDate(start.getDate() - days)
         setEndDate(end.toISOString().split('T')[0])
         setStartDate(start.toISOString().split('T')[0])
     }, [userPlan])
@@ -118,8 +150,9 @@ export default function MarketDataPage() {
         }
     }
 
-    const handleSearch = async () => {
-        if (!selectedProduct) {
+    const handleSearch = async (productId: number | '') => {
+        const idToSearch = productId || selectedProduct
+        if (!idToSearch) {
             setError('Please select a product')
             return
         }
@@ -131,7 +164,7 @@ export default function MarketDataPage() {
 
         try {
             // Fetch current product data
-            const productRes = await fetch(`/api/market-data/${selectedProduct}`)
+            const productRes = await fetch(`/api/market-data/${idToSearch}`)
             if (!productRes.ok) throw new Error('Failed to fetch product data')
             const productData = await productRes.json()
             setSelectedProductData(productData)
@@ -172,9 +205,15 @@ export default function MarketDataPage() {
         }
     }
 
+    const handleSearchClick = () => {
+        if (selectedProduct && typeof selectedProduct === 'number') {
+            handleSearch(selectedProduct)
+        }
+    }
+
     const setQuickDateRange = (days: number) => {
-        // Enforce server limits — free users can only go back 7 days
-        const maxDays = userPlan === 'plus' ? 150 : 7
+        // Enforce server limits
+        const maxDays = userPlan === 'premium' ? 365 : (userPlan === 'plus' ? 150 : 14)
         const effectiveDays = Math.min(days, maxDays)
         const end = new Date()
         const start = new Date()
@@ -183,8 +222,12 @@ export default function MarketDataPage() {
         setStartDate(start.toISOString().split('T')[0])
     }
 
-    // Check if a quick filter is locked for free users
-    const isFilterLocked = (days: number) => userPlan !== 'plus' && days > 7
+    // Check if a quick filter is locked for the current user
+    const isFilterLocked = (days: number) => {
+        if (userPlan === 'premium') return false
+        if (userPlan === 'plus') return days > 150
+        return days > 14
+    }
 
     const handleQuickFilterClick = (days: number) => {
         if (isFilterLocked(days)) {
@@ -197,7 +240,8 @@ export default function MarketDataPage() {
     // Get the min date for the date picker based on plan
     const getMinDate = () => {
         const d = new Date()
-        d.setDate(d.getDate() - (userPlan === 'plus' ? 150 : 7))
+        const maxDays = userPlan === 'premium' ? 365 : (userPlan === 'plus' ? 150 : 14)
+        d.setDate(d.getDate() - maxDays)
         return d.toISOString().split('T')[0]
     }
 
@@ -376,19 +420,29 @@ export default function MarketDataPage() {
                         <button onClick={() => setQuickDateRange(7)} className={styles.quickFilterBtn}>
                             Last 7 Days
                         </button>
+                        <button onClick={() => setQuickDateRange(14)} className={styles.quickFilterBtn}>
+                            Last 14 Days
+                        </button>
                         <button
                             onClick={() => handleQuickFilterClick(30)}
                             className={`${styles.quickFilterBtn} ${isFilterLocked(30) ? styles.lockedFilter : ''}`}
-                            title={isFilterLocked(30) ? 'Upgrade to Plus for extended history' : ''}
+                            title={isFilterLocked(30) ? 'Upgrade to Plus/Premium for extended history' : ''}
                         >
                             Last 30 Days {isFilterLocked(30) && <span className="plus-badge-inline">✦ PLUS</span>}
                         </button>
                         <button
-                            onClick={() => handleQuickFilterClick(90)}
-                            className={`${styles.quickFilterBtn} ${isFilterLocked(90) ? styles.lockedFilter : ''}`}
-                            title={isFilterLocked(90) ? 'Upgrade to Plus for extended history' : ''}
+                            onClick={() => handleQuickFilterClick(150)}
+                            className={`${styles.quickFilterBtn} ${isFilterLocked(150) ? styles.lockedFilter : ''}`}
+                            title={isFilterLocked(150) ? 'Upgrade to Plus/Premium for extended history' : ''}
                         >
-                            Last 3 Months {isFilterLocked(90) && <span className="plus-badge-inline">✦ PLUS</span>}
+                            Last 5 Months {isFilterLocked(150) && <span className="plus-badge-inline">✦ PLUS</span>}
+                        </button>
+                        <button
+                            onClick={() => handleQuickFilterClick(365)}
+                            className={`${styles.quickFilterBtn} ${isFilterLocked(365) ? styles.lockedFilter : ''}`}
+                            title={isFilterLocked(365) ? 'Upgrade to Premium for 1 year history' : ''}
+                        >
+                            Last 1 Year {isFilterLocked(365) && <span className="premium-badge-inline">★ PREMIUM</span>}
                         </button>
                     </div>
 
@@ -407,7 +461,7 @@ export default function MarketDataPage() {
 
                     <div className={styles.buttonGroup}>
                         <button
-                            onClick={handleSearch}
+                            onClick={handleSearchClick}
                             disabled={loading}
                             className={styles.primaryButton}
                         >
@@ -516,5 +570,13 @@ export default function MarketDataPage() {
                 )}
             </div>
         </div >
+    )
+}
+
+export default function MarketDataPage() {
+    return (
+        <Suspense fallback={<div>Loading market data...</div>}>
+            <MarketDataContent />
+        </Suspense>
     )
 }

@@ -9,12 +9,7 @@ import {
     Card,
     CardContent,
     Avatar,
-    LinearProgress,
     Button,
-    List,
-    ListItem,
-    ListItemAvatar,
-    ListItemText,
     Chip,
     useTheme,
     alpha,
@@ -24,35 +19,10 @@ import {
     Category as VariationIcon,
     Anchor as PortIcon,
     CurrencyExchange as CurrencyIcon,
-    TrendingUp as UpIcon,
-    TrendingDown as DownIcon,
     Notifications as AnnouncementIcon,
     FlashOn as ActionIcon,
-    ShowChart as MarketIcon,
 } from '@mui/icons-material';
-import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend,
-    Filler,
-} from 'chart.js';
-import { Line } from 'react-chartjs-2';
-
-ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend,
-    Filler
-);
+import ActivityFeed from '@/components/admin/ActivityFeed';
 
 const goldColor = '#786D3C';
 const navyColor = '#1B1464';
@@ -66,36 +36,14 @@ export default function AdminDashboard() {
         totalPorts: 0,
         totalCurrencies: 0,
     });
-    const [activities, setActivities] = React.useState<any[]>([]);
 
     React.useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                // Fetch All Dashboard Stats
                 const statsRes = await fetch('/api/admin/dashboard-stats');
                 if (statsRes.ok) {
                     const data = await statsRes.json();
                     setStatsData(data.stats);
-
-                    // Add icons back to activities
-                    const enrichedActivities = data.activities.map((act: any) => ({
-                        ...act,
-                        icon: act.title.includes('Price') ? <MarketIcon /> : <ActionIcon />
-                    }));
-                    setActivities(enrichedActivities);
-
-                    // Update Chart Data if real labels exist
-                    if (data.chart) {
-                        setChartDataState({
-                            labels: data.chart.labels,
-                            datasets: [
-                                {
-                                    ...chartDataTemplate.datasets[0],
-                                    data: data.chart.data
-                                }
-                            ]
-                        });
-                    }
                 }
             } catch (error) {
                 console.error('Failed to fetch dashboard data:', error);
@@ -114,41 +62,7 @@ export default function AdminDashboard() {
         { label: 'Currencies', value: statsData.totalCurrencies.toString(), change: '+0%', icon: <CurrencyIcon />, color: goldColor },
     ];
 
-    const chartDataTemplate = {
-        labels: ['01 Feb', '02 Feb', '03 Feb', '04 Feb', '05 Feb', '06 Feb', '07 Feb'],
-        datasets: [
-            {
-                label: 'Market Volume',
-                data: [450, 590, 800, 810, 560, 550, 940],
-                fill: true,
-                borderColor: navyColor,
-                backgroundColor: alpha(navyColor, 0.1),
-                tension: 0.4,
-                pointRadius: 4,
-                pointBackgroundColor: navyColor,
-            },
-        ],
-    };
 
-    const [chartDataState, setChartDataState] = React.useState(chartDataTemplate);
-
-    const chartOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: { display: false },
-            tooltip: {
-                backgroundColor: navyColor,
-                titleFont: { weight: 'bold' as const },
-                padding: 12,
-                cornerRadius: 8,
-            },
-        },
-        scales: {
-            y: { grid: { display: false }, ticks: { font: { size: 10 } } },
-            x: { grid: { display: false }, ticks: { font: { size: 10 } } },
-        },
-    };
 
     return (
         <Box sx={{ flexGrow: 1 }}>
@@ -202,7 +116,7 @@ export default function AdminDashboard() {
             </Grid>
 
             <Grid container spacing={3}>
-                {/* Main Market Card */}
+                {/* Live Activity Feed */}
                 <Grid size={{ xs: 12, lg: 8 }}>
                     <Paper
                         sx={{
@@ -214,18 +128,13 @@ export default function AdminDashboard() {
                             border: '1px solid rgba(0,0,0,0.03)'
                         }}
                     >
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                             <Box>
-                                <Typography variant="h6" sx={{ fontWeight: 800, color: navyColor }}>Market Performance</Typography>
-                                <Typography variant="caption" sx={{ color: 'text.secondary' }}>Daily transaction volume and price index</Typography>
+                                <Typography variant="h6" sx={{ fontWeight: 800, color: navyColor }}>Live Activity Feed</Typography>
+                                <Typography variant="caption" sx={{ color: 'text.secondary' }}>Real-time user actions and admin operations</Typography>
                             </Box>
-                            <Button size="small" variant="outlined" sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 700 }}>
-                                Export CSV
-                            </Button>
                         </Box>
-                        <Box sx={{ height: 320 }}>
-                            <Line data={chartDataState} options={chartOptions} />
-                        </Box>
+                        <ActivityFeed />
                     </Paper>
                 </Grid>
 
@@ -302,28 +211,22 @@ export default function AdminDashboard() {
                             </Paper>
                         </Grid>
 
-                        {/* Recent Activity */}
+                        {/* Quick Stats */}
                         <Grid size={{ xs: 12 }}>
                             <Paper sx={{ p: 3, borderRadius: 6, border: '1px solid rgba(0,0,0,0.05)' }}>
-                                <Typography variant="h6" sx={{ fontWeight: 800, mb: 2 }}>Recent Logs</Typography>
-                                <List sx={{ p: 0 }}>
-                                    {activities.map((act, i) => (
-                                        <ListItem key={i} sx={{ px: 0, py: 1.5 }}>
-                                            <ListItemAvatar>
-                                                <Avatar sx={{ bgcolor: alpha(theme.palette.divider, 0.4), color: navyColor, width: 32, height: 32 }}>
-                                                    {React.cloneElement(act.icon as any, { fontSize: 'small' })}
-                                                </Avatar>
-                                            </ListItemAvatar>
-                                            <ListItemText
-                                                primary={act.title}
-                                                secondary={act.desc}
-                                                primaryTypographyProps={{ fontWeight: 700, fontSize: '0.85rem' }}
-                                                secondaryTypographyProps={{ fontSize: '0.75rem' }}
-                                            />
-                                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>{act.time}</Typography>
-                                        </ListItem>
-                                    ))}
-                                </List>
+                                <Typography variant="h6" sx={{ fontWeight: 800, mb: 2 }}>System Overview</Typography>
+                                <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
+                                    • Total Products: {statsData.totalProducts}
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
+                                    • Variations: {statsData.totalVariations}
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
+                                    • Active Ports: {statsData.totalPorts}
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                    • Currencies: {statsData.totalCurrencies}
+                                </Typography>
                             </Paper>
                         </Grid>
                     </Grid>

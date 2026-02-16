@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { requireAdmin } from '@/lib/auth-helpers'
+import { logAudit, AuditAction, AuditTargetType } from '@/lib/audit-logger'
 
 // PUT /api/admin/users/[id] — update user fields (admin only)
 export async function PUT(
     request: NextRequest,
     context: { params: Promise<{ id: string }> }
 ) {
-    const { error } = await requireAdmin()
+    const { error, session } = await requireAdmin()
     if (error) return error
 
     try {
@@ -21,7 +22,7 @@ export async function PUT(
 
         // Whitelist allowed fields — prevent mass assignment attacks
         const allowedFields: Record<string, any> = {}
-        if (typeof body.plan === 'string' && ['free', 'plus'].includes(body.plan)) {
+        if (typeof body.plan === 'string' && ['free', 'plus', 'premium'].includes(body.plan)) {
             allowedFields.plan = body.plan
         }
         if (typeof body.isActive === 'boolean') {
@@ -29,6 +30,9 @@ export async function PUT(
         }
         if (typeof body.isStaff === 'boolean') {
             allowedFields.isStaff = body.isStaff
+        }
+        if (typeof body.isSuperuser === 'boolean') {
+            allowedFields.isSuperuser = body.isSuperuser
         }
         if (typeof body.firstName === 'string') {
             allowedFields.firstName = body.firstName.trim().slice(0, 100)
@@ -42,13 +46,20 @@ export async function PUT(
         }
 
         // Prevent self-demotion (admin can't remove their own staff status)
-        const { session } = await requireAdmin()
         const currentUserId = parseInt(session?.user?.id || '0')
-        if (currentUserId === id && allowedFields.isStaff === false) {
-            return NextResponse.json(
-                { error: 'Cannot remove your own admin privileges' },
-                { status: 403 }
-            )
+        if (currentUserId === id) {
+            if (allowedFields.isStaff === false || allowedFields.isSuperuser === false) {
+                return NextResponse.json(
+                    { error: 'Cannot remove your own admin/superuser privileges' },
+                    { status: 403 }
+                )
+            }
+        }
+
+        // Get original user state for audit diffing (optional, but good for context)
+        const originalUser = await prisma.user.findUnique({ where: { id } })
+        if (!originalUser) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 })
         }
 
         const updated = await prisma.user.update({
@@ -66,6 +77,55 @@ export async function PUT(
                 lastName: true
             }
         })
+
+        // Audit Logging
+        const adminId = parseInt(session?.user?.id || '0')
+        const ipAddress = request.headers.get('x-forwarded-for') || 'unknown'
+
+        // Log specific changes
+        if (allowedFields.plan && allowedFields.plan !== originalUser.plan) {
+            await logAudit({
+                userId: adminId,
+                action: 'PLAN_CHANGE',
+                targetType: 'User',
+                targetId: id,
+                changes: { oldPlan: originalUser.plan, newPlan: allowedFields.plan },
+                ipAddress
+            })
+        }
+
+        if (allowedFields.isStaff !== undefined && allowedFields.isStaff !== originalUser.isStaff) {
+            await logAudit({
+                userId: adminId,
+                action: allowedFields.isStaff ? 'ROLE_GRANT' : 'ROLE_REVOKE',
+                targetType: 'User',
+                targetId: id,
+                changes: { role: 'isStaff', value: allowedFields.isStaff },
+                ipAddress
+            })
+        }
+
+        if (allowedFields.isSuperuser !== undefined && allowedFields.isSuperuser !== originalUser.isSuperuser) {
+            await logAudit({
+                userId: adminId,
+                action: allowedFields.isSuperuser ? 'ROLE_GRANT' : 'ROLE_REVOKE',
+                targetType: 'User',
+                targetId: id,
+                changes: { role: 'isSuperuser', value: allowedFields.isSuperuser },
+                ipAddress
+            })
+        }
+
+        if (allowedFields.isActive !== undefined && allowedFields.isActive !== originalUser.isActive) {
+            await logAudit({
+                userId: adminId,
+                action: 'USER_UPDATE',
+                targetType: 'User',
+                targetId: id,
+                changes: { field: 'isActive', oldValue: originalUser.isActive, newValue: allowedFields.isActive },
+                ipAddress
+            })
+        }
 
         console.log(`Admin updated user ${id}: ${JSON.stringify(allowedFields)}`)
 
@@ -108,6 +168,17 @@ export async function DELETE(
             where: { id },
             data: { isActive: false },
             select: { id: true, username: true, isActive: true }
+        })
+
+        // Log Audit
+        const adminId = parseInt(session?.user?.id || '0')
+        await logAudit({
+            userId: adminId,
+            action: 'USER_UPDATE',
+            targetType: 'User',
+            targetId: id,
+            changes: { action: 'deactivate_user', reason: 'admin_action' },
+            ipAddress: request.headers.get('x-forwarded-for') || 'unknown'
         })
 
         console.log(`Admin disabled user ${id} (${updated.username})`)

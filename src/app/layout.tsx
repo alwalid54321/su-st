@@ -6,9 +6,69 @@ import ErrorBoundary from '@/components/ErrorBoundary'
 import StyledJsxRegistry from '@/lib/styled-jsx-registry'
 import './globals.css'
 
-export const metadata = {
-  title: "SudaStock - Sudan's Premier Agricultural Commodities Platform",
-  description: 'Connecting local producers with global markets through transparent data and reliable logistics.',
+import type { Metadata, Viewport } from 'next'
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#111827',
+}
+
+export const metadata: Metadata = {
+  metadataBase: new URL('https://www.sudastock.com'),
+  title: {
+    default: "SudaStock - Sudan's Premier Agricultural Commodities Platform",
+    template: '%s | SudaStock',
+  },
+  description: 'Connecting local producers with global markets through transparent data and reliable logistics. Real-time prices for Sesame, Gum Arabic, Peanuts, and more.',
+  keywords: ['Sudan', 'Agriculture', 'Commodities', 'Sesame', 'Gum Arabic', 'Peanuts', 'Market Prices', 'Export', 'Logistics'],
+  authors: [{ name: 'SudaStock Team' }],
+  creator: 'SudaStock',
+  publisher: 'SudaStock',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    title: "SudaStock - Sudan's Agricultural Market Data",
+    description: 'Real-time market data, logistics, and insights for Sudanese agricultural exports.',
+    url: 'https://www.sudastock.com',
+    siteName: 'SudaStock',
+    images: [
+      {
+        url: '/images/branding/logo-icon.png', // Fallback to logo as requested
+        width: 800,
+        height: 600,
+        alt: 'SudaStock Logo',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'SudaStock',
+    description: 'The definitive source for Sudanese agricultural market data.',
+    images: ['/images/branding/logo-icon.png'], // Fallback to logo
+  },
+  icons: {
+    icon: '/images/branding/logo-icon.png',
+    shortcut: '/images/branding/logo-icon.png',
+    apple: '/images/branding/logo-icon.png',
+  },
+  manifest: '/manifest.json',
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
 }
 
 export default function RootLayout({

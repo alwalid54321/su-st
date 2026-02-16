@@ -27,7 +27,7 @@ export default auth((req) => {
       }
       return NextResponse.redirect(new URL("/user", req.url))
     }
-    return null
+    return NextResponse.next()
   }
 
   // Handle admin login page
@@ -40,7 +40,7 @@ export default auth((req) => {
       // If regular user tries to access admin login, redirect to user dashboard
       return NextResponse.redirect(new URL("/user", req.url))
     }
-    return null
+    return NextResponse.next()
   }
 
   // Redirect /dashboard routes to /admin (except login which is handled above)
@@ -70,9 +70,39 @@ export default auth((req) => {
     }
   }
 
-  return NextResponse.next()
+  const nonce = Buffer.from(crypto.randomUUID()).toString('base64')
+  const cspHeader = `
+    default-src 'self';
+    script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdnjs.cloudflare.com;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;
+    img-src 'self' blob: data: https://picsum.photos https://flagcdn.com https://fastly.picsum.photos;
+    font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+    frame-ancestors 'none';
+    block-all-mixed-content;
+    upgrade-insecure-requests;
+`
+  // Replace newline characters and extra spaces
+  const contentSecurityPolicyHeaderValue = cspHeader
+    .replace(/\s{2,}/g, ' ')
+    .trim()
+
+  const requestHeaders = new Headers(req.headers)
+  requestHeaders.set('x-nonce', nonce)
+  requestHeaders.set('Content-Security-Policy', contentSecurityPolicyHeaderValue)
+
+  const response = NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  })
+  response.headers.set('Content-Security-Policy', contentSecurityPolicyHeaderValue)
+
+  return response
 })
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|manifest.json|sw.js).*)"],
 }

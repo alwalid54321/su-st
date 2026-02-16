@@ -25,10 +25,10 @@ if (connectionString && connectionString.startsWith('postgres') && isProduction)
         console.log(`[Prisma] Initializing Neon Serverless Adapter...`)
 
         const pool = new Pool({ connectionString })
-        const adapter = new PrismaNeon(pool)
+        const adapter = new PrismaNeon(pool as any)
 
         prisma = globalForPrisma.prisma ?? new PrismaClient({
-            adapter,
+            adapter: adapter as any,
             datasourceUrl: connectionString
         })
     } catch (e) {

@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
         }, { status: 201 })
     } catch (err) {
         if (err instanceof z.ZodError) {
-            return NextResponse.json({ error: 'Invalid input data', details: err.errors }, { status: 400 })
+            return NextResponse.json({ error: 'Invalid input data', details: err.issues }, { status: 400 })
         }
 
         if (err instanceof Prisma.PrismaClientKnownRequestError) {
