@@ -4,6 +4,7 @@ import ConditionalNavbar from '@/components/ConditionalNavbar'
 import ConditionalWrapper from '@/components/ConditionalWrapper'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import StyledJsxRegistry from '@/lib/styled-jsx-registry'
+import { LanguageProvider } from '@/contexts/LanguageContext'
 import './globals.css'
 
 import type { Metadata, Viewport } from 'next'
@@ -86,29 +87,6 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Comfortaa:wght@400;600&display=swap" rel="stylesheet" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossOrigin="anonymous" referrerPolicy="no-referrer" />
         <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if ('serviceWorker' in navigator) {
-                window.addEventListener('load', function() {
-                  const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-                  const isHttps = window.location.protocol === 'https:';
-                  
-                  if (isHttps || isLocalhost) {
-                    navigator.serviceWorker.register('/sw.js').then(
-                      function(registration) {
-                        console.log('SW Registered:', registration.scope);
-                      },
-                      function(err) {
-                        console.error('SW Failed:', err);
-                      }
-                    );
-                  }
-                });
-              }
-            `
-          }}
-        />
-        <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
@@ -133,14 +111,16 @@ export default function RootLayout({
         <StyledJsxRegistry>
           <ThemeRegistry>
             <Providers>
-              <ConditionalNavbar />
-              <ConditionalWrapper>
-                <ErrorBoundary>
-                  <main suppressHydrationWarning>
-                    {children}
-                  </main>
-                </ErrorBoundary>
-              </ConditionalWrapper>
+              <LanguageProvider>
+                <ConditionalNavbar />
+                <ConditionalWrapper>
+                  <ErrorBoundary>
+                    <main suppressHydrationWarning>
+                      {children}
+                    </main>
+                  </ErrorBoundary>
+                </ConditionalWrapper>
+              </LanguageProvider>
             </Providers>
           </ThemeRegistry>
         </StyledJsxRegistry>

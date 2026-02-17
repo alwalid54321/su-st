@@ -1,0 +1,213 @@
+.container {
+    position: relative;
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+}
+
+.mainLabel {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.selectorBox {
+    background: #f9fafb;
+    border: 1px solid #d1d5db;
+    border-radius: 14px;
+    padding: 0.85rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.selectorBox:hover {
+    border-color: #1B1464;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.selectorBox.active {
+    border-color: #1B1464;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(27, 20, 100, 0.1);
+}
+
+.calendarIcon {
+    color: #1B1464;
+    font-size: 1.1rem;
+}
+
+.rangeDisplay {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: #111827;
+    font-size: 0.95rem;
+}
+
+.separator {
+    color: #9ca3af;
+    font-weight: 400;
+}
+
+.chevronIcon {
+    color: #6b7280;
+    font-size: 0.8rem;
+    transition: transform 0.3s ease;
+}
+
+.rotate {
+    transform: rotate(180deg);
+}
+
+/* Dropdown */
+.dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    padding: 1.25rem;
+    z-index: 1000;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.quickSection {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 1.25rem;
+}
+
+.quickBtn {
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    color: #4b5563;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.quickBtn:hover {
+    background: #e5e7eb;
+    color: #1B1464;
+    border-color: #d1d5db;
+}
+
+.locked {
+    color: #9ca3af;
+    background: #f9fafb;
+    border-style: dashed;
+}
+
+.badge {
+    color: #2563eb;
+    font-size: 0.75rem;
+}
+
+.premiumBadge {
+    color: #D4AF37;
+    font-size: 0.75rem;
+}
+
+.divider {
+    position: relative;
+    text-align: center;
+    margin-bottom: 1.25rem;
+}
+
+.divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #e5e7eb;
+}
+
+.divider span {
+    position: relative;
+    background: white;
+    padding: 0 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.customSection {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.inputGroup label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #6b7280;
+    text-transform: uppercase;
+}
+
+.inputGroup input {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    background: #f9fafb;
+    font-size: 0.85rem;
+    color: #111827;
+    font-family: inherit;
+    transition: border-color 0.2s;
+}
+
+.inputGroup input:focus {
+    outline: none;
+    border-color: #1B1464;
+    background: white;
+}
+
+/* RTL Support via dir attribute handled in JS, but some fixes here */
+[dir="rtl"] .calendarIcon {
+    margin-left: 0;
+}
+
+[dir="rtl"] .chevronIcon {
+    margin-right: auto;
+}

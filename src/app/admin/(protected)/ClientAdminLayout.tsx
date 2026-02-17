@@ -37,6 +37,10 @@ import {
     ChevronLeft as ChevronLeftIcon,
     ChevronRight as ChevronRightIcon,
     Person as PersonIcon,
+    Category as VariationIcon,
+    Anchor as PortIcon,
+    Settings as SettingsIcon,
+    History as ActivityIcon,
 } from '@mui/icons-material';
 import AdminSecurityGuard from '@/components/AdminSecurityGuard';
 
@@ -63,10 +67,15 @@ export function ClientAdminLayout({ children }: { children: React.ReactNode }) {
 
     const navItems = [
         { name: 'Dashboard', path: '/admin', icon: <DashboardIcon /> },
+        { name: 'Users', path: '/admin/users', icon: <PersonIcon /> },
         { name: 'Market Data', path: '/admin/market-data', icon: <MarketIcon /> },
+        { name: 'Variations', path: '/admin/variations', icon: <VariationIcon /> },
+        { name: 'Ports', path: '/admin/ports', icon: <PortIcon /> },
         { name: 'Currencies', path: '/admin/currencies', icon: <CurrencyIcon /> },
         { name: 'Gallery', path: '/admin/gallery', icon: <GalleryIcon /> },
         { name: 'Announcements', path: '/admin/announcements', icon: <AnnouncementIcon /> },
+        { name: 'Audit Logs', path: '/admin/audit-logs', icon: <ActivityIcon /> },
+        { name: 'Settings', path: '/admin/settings', icon: <SettingsIcon /> },
     ];
 
     const isActive = (path: string) => {

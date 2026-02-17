@@ -11,11 +11,21 @@ export async function GET() {
 
     try {
         // Basic Stats
-        const [totalProducts, totalVariations, totalPorts, totalCurrencies] = await Promise.all([
+        const [totalProducts, totalVariations, totalPorts, totalCurrencies, latestUsers, latestAnnouncements] = await Promise.all([
             prisma.marketData.count({ where: { isCurrent: true } }),
             prisma.productVariation.count({ where: { isActive: true } }),
             prisma.port.count({ where: { isActive: true } }),
             prisma.currency.count({ where: { isCurrent: true } }),
+            prisma.user.findMany({
+                take: 5,
+                orderBy: { dateJoined: 'desc' },
+                select: { id: true, username: true, email: true, dateJoined: true, plan: true }
+            }),
+            prisma.announcement.findMany({
+                take: 5,
+                orderBy: { createdAt: 'desc' },
+                select: { id: true, title: true, category: true, createdAt: true }
+            })
         ]);
 
         // Mock historical data for now based on actual dates
@@ -55,6 +65,8 @@ export async function GET() {
                 labels: last7Days,
                 data: volumeData
             },
+            latestUsers: latestUsers.map(u => ({ ...u, dateJoined: formatTimeAgo(new Date(u.dateJoined)) })),
+            latestAnnouncements: latestAnnouncements.map(a => ({ ...a, createdAt: formatTimeAgo(new Date(a.createdAt)) })),
             activities: mappedActivities.length > 0 ? mappedActivities : [
                 { title: 'System Online', time: 'Just now', desc: 'Secure Admin Portal Initialized', type: 'success' }
             ]

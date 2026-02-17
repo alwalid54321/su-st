@@ -65,7 +65,7 @@ export default function ActivityFeed() {
 
     const fetchActivities = async () => {
         try {
-            const res = await fetch('/api/admin/dashboard-activity?limit=25')
+            const res = await fetch('/api/admin/dashboard-activity?limit=8')
             if (res.ok) {
                 const data = await res.json()
                 setActivities(data.activities)

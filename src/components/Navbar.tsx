@@ -38,6 +38,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import CampaignIcon from '@mui/icons-material/Campaign';
 import SearchIcon from '@mui/icons-material/Search';
 import LanguageIcon from '@mui/icons-material/Language';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const goldColor = '#786D3C';
 const textColor = '#1B1464';
@@ -45,6 +46,7 @@ const textColor = '#1B1464';
 
 export default function Navbar() {
     const { data: session } = useSession();
+    const { language, setLanguage, t, direction } = useLanguage();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [productsAnchorEl, setProductsAnchorEl] = useState<null | HTMLElement>(null);
     const [dashboardAnchorEl, setDashboardAnchorEl] = useState<null | HTMLElement>(null);
@@ -57,7 +59,6 @@ export default function Navbar() {
 
     const [scrollProgress, setScrollProgress] = useState(0);
     const [searchOpen, setSearchOpen] = useState(false);
-    const [language, setLanguage] = useState('EN');
 
     // Scroll trigger for transparency and shrinking
     const scrolled = useScrollTrigger({
@@ -110,10 +111,10 @@ export default function Navbar() {
     const isAdmin = session && ((session.user as any).isStaff || (session.user as any).isSuperuser);
 
     const navItems = [
-        { name: 'HOME', href: '/' },
-        { name: 'ABOUT US', href: '/about' },
-        { name: 'DATA', href: '/market-data' },
-        { name: 'CONTACT US', href: '/contact' },
+        { name: t('home'), href: '/' },
+        { name: t('about'), href: '/about' },
+        { name: t('data'), href: '/market-data' },
+        { name: t('contact'), href: '/contact' },
     ];
 
     const productsDropdownItems = [
@@ -144,7 +145,7 @@ export default function Navbar() {
     const logoScale = scrolled ? 0.85 : 1;
 
     const drawer = (
-        <Box sx={{ textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{ textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column', direction: direction }}>
             <Box sx={{ py: 2, display: 'flex', justifyContent: 'flex-end', px: 2 }}>
                 <IconButton onClick={handleDrawerToggle}>
                     <CloseIcon />
@@ -176,7 +177,7 @@ export default function Navbar() {
                                 color: textColor
                             }}
                         >
-                            <Typography variant="button" sx={{ fontWeight: 600, mr: 1 }}>PRODUCTS</Typography>
+                            <Typography variant="button" sx={{ fontWeight: 600, mr: 1 }}>{t('products')}</Typography>
                             {mobileProductsOpen ? <ExpandLess /> : <ExpandMore />}
                         </Box>
                         <Collapse in={mobileProductsOpen} timeout="auto" unmountOnExit>
@@ -208,7 +209,7 @@ export default function Navbar() {
                                     color: goldColor
                                 }}
                             >
-                                <Typography variant="button" sx={{ fontWeight: 700, mr: 1 }}>ADMIN DASHBOARD</Typography>
+                                <Typography variant="button" sx={{ fontWeight: 700, mr: 1 }}>{t('adminDashboard')}</Typography>
                                 {mobileDashboardOpen ? <ExpandLess /> : <ExpandMore />}
                             </Box>
                             <Collapse in={mobileDashboardOpen} timeout="auto" unmountOnExit>
@@ -230,7 +231,7 @@ export default function Navbar() {
                     <ListItem disablePadding>
                         <ListItemText sx={{ textAlign: 'center' }}>
                             <Link href="/user" style={{ textDecoration: 'none', color: goldColor, display: 'block', padding: '10px' }}>
-                                <Typography variant="button" sx={{ fontWeight: 700 }}>MY DASHBOARD</Typography>
+                                <Typography variant="button" sx={{ fontWeight: 700 }}>{t('myDashboard')}</Typography>
                             </Link>
                         </ListItemText>
                     </ListItem>
@@ -245,15 +246,15 @@ export default function Navbar() {
                         fullWidth
                         sx={{ bgcolor: goldColor, color: '#fff', '&:hover': { bgcolor: '#5a512d' } }}
                     >
-                        Logout
+                        {t('logout')}
                     </Button>
                 ) : (
                     <>
                         <Button component="a" href="/login" variant="outlined" fullWidth sx={{ color: textColor, borderColor: textColor }}>
-                            Login
+                            {t('login')}
                         </Button>
                         <Button component="a" href="/register" variant="contained" fullWidth sx={{ bgcolor: goldColor, color: '#fff', '&:hover': { bgcolor: '#5a512d' } }}>
-                            Register
+                            {t('register')}
                         </Button>
                     </>
                 )}
@@ -287,7 +288,8 @@ export default function Navbar() {
                     borderBottom: scrolled ? `1px solid rgba(0,0,0,0.05)` : 'none',
                     height: navHeight,
                     display: 'flex',
-                    justifyContent: 'center'
+                    justifyContent: 'center',
+                    direction: direction
                 }}
             >
                 <Container maxWidth="xl">
@@ -378,7 +380,7 @@ export default function Navbar() {
                                     transition: 'all 0.2s ease'
                                 }}
                             >
-                                Products
+                                {t('products')}
                             </Button>
                         </Box>
 
@@ -424,7 +426,7 @@ export default function Navbar() {
                             <Button
                                 size="small"
                                 startIcon={<LanguageIcon fontSize="small" />}
-                                onClick={() => setLanguage(language === 'EN' ? 'AR' : 'EN')}
+                                onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')}
                                 sx={{
                                     color: isTransparent ? '#fff' : textColor,
                                     fontWeight: 700,
@@ -433,7 +435,7 @@ export default function Navbar() {
                                     '&:hover': { bgcolor: 'rgba(120, 109, 60, 0.1)' }
                                 }}
                             >
-                                {language}
+                                {language === 'en' ? 'العربية' : 'English'}
                             </Button>
 
                             <Divider orientation="vertical" flexItem sx={{ mx: 1, borderColor: isTransparent ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)' }} />
@@ -457,7 +459,7 @@ export default function Navbar() {
                                         }
                                     }}
                                 >
-                                    Admin Dashboard
+                                    {t('adminDashboard')}
                                 </Button>
                             ) : session ? (
                                 <Button
@@ -474,7 +476,7 @@ export default function Navbar() {
                                         }
                                     }}
                                 >
-                                    My Dashboard
+                                    {t('myDashboard')}
                                 </Button>
                             ) : null}
 
@@ -495,7 +497,7 @@ export default function Navbar() {
                                             boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
                                         }}
                                     >
-                                        Logout
+                                        {t('logout')}
                                     </Button>
                                 </Box>
                             ) : (
@@ -518,7 +520,7 @@ export default function Navbar() {
                                             }
                                         }}
                                     >
-                                        Login
+                                        {t('login')}
                                     </Button>
                                     <Button
                                         component="a"
@@ -535,7 +537,7 @@ export default function Navbar() {
                                             boxShadow: '0 4px 15px rgba(120, 109, 60, 0.3)'
                                         }}
                                     >
-                                        Register
+                                        {t('register')}
                                     </Button>
                                 </Box>
                             )}
@@ -557,6 +559,7 @@ export default function Navbar() {
 
             <Drawer
                 variant="temporary"
+                anchor={direction === 'rtl' ? 'right' : 'left'}
                 open={mobileOpen}
                 onClose={handleDrawerToggle}
                 ModalProps={{ keepMounted: true }}

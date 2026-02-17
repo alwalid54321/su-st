@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 interface Announcement {
     id: number
@@ -19,6 +20,7 @@ interface Announcement {
 }
 
 export default function AnnouncementsSection() {
+    const { t, language } = useLanguage()
     const [announcements, setAnnouncements] = useState<Announcement[]>([])
     const [loading, setLoading] = useState(true)
 
@@ -61,7 +63,7 @@ export default function AnnouncementsSection() {
 
     const formatDate = (dateString: Date | string) => {
         const date = new Date(dateString)
-        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+        return date.toLocaleDateString(language === 'ar' ? 'ar-SD' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })
     }
 
     const truncateContent = (content: string, maxLength: number = 150) => {
@@ -74,7 +76,7 @@ export default function AnnouncementsSection() {
             <section className="announcements-section">
                 <div className="announcements-loading">
                     <div className="announcements-spinner"></div>
-                    <p>Fetching platform broadcasts...</p>
+                    <p>{t('fetchingBroadcasts')}</p>
                 </div>
             </section>
         )
@@ -89,23 +91,25 @@ export default function AnnouncementsSection() {
         <section className="announcements-section">
             <div className="announcements-header">
                 <div>
-                    <h2 className="announcements-title">Announcements</h2>
+                    <h2 className="announcements-title">{t('announcements')}</h2>
                 </div>
                 <Link href="/announcements" className="box-link">
-                    View All <i className="fas fa-arrow-right"></i>
+                    {t('viewAll')} <i className={`fas ${language === 'ar' ? 'fa-arrow-left' : 'fa-arrow-right'}`}></i>
                 </Link>
             </div>
 
             <div className="announcements-ticker-container">
-                <div className="announcements-track">
+                <div className="announcements-track" dir="ltr">
+                    {/* Force LTR for ticker to scroll correctly, content inside can be RTL if needed */}
                     {tickerItems.map((announcement, index) => (
                         <div
                             key={`${announcement.id}-${index}`}
                             className={`announcement-box ${announcement.isFeatured ? 'featured' : ''}`}
+                            dir={language === 'ar' ? 'rtl' : 'ltr'}
                         >
                             <div className="box-meta">
                                 <span className={`box-category category-${getCategoryColor(announcement.category)}`}>
-                                    {announcement.category}
+                                    {t(announcement.category) || announcement.category}
                                 </span>
                                 {announcement.isFeatured && (
                                     <span className="featured-badge">
@@ -125,11 +129,11 @@ export default function AnnouncementsSection() {
                                         rel="noopener noreferrer"
                                         className="box-link"
                                     >
-                                        Details <i className="fas fa-external-link-alt"></i>
+                                        {t('details')} <i className={`fas ${language === 'ar' ? 'fa-external-link-alt' : 'fa-external-link-alt'}`}></i>
                                     </a>
                                 ) : (
                                     <Link href={`/announcements/${announcement.id}`} className="box-link">
-                                        Details <i className="fas fa-arrow-right"></i>
+                                        {t('details')} <i className={`fas ${language === 'ar' ? 'fa-arrow-left' : 'fa-arrow-right'}`}></i>
                                     </Link>
                                 )}
                             </div>

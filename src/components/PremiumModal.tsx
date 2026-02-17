@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import styles from './PremiumModal.module.css'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 interface PremiumModalProps {
     isOpen: boolean
@@ -13,6 +14,7 @@ interface PremiumModalProps {
 export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
     const [isVisible, setIsVisible] = useState(false)
     const [mounted, setMounted] = useState(false)
+    const { t, language } = useLanguage()
 
     useEffect(() => {
         setMounted(true)
@@ -30,7 +32,7 @@ export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
     if (!isVisible && !isOpen) return null
 
     const modalContent = (
-        <div className={`${styles.overlay} ${isOpen ? styles.active : ''}`} onClick={onClose}>
+        <div className={`${styles.overlay} ${isOpen ? styles.active : ''}`} onClick={onClose} dir={language === 'ar' ? 'rtl' : 'ltr'}>
             <div className={`${styles.modal} ${isOpen ? styles.modalActive : ''}`} onClick={e => e.stopPropagation()}>
                 <button className={styles.closeBtn} onClick={onClose}>
                     <i className="fas fa-times"></i>
@@ -40,8 +42,8 @@ export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
                     <div className={styles.iconWrapper}>
                         <i className="fas fa-crown"></i>
                     </div>
-                    <h2>Unlock Full Access</h2>
-                    <p>Get unlimited access to historical market data and advanced tools</p>
+                    <h2>{t('unlockFullAccess')}</h2>
+                    <p>{t('getUnlimitedAccess')}</p>
                 </div>
 
                 <div className={styles.features}>
@@ -50,8 +52,8 @@ export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
                             <i className="fas fa-history"></i>
                         </div>
                         <div className={styles.featureText}>
-                            <h3>Up to 1 Year History</h3>
-                            <p>Deep dive into market trends with Plus (5 months) or Premium (1 year) plans</p>
+                            <h3>{t('upTo1Year')}</h3>
+                            <p>{t('deepDiveTrends')}</p>
                         </div>
                     </div>
 
@@ -60,8 +62,8 @@ export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
                             <i className="fas fa-exchange-alt"></i>
                         </div>
                         <div className={styles.featureText}>
-                            <h3>Currency Converter</h3>
-                            <p>Real-time conversion with historical trend analysis</p>
+                            <h3>{t('currencyConverter')}</h3>
+                            <p>{t('currencyConverterDesc')}</p>
                         </div>
                     </div>
 
@@ -70,25 +72,25 @@ export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
                             <i className="fas fa-file-csv"></i>
                         </div>
                         <div className={styles.featureText}>
-                            <h3>Export Data</h3>
-                            <p>Download market data in CSV format for offline analysis</p>
+                            <h3>{t('exportData')}</h3>
+                            <p>{t('downloadCSV')}</p>
                         </div>
                     </div>
                 </div>
 
                 <div className={styles.actions}>
                     <Link href="/pricing" className={styles.upgradeBtn}>
-                        View Plans & Upgrade
-                        <i className="fas fa-arrow-right"></i>
+                        {t('viewPlansUpgrade')}
+                        <i className={`fas ${language === 'ar' ? 'fa-arrow-left' : 'fa-arrow-right'}`}></i>
                     </Link>
                     <button className={styles.maybeLaterBtn} onClick={onClose}>
-                        Maybe Later
+                        {t('maybeLater')}
                     </button>
                 </div>
 
                 <div className={styles.guarantee}>
                     <i className="fas fa-shield-alt"></i>
-                    <span>Secure payments focused on your data privacy</span>
+                    <span>{t('securePayments')}</span>
                 </div>
             </div>
         </div>

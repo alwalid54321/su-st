@@ -12,12 +12,14 @@ import {
     Title,
     Tooltip,
     Legend,
-    Filler // Add Filler for gradients
+    Filler
 } from 'chart.js'
 import { Line } from 'react-chartjs-2'
 import styles from './market-data.module.css'
 import PremiumModal from '@/components/PremiumModal'
 import PriceAlertModal from '@/components/PriceAlertModal'
+import DateRangeSelector from '@/components/DateRangeSelector'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 ChartJS.register(
     CategoryScale,
@@ -67,6 +69,7 @@ function MarketDataContent() {
     const searchParams = useSearchParams()
     const router = useRouter()
     const initialProductId = searchParams.get('product')
+    const { t, language, direction } = useLanguage()
 
     const [products, setProducts] = useState<MarketDataItem[]>([])
     const [selectedProduct, setSelectedProduct] = useState<number | ''>(
@@ -100,10 +103,13 @@ function MarketDataContent() {
             if (!isNaN(id) && products.some(p => p.id === id)) {
                 setSelectedProduct(id)
             }
+        } else if (products.length > 0 && !selectedProduct) {
+            // Default to the first product if none selected
+            setSelectedProduct(products[0].id);
         }
     }, [initialProductId, products])
 
-    // Trigger search when selectedProduct changes (if it was set from URL or user)
+    // Trigger search when selectedProduct changes
     useEffect(() => {
         if (selectedProduct && typeof selectedProduct === 'number') {
             handleSearch(selectedProduct)
@@ -152,10 +158,7 @@ function MarketDataContent() {
 
     const handleSearch = async (productId: number | '') => {
         const idToSearch = productId || selectedProduct
-        if (!idToSearch) {
-            setError('Please select a product')
-            return
-        }
+        if (!idToSearch) return
 
         setLoading(true)
         setError('')
@@ -171,7 +174,7 @@ function MarketDataContent() {
 
             // Fetch historical data
             const historyRes = await fetch(
-                `/api/market-data/${selectedProduct}/history`
+                `/api/market-data/${idToSearch}/history`
             )
             if (historyRes.ok) {
                 const historyData = await historyRes.json()
@@ -202,12 +205,6 @@ function MarketDataContent() {
             setError(err.message || 'Failed to load market data')
         } finally {
             setLoading(false)
-        }
-    }
-
-    const handleSearchClick = () => {
-        if (selectedProduct && typeof selectedProduct === 'number') {
-            handleSearch(selectedProduct)
         }
     }
 
@@ -275,7 +272,6 @@ function MarketDataContent() {
     }
 
     const formatCurrency = (val: number) => Number(val).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' SDG'
-    const getTrendClass = (val: number) => val > 0 ? styles.trendUp : val < 0 ? styles.trendDown : styles.trendStable
     const getTrendIcon = (val: number) => val > 0 ? '↑' : val < 0 ? '↓' : '→'
 
     const chartOptions = {
@@ -284,6 +280,7 @@ function MarketDataContent() {
         plugins: {
             legend: {
                 position: 'top' as const,
+                rtl: direction === 'rtl',
                 labels: {
                     usePointStyle: true,
                     boxWidth: 8,
@@ -300,17 +297,20 @@ function MarketDataContent() {
                 borderWidth: 1,
                 padding: 10,
                 displayColors: true,
+                rtl: direction === 'rtl',
             }
         },
         scales: {
             y: {
                 beginAtZero: false,
                 grid: { color: '#f3f4f6' },
-                ticks: { color: '#6b7280', font: { size: 11 } }
+                ticks: { color: '#6b7280', font: { size: 11 } },
+                position: direction === 'rtl' ? 'right' as const : 'left' as const
             },
             x: {
                 grid: { display: false },
-                ticks: { color: '#6b7280', font: { size: 11 } }
+                ticks: { color: '#6b7280', font: { size: 11 } },
+                reverse: false // Time scale is always LTR usually, but can be flipped if needed
             }
         },
         interaction: {
@@ -320,12 +320,26 @@ function MarketDataContent() {
         }
     }
 
-    const chartData = history.length > 0 ? {
-        labels: history.map(h => new Date(h.archivedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
+    const filteredHistory = history.filter(h => {
+        const date = new Date(h.archivedAt)
+        const start = startDate ? new Date(startDate) : null
+        const end = endDate ? new Date(endDate) : null
+
+        // Reset hours for clean date comparison
+        if (start) start.setHours(0, 0, 0, 0)
+        if (end) end.setHours(23, 59, 59, 999)
+
+        if (start && date < start) return false
+        if (end && date > end) return false
+        return true
+    })
+
+    const chartData = filteredHistory.length > 0 ? {
+        labels: filteredHistory.map(h => new Date(h.archivedAt).toLocaleDateString(language === 'ar' ? 'ar-SD' : 'en-US', { month: 'short', day: 'numeric' })),
         datasets: [
             {
-                label: 'Global Average',
-                data: history.map(h => (Number(h.dmtChina) + Number(h.dmtUae) + Number(h.dmtIndia)) / 3),
+                label: t('globalAverage'),
+                data: filteredHistory.map(h => (Number(h.dmtChina) + Number(h.dmtUae) + Number(h.dmtIndia)) / 3),
                 borderColor: '#1B1464',
                 backgroundColor: (context: any) => {
                     const ctx = context.chart.ctx;
@@ -341,8 +355,8 @@ function MarketDataContent() {
                 pointHoverRadius: 4
             },
             {
-                label: 'Port Sudan',
-                data: history.map(h => Number(h.portSudan)),
+                label: t('portSudanFob'),
+                data: filteredHistory.map(h => Number(h.portSudan)),
                 borderColor: '#D4AF37',
                 backgroundColor: 'transparent',
                 borderDash: [5, 5],
@@ -355,217 +369,151 @@ function MarketDataContent() {
     } : null
 
     return (
-        <div className={styles.pageContainer}>
+        <div className={styles.pageContainer} dir={direction}>
             <div className={styles.contentWrapper}>
                 {/* Header Section */}
                 <header className={styles.header}>
-                    <h1 className={styles.title}>Market Insights</h1>
-                    <p className={styles.subtitle}>Track Sudanese commodity prices and global market trends in real-time. Make data-driven decisions with our advanced analytics.</p>
+                    <h1 className={styles.title}>{t('marketInsights')}</h1>
+                    <p className={styles.subtitle}>{t('marketSubtitle')}</p>
                 </header>
 
-
-
-                {/* Search Form Card */}
-                <div className={styles.card}>
-                    <h2 className={styles.cardTitle}>
-                        <i className="fas fa-search-dollar" style={{ color: '#D4AF37' }}></i>
-                        Market Analysis
-                    </h2>
-
-                    {error && (
-                        <div style={{ padding: '1rem', background: '#fee2e2', color: '#ef4444', borderRadius: '8px', marginBottom: '1.5rem', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                            <i className="fas fa-exclamation-circle"></i> {error}
+                {/* Hero Section: Chart */}
+                <div className={styles.chartCard}>
+                    <div className={styles.chartHeader}>
+                        <div className={styles.chartTitle}>
+                            {selectedProductData ? (
+                                <>
+                                    <h2>{t(selectedProductData.name) || selectedProductData.name} {t('Performance')}</h2>
+                                    <div className={styles.metaTags}>
+                                        <span className={`${styles.tag} ${styles.tagStatus}`}>
+                                            <i className="fas fa-check-circle"></i> {t(selectedProductData.status) || selectedProductData.status}
+                                        </span>
+                                        <span className={`${styles.tag} ${styles.tagForecast}`}>
+                                            <i className="fas fa-binoculars"></i> {t(selectedProductData.forecast) || selectedProductData.forecast}
+                                        </span>
+                                    </div>
+                                </>
+                            ) : (
+                                <h2>{t('selectProduct')}</h2>
+                            )}
                         </div>
-                    )}
-
-                    <div className={styles.formGrid}>
-                        <div>
-                            <label htmlFor="productSelect" className={styles.label}>Select Product</label>
-                            <select
-                                id="productSelect"
-                                value={selectedProduct}
-                                onChange={(e) => setSelectedProduct(e.target.value ? Number(e.target.value) : '')}
-                                className={styles.select}
-                            >
-                                <option value="">-- Choose a Commodity --</option>
-                                {products.map(p => (
-                                    <option key={p.id} value={p.id}>{p.name}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div>
-                            <label htmlFor="startDate" className={styles.label}>Start Date</label>
-                            <input
-                                type="date"
-                                id="startDate"
-                                value={startDate}
-                                min={getMinDate()}
-                                onChange={(e) => setStartDate(e.target.value)}
-                                className={styles.input}
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="endDate" className={styles.label}>End Date</label>
-                            <input
-                                type="date"
-                                id="endDate"
-                                value={endDate}
-                                onChange={(e) => setEndDate(e.target.value)}
-                                className={styles.input}
-                            />
-                        </div>
-                    </div>
-
-                    <div className={styles.quickFilters}>
-                        <button onClick={() => setQuickDateRange(7)} className={styles.quickFilterBtn}>
-                            Last 7 Days
-                        </button>
-                        <button onClick={() => setQuickDateRange(14)} className={styles.quickFilterBtn}>
-                            Last 14 Days
-                        </button>
-                        <button
-                            onClick={() => handleQuickFilterClick(30)}
-                            className={`${styles.quickFilterBtn} ${isFilterLocked(30) ? styles.lockedFilter : ''}`}
-                            title={isFilterLocked(30) ? 'Upgrade to Plus/Premium for extended history' : ''}
-                        >
-                            Last 30 Days {isFilterLocked(30) && <span className="plus-badge-inline">✦ PLUS</span>}
-                        </button>
-                        <button
-                            onClick={() => handleQuickFilterClick(150)}
-                            className={`${styles.quickFilterBtn} ${isFilterLocked(150) ? styles.lockedFilter : ''}`}
-                            title={isFilterLocked(150) ? 'Upgrade to Plus/Premium for extended history' : ''}
-                        >
-                            Last 5 Months {isFilterLocked(150) && <span className="plus-badge-inline">✦ PLUS</span>}
-                        </button>
-                        <button
-                            onClick={() => handleQuickFilterClick(365)}
-                            className={`${styles.quickFilterBtn} ${isFilterLocked(365) ? styles.lockedFilter : ''}`}
-                            title={isFilterLocked(365) ? 'Upgrade to Premium for 1 year history' : ''}
-                        >
-                            Last 1 Year {isFilterLocked(365) && <span className="premium-badge-inline">★ PREMIUM</span>}
-                        </button>
-                    </div>
-
-                    <PremiumModal isOpen={showPremiumModal} onClose={() => setShowPremiumModal(false)} />
-
-                    {/* Upgrade Banner for Free Users */}
-                    {userPlan === 'free' && (
-                        <div className={styles.upgradeBanner}>
-                            <div className={styles.upgradeBannerText}>
-                                <strong>Unlock 5 months of market history</strong>
-                                <p>Upgrade to SudaStock Plus for extended data, CSV exports, and more.</p>
-                            </div>
-                            <Link href="/pricing" className={styles.upgradeCta}>Upgrade to Plus</Link>
-                        </div>
-                    )}
-
-                    <div className={styles.buttonGroup}>
-                        <button
-                            onClick={handleSearchClick}
-                            disabled={loading}
-                            className={styles.primaryButton}
-                        >
-                            {loading ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-chart-line"></i>}
-                            {loading ? 'Analyzing...' : 'Generate Report'}
-                        </button>
-
                         {selectedProductData && (
-                            <button
-                                onClick={exportToCSV}
-                                disabled={history.length === 0}
-                                className={styles.secondaryButton}
-                            >
-                                <i className="fas fa-download"></i>
-                                Export CSV
-                            </button>
+                            <div className={styles.mainTrend}>
+                                <span className={styles.trendValue}>
+                                    {getTrendIcon(selectedProductData.trend)} {Math.abs(selectedProductData.trend)}%
+                                </span>
+                                <span style={{ fontSize: '0.9rem', color: '#6b7280' }}>{t('trend24h')}</span>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className={styles.heroChartContainer} style={{ height: '400px', width: '100%', position: 'relative' }}>
+                        {loading ? (
+                            <div className={styles.loadingState}>
+                                <i className="fas fa-spinner fa-spin fa-2x"></i>
+                                <p>{t('analyzing')}</p>
+                            </div>
+                        ) : chartData ? (
+                            <Line data={chartData} options={chartOptions} />
+                        ) : (
+                            <div className={styles.emptyState}>
+                                <i className="fas fa-chart-line fa-3x" style={{ marginBottom: '1rem', color: '#d1d5db' }}></i>
+                                <p>{t('selectProduct')}</p>
+                            </div>
                         )}
                     </div>
                 </div>
 
-                {/* Results Section */}
-                {selectedProductData && !loading && (
-                    <div className={styles.resultsSection}>
-                        {/* Product Header */}
-                        <div className={styles.productHeader}>
-                            <div className={styles.productTitle}>
-                                <h2>{selectedProductData.name}</h2>
-                                <div className={styles.metaTags}>
-                                    <span className={`${styles.tag} ${styles.tagStatus}`}>
-                                        <i className="fas fa-check-circle"></i> {selectedProductData.status}
-                                    </span>
-                                    <span className={`${styles.tag} ${styles.tagForecast}`}>
-                                        <i className="fas fa-binoculars"></i> {selectedProductData.forecast}
-                                    </span>
-                                    {lastUpdated && (
-                                        <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>
-                                            Updated: {lastUpdated.toLocaleTimeString()}
-                                        </span>
-                                    )}
-                                </div>
-                            </div>
+                {/* Controls & Configuration Section */}
+                <div className={styles.configSection}>
+                    {/* Search/Filter Card */}
+                    <div className={styles.card}>
 
-                            <div className={styles.productActions}>
-                                <button
-                                    onClick={() => setShowAlertModal(true)}
-                                    className={`${styles.secondaryButton} ${styles.alertBtn}`}
-                                    title="Set Price Alert"
-                                >
-                                    <i className="fas fa-bell"></i> Set Alert
-                                </button>
-                                <div className={styles.mainTrend}>
-                                    <span className={styles.trendValue}>
-                                        {getTrendIcon(selectedProductData.trend)} {Math.abs(selectedProductData.trend)}%
-                                    </span>
-                                    <span style={{ fontSize: '0.9rem', color: '#6b7280' }}>24h Trend</span>
-                                </div>
+                        {error && (
+                            <div style={{ padding: '1rem', background: '#fee2e2', color: '#ef4444', borderRadius: '8px', marginBottom: '1.5rem', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                <i className="fas fa-exclamation-circle"></i> {error}
                             </div>
-                        </div>
-
-                        {selectedProductData && (
-                            <PriceAlertModal
-                                isOpen={showAlertModal}
-                                onClose={() => setShowAlertModal(false)}
-                                productName={selectedProductData.name}
-                                productId={selectedProductData.id}
-                                currentPrice={selectedProductData.value}
-                            />
                         )}
 
-                        {/* Data Grid: Chart & Prices */}
-                        <div className={styles.dataGrid}>
-                            {/* Left: Chart */}
-                            <div className={styles.chartContainer}>
-                                {chartData ? (
-                                    <Line data={chartData} options={chartOptions} />
-                                ) : (
-                                    <div className={styles.emptyState}>No chart data available</div>
-                                )}
+                        <div className={styles.formGrid}>
+                            <div>
+                                <label htmlFor="productSelect" className={styles.label}>{t('selectProduct')}</label>
+                                <select
+                                    id="productSelect"
+                                    value={selectedProduct}
+                                    onChange={(e) => setSelectedProduct(e.target.value ? Number(e.target.value) : '')}
+                                    className={styles.select}
+                                >
+                                    <option value="">-- {t('selectProduct')} --</option>
+                                    {products.map(p => (
+                                        <option key={p.id} value={p.id}>{t(p.name) || p.name}</option>
+                                    ))}
+                                </select>
                             </div>
+                            <DateRangeSelector
+                                startDate={startDate}
+                                endDate={endDate}
+                                minDate={getMinDate()}
+                                onRangeChange={(start, end) => {
+                                    setStartDate(start)
+                                    setEndDate(end)
+                                }}
+                                onQuickFilter={handleQuickFilterClick}
+                                isFilterLocked={isFilterLocked}
+                            />
+                        </div>
 
-                            {/* Right: Prices */}
-                            <div className={styles.priceList}>
-                                {[
-                                    { label: 'Port Sudan (FOB)', value: selectedProductData.portSudan },
-                                    { label: 'Avg Global Price', value: selectedProductData.value },
-                                    { label: 'China (DMT)', value: selectedProductData.dmtChina },
-                                    { label: 'UAE (DMT)', value: selectedProductData.dmtUae },
-                                    { label: 'India (DMT)', value: selectedProductData.dmtIndia }
-                                ].map((item, idx) => (
-                                    <div key={idx} className={styles.priceRow}>
-                                        <span className={styles.priceLabel}>{item.label}</span>
-                                        <span className={styles.priceValue}>{formatCurrency(item.value)}</span>
-                                    </div>
-                                ))}
-                            </div>
+                        <div className={styles.buttonGroup}>
+                            {selectedProductData && (
+                                <button
+                                    onClick={exportToCSV}
+                                    disabled={history.length === 0}
+                                    className={styles.secondaryButton}
+                                >
+                                    <i className="fas fa-download"></i>
+                                    {t('exportCSV')}
+                                </button>
+                            )}
+                            <button
+                                onClick={() => setShowAlertModal(true)}
+                                className={`${styles.secondaryButton} ${styles.alertBtn}`}
+                                title={t('setAlert')}
+                                disabled={!selectedProductData}
+                            >
+                                <i className="fas fa-bell"></i> {t('setAlert')}
+                            </button>
                         </div>
                     </div>
+                </div>
+
+                <PremiumModal isOpen={showPremiumModal} onClose={() => setShowPremiumModal(false)} />
+                {selectedProductData && (
+                    <PriceAlertModal
+                        isOpen={showAlertModal}
+                        onClose={() => setShowAlertModal(false)}
+                        productName={selectedProductData.name}
+                        productId={selectedProductData.id}
+                        currentPrice={selectedProductData.value}
+                    />
                 )}
 
-                {/* Empty State / Loading */}
-                {!selectedProductData && !loading && (
-                    <div className={styles.emptyState}>
-                        <i className="fas fa-search-dollar fa-3x" style={{ marginBottom: '1rem', color: '#d1d5db' }}></i>
-                        <p>Select a product above to start analyzing market trends.</p>
+                {/* Result Details (Prices) */}
+                {selectedProductData && !loading && (
+                    <div className={styles.resultsSection}>
+                        <div className={styles.priceList}>
+                            {[
+                                { label: t('portSudanFob'), value: selectedProductData.portSudan },
+                                { label: t('avgGlobalPrice'), value: selectedProductData.value },
+                                { label: t('chinaDmt'), value: selectedProductData.dmtChina },
+                                { label: t('uaeDmt'), value: selectedProductData.dmtUae },
+                                { label: t('indiaDmt'), value: selectedProductData.dmtIndia }
+                            ].map((item, idx) => (
+                                <div key={idx} className={styles.priceRow}>
+                                    <span className={styles.priceLabel}>{item.label}</span>
+                                    <span className={styles.priceValue}>{formatCurrency(item.value)}</span>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 )}
             </div>
@@ -575,7 +523,7 @@ function MarketDataContent() {
 
 export default function MarketDataPage() {
     return (
-        <Suspense fallback={<div>Loading market data...</div>}>
+        <Suspense fallback={<div>Loading...</div>}>
             <MarketDataContent />
         </Suspense>
     )

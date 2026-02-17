@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import styles from './PriceAlertModal.module.css'
 import { usePushNotifications } from '@/hooks/usePushNotifications'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 interface Props {
     isOpen: boolean
@@ -21,6 +22,8 @@ export default function PriceAlertModal({ isOpen, onClose, productName, productI
     const [loading, setLoading] = useState(false)
     const [success, setSuccess] = useState(false)
     const { permission, subscribeToPush } = usePushNotifications()
+
+    const { t, language } = useLanguage()
 
     if (!isOpen) return null
 
@@ -61,10 +64,10 @@ export default function PriceAlertModal({ isOpen, onClose, productName, productI
     }
 
     return (
-        <div className={styles.overlay} onClick={onClose}>
+        <div className={styles.overlay} onClick={onClose} dir={language === 'ar' ? 'rtl' : 'ltr'}>
             <div className={styles.modal} onClick={e => e.stopPropagation()}>
                 <div className={styles.header}>
-                    <h3>Set Price Alert</h3>
+                    <h3>{t('setPriceAlert')}</h3>
                     <button onClick={onClose} className={styles.closeBtn}>&times;</button>
                 </div>
 
@@ -73,45 +76,45 @@ export default function PriceAlertModal({ isOpen, onClose, productName, productI
                         <div className={styles.authIcon}>
                             <i className="fas fa-user-lock"></i>
                         </div>
-                        <h4>Sign In Required</h4>
-                        <p>You must be signed in to set price alerts and receive real-time notifications.</p>
+                        <h4>{t('signInRequired')}</h4>
+                        <p>{t('signInAlertMsg')}</p>
                         <div className={styles.authActions}>
-                            <Link href="/login" className={styles.loginBtn}>Sign In</Link>
-                            <Link href="/register" className={styles.registerBtn}>Create Account</Link>
+                            <Link href="/login" className={styles.loginBtn}>{t('login')}</Link>
+                            <Link href="/register" className={styles.registerBtn}>{t('register')}</Link>
                         </div>
                     </div>
                 ) : success ? (
                     <div className={styles.successMessage}>
-                        <i className="fas fa-check-circle"></i> Alert Set Successfully!
+                        <i className="fas fa-check-circle"></i> {t('alertSetSuccess')}
                     </div>
                 ) : (
                     <form onSubmit={handleSubmit} className={styles.form}>
                         <p className={styles.productInfo}>
-                            Alert for <strong>{productName}</strong> (Current: {currentPrice} SDG)
+                            {t('alertFor')} <strong>{t(productName) || productName}</strong> ({t('avgGlobalPrice')}: {currentPrice} SDG)
                         </p>
 
                         <div className={styles.formGroup}>
-                            <label>Notify me when price goes:</label>
+                            <label>{t('notifyWhen')}</label>
                             <div className={styles.toggleGroup}>
                                 <button
                                     type="button"
                                     className={`${styles.toggleBtn} ${condition === 'ABOVE' ? styles.active : ''}`}
                                     onClick={() => setCondition('ABOVE')}
                                 >
-                                    Above 📈
+                                    {t('above')} 📈
                                 </button>
                                 <button
                                     type="button"
                                     className={`${styles.toggleBtn} ${condition === 'BELOW' ? styles.active : ''}`}
                                     onClick={() => setCondition('BELOW')}
                                 >
-                                    Below 📉
+                                    {t('below')} 📉
                                 </button>
                             </div>
                         </div>
 
                         <div className={styles.formGroup}>
-                            <label>Target Price (SDG)</label>
+                            <label>{t('targetPriceSDG')}</label>
                             <input
                                 type="number"
                                 value={targetPrice}
@@ -124,14 +127,14 @@ export default function PriceAlertModal({ isOpen, onClose, productName, productI
                         </div>
 
                         <button type="submit" className={styles.submitBtn} disabled={loading}>
-                            {loading ? 'Saving...' : 'Create Alert'}
+                            {loading ? t('saving') : t('createAlert')}
                         </button>
 
                         {permission === 'default' && (
-                            <p className={styles.note}>We'll ask for notification permission when you save.</p>
+                            <p className={styles.note}>{t('permNote')}</p>
                         )}
                         {permission === 'denied' && (
-                            <p className={styles.errorText}>Notifications blocked. Check browser settings.</p>
+                            <p className={styles.errorText}>{t('permBlocked')}</p>
                         )}
                     </form>
                 )}

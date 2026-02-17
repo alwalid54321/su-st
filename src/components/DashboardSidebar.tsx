@@ -4,19 +4,21 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
 import styles from './dashboard-sidebar.module.css'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 export default function DashboardSidebar() {
     const pathname = usePathname()
     const { data: session } = useSession()
+    const { t, language } = useLanguage()
 
     const navItems = [
-        { href: '/dashboard', icon: 'fas fa-home', label: 'Dashboard' },
-        { href: '/dashboard/market-data', icon: 'fas fa-chart-line', label: 'Market Data' },
-        { href: '/dashboard/currencies', icon: 'fas fa-money-bill-wave', label: 'Currencies' },
-        { href: '/dashboard/gallery', icon: 'fas fa-images', label: 'Gallery' },
-        { href: '/dashboard/announcements', icon: 'fas fa-bullhorn', label: 'Announcements' },
-        { href: '/dashboard/users', icon: 'fas fa-users', label: 'Users' },
-        { href: '/dashboard/settings', icon: 'fas fa-cog', label: 'Settings' },
+        { href: '/dashboard', icon: 'fas fa-home', label: t('dashboard') },
+        { href: '/dashboard/market-data', icon: 'fas fa-chart-line', label: t('marketData') },
+        { href: '/dashboard/currencies', icon: 'fas fa-money-bill-wave', label: t('currencies') },
+        { href: '/dashboard/gallery', icon: 'fas fa-images', label: t('gallery') },
+        { href: '/dashboard/announcements', icon: 'fas fa-bullhorn', label: t('announcements') },
+        { href: '/dashboard/users', icon: 'fas fa-users', label: t('users') },
+        { href: '/dashboard/settings', icon: 'fas fa-cog', label: t('settings') },
     ]
 
     const handleSignOut = async () => {
@@ -26,10 +28,10 @@ export default function DashboardSidebar() {
     const userNameInitial = session?.user?.name ? session.user.name.charAt(0).toUpperCase() : '?'
 
     return (
-        <aside className={styles.sidebar}>
+        <aside className={styles.sidebar} dir={language === 'ar' ? 'rtl' : 'ltr'}>
             <div className={styles.sidebarHeader}>
                 <Link href="/dashboard" className={styles.sidebarLogo}>
-                    SudaStock Admin
+                    {t('sudaStockAdmin')}
                 </Link>
             </div>
             <nav className={styles.sidebarNav}>
@@ -52,11 +54,11 @@ export default function DashboardSidebar() {
                     <div className={styles.userAvatar}>
                         {userNameInitial}
                     </div>
-                    <span className={styles.userName}>{session?.user?.name || 'Admin User'}</span>
+                    <span className={styles.userName}>{session?.user?.name || t('adminUser')}</span>
                 </div>
                 <button onClick={handleSignOut} className={styles.logoutButton}>
                     <i className="fas fa-sign-out-alt"></i>
-                    Logout
+                    {t('logout')}
                 </button>
             </div>
         </aside>
