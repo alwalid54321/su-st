@@ -328,7 +328,7 @@ export default function RegisterPage() {
                     <div className={styles.submitButtonContainer}>
                         <button
                             type="submit"
-                            disabled={loading || passwordStrength < 3}
+                            disabled={loading || passwordStrength < 5}
                             className={styles.submitButton}
                         >
                             {loading ? (

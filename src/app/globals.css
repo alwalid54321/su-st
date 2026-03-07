@@ -3511,3 +3511,88 @@ h6 {
     font-size: 0.7rem !important;
   }
 }
+
+/* --- Global Mobile Polish (User Requested) --- */
+@media screen and (max-width: 768px) {
+
+  /* Tap Targets & Spacing */
+  button,
+  a.btn,
+  .action-btn {
+    min-height: 44px;
+    /* Minimum Apple Human Interface touch target */
+  }
+
+  /* Typography Scaling */
+  html {
+    font-size: 14px;
+  }
+
+  .hero-main-title {
+    font-size: 2.25rem;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+  }
+
+  .brand-title {
+    font-size: 2.5rem;
+    letter-spacing: 2px;
+  }
+
+  .brand-arabic {
+    font-size: 2.5rem;
+  }
+
+  .section-header h2,
+  .section-title {
+    font-size: 1.75rem;
+  }
+
+  .premium-alert-glass {
+    padding: 30px 20px;
+    border-radius: 20px;
+  }
+
+  .alert-text-content h3 {
+    font-size: 1.5rem;
+  }
+
+  .currency-cards-container {
+    padding: 0 10px;
+    gap: 15px;
+  }
+
+  .currency-card {
+    border-radius: 15px;
+  }
+
+  .currency-content {
+    padding: 1.5rem;
+  }
+
+  .announcement-box {
+    flex: 0 0 300px;
+    padding: 1.5rem;
+  }
+
+  /* Padding Adjustments */
+  .container {
+    padding: 0 15px;
+    width: 100%;
+  }
+
+  .cta-content {
+    margin: 1rem 0 !important;
+    padding-left: 0 !important;
+    text-align: center;
+  }
+
+  .cta-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .cta-buttons .btn {
+    width: 100%;
+  }
+}

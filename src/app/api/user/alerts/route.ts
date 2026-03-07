@@ -4,6 +4,8 @@ import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
 import { z } from 'zod'
 
+import { checkRateLimit } from '@/lib/rate-limit'
+
 // Validation schema for creating an alert
 const alertSchema = z.object({
     marketDataId: z.number(),
@@ -38,6 +40,17 @@ export async function POST(req: NextRequest) {
     const session = await auth()
     if (!session?.user?.id) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Rate Limit: 20 alerts per hour per user
+    const rateLimitKey = `alert_create_${session.user.id}`
+    const rateLimit = checkRateLimit(rateLimitKey, 20, 60 * 60 * 1000)
+
+    if (!rateLimit.allowed) {
+        return NextResponse.json(
+            { error: 'Rate limit exceeded. Too many alerts created. Please try again later.' },
+            { status: 429 }
+        )
     }
 
     try {

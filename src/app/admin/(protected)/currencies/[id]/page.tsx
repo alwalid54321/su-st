@@ -27,7 +27,8 @@ export default function CurrencyFormPage() {
         code: '',
         name: '',
         rate: 1.0,
-        isBase: false
+        isBase: false,
+        isAutoUpdate: false
     })
 
     useEffect(() => {
@@ -56,7 +57,8 @@ export default function CurrencyFormPage() {
                     code: data.code,
                     name: data.name,
                     rate: parseFloat(data.rate) || 1.0,
-                    isBase: data.code === 'USD' // Derive isBase from code
+                    isBase: data.code === 'USD', // Derive isBase from code
+                    isAutoUpdate: data.isAutoUpdate ?? false
                 })
             } else if (res.status === 404) {
                 console.warn(`Currency with ID ${id} not found.`);
@@ -100,7 +102,8 @@ export default function CurrencyFormPage() {
             const dataToSend = {
                 code: formData.code.toUpperCase(),
                 name: formData.name,
-                rate: formData.rate
+                rate: formData.rate,
+                isAutoUpdate: formData.isAutoUpdate
             };
 
             const res = await fetch(url, {
@@ -218,6 +221,20 @@ export default function CurrencyFormPage() {
                             />
                         </div>
 
+                        <div className={styles.checkboxContainer}>
+                            <input
+                                type="checkbox"
+                                name="isAutoUpdate"
+                                checked={formData.isAutoUpdate}
+                                onChange={handleChange}
+                                id="isAutoUpdate"
+                                className={styles.checkbox}
+                            />
+                            <label htmlFor="isAutoUpdate" className={styles.checkboxLabel}>
+                                Automatically sync exchange rate from external API
+                            </label>
+                        </div>
+
                         <div>
                             <label className={styles.formLabel}>Exchange Rate (per USD)</label>
                             <input
@@ -226,10 +243,15 @@ export default function CurrencyFormPage() {
                                 value={formData.rate}
                                 onChange={handleChange}
                                 step="0.0001"
+                                disabled={formData.isAutoUpdate}
                                 required
-                                className={`${styles.input} ${styles.fontMono}`}
+                                className={`${styles.input} ${styles.fontMono} ${formData.isAutoUpdate ? 'bg-gray-100 cursor-not-allowed opacity-70' : ''}`}
                             />
-                            <p className={styles.helpText}>Current market rate against USD</p>
+                            {formData.isAutoUpdate ? (
+                                <p className={styles.helpText} style={{ color: '#d97706' }}>Rate is locked because Auto Update is enabled.</p>
+                            ) : (
+                                <p className={styles.helpText}>Current market rate against USD (Manual Input)</p>
+                            )}
                         </div>
 
                         <div className={styles.checkboxContainer}>

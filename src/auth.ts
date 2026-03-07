@@ -22,8 +22,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
                 const email = (credentials.email as string).toLowerCase()
 
-                // Check rate limiting
-                const rateLimitCheck = checkRateLimit(email)
+                // Use login_ prefix to prevent collisions with other endpoints (like forgot-password)
+                const rateLimitKey = `login_${email}`
+                const rateLimitCheck = checkRateLimit(rateLimitKey)
                 if (!rateLimitCheck.allowed) {
                     console.warn(`Auth: Rate limited for ${email}`);
                     throw new Error('Too many login attempts. Please try again later.')
@@ -36,7 +37,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
                     if (!user) {
                         console.warn(`Auth: User not found: ${email}`);
-                        recordFailedAttempt(email)
+                        recordFailedAttempt(rateLimitKey)
                         return null
                     }
 
@@ -52,12 +53,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
                     if (!isPasswordValid) {
                         console.warn(`Auth: Invalid password for ${email}`);
-                        recordFailedAttempt(email)
+                        recordFailedAttempt(rateLimitKey)
                         return null
                     }
 
                     // Clear failed attempts on successful login
-                    clearAttempts(email)
+                    clearAttempts(rateLimitKey)
 
                     console.log(`Auth: Successful login for ${user.email}`);
 

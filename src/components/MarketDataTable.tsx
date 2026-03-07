@@ -67,6 +67,38 @@ export default function MarketDataTable() {
         setExchangeRate(rate)
     }
 
+    const exportToCSV = () => {
+        if (!marketData || marketData.length === 0) return
+
+        const headers = ['Product', `Port Sudan (${selectedCurrency})`, `CNF China (${selectedCurrency})`, `CNF UAE (${selectedCurrency})`, `CNF Mersing (${selectedCurrency})`, `CNF India (${selectedCurrency})`, 'Status', 'Trend', 'Last Update']
+
+        const csvRows = [headers.join(',')]
+
+        for (const row of marketData) {
+            const values = [
+                `"${row.name}"`,
+                convertPrice(row.portSudan),
+                convertPrice(row.dmtChina),
+                convertPrice(row.dmtUae),
+                convertPrice(row.dmtMersing),
+                convertPrice(row.dmtIndia),
+                `"${row.status}"`,
+                row.trend > 0 ? 'Up' : row.trend < 0 ? 'Down' : 'Stable',
+                `"${new Date(row.lastUpdate).toLocaleString()}"`
+            ]
+            csvRows.push(values.join(','))
+        }
+
+        const csvContent = "data:text/csv;charset=utf-8," + csvRows.join('\n')
+        const encodedUri = encodeURI(csvContent)
+        const link = document.createElement("a")
+        link.setAttribute("href", encodedUri)
+        link.setAttribute("download", `market_data_${new Date().toISOString().split('T')[0]}.csv`)
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+    }
+
     const convertPrice = (price: number) => {
         if (!price) return 'N/A'
         return (Number(price) * Number(exchangeRate)).toFixed(2)
@@ -94,7 +126,10 @@ export default function MarketDataTable() {
                     <span className="update-time">
                         Last update: {isMounted && marketData[0] ? new Date(marketData[0].lastUpdate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A'}
                     </span>
-                    <div className="refresh-button">
+                    <div className="action-buttons-container" style={{ display: 'flex', gap: '10px' }}>
+                        <button onClick={exportToCSV} className="action-btn" style={{ backgroundColor: '#28a745', color: 'white' }}>
+                            <i className="fas fa-file-csv"></i> Export CSV
+                        </button>
                         <button onClick={() => window.location.reload()} className="refresh-btn">
                             <i className="fas fa-sync"></i> Refresh
                         </button>

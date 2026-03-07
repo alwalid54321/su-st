@@ -156,7 +156,7 @@ export default function Navbar() {
                 {navItems.map((item) => (
                     <ListItem key={item.name} disablePadding>
                         <ListItemText sx={{ textAlign: 'center' }}>
-                            <Link href={item.href} style={{ textDecoration: 'none', color: textColor, display: 'block', padding: '10px' }}>
+                            <Link href={item.href} style={{ textDecoration: 'none', color: textColor, display: 'block', padding: '16px 10px' }}>
                                 <Typography variant="button" sx={{ fontWeight: 600 }}>{item.name}</Typography>
                             </Link>
                         </ListItemText>
@@ -185,7 +185,7 @@ export default function Navbar() {
                                 {productsDropdownItems.map((item) => (
                                     <ListItem key={item.name} disablePadding>
                                         <Link href={item.href} style={{ textDecoration: 'none', color: textColor, width: '100%' }}>
-                                            <ListItemText primary={item.name} sx={{ textAlign: 'center', py: 1 }} />
+                                            <ListItemText primary={item.name} sx={{ textAlign: 'center', py: 1.5 }} />
                                         </Link>
                                     </ListItem>
                                 ))}
@@ -201,7 +201,7 @@ export default function Navbar() {
                             <Box
                                 onClick={() => setMobileDashboardOpen(!mobileDashboardOpen)}
                                 sx={{
-                                    py: 1.5,
+                                    py: 2,
                                     cursor: 'pointer',
                                     display: 'flex',
                                     alignItems: 'center',
@@ -217,7 +217,7 @@ export default function Navbar() {
                                     {dashboardDropdownItems.map((item) => (
                                         <ListItem key={item.name} disablePadding>
                                             <Link href={`/admin${item.href}`} style={{ textDecoration: 'none', color: textColor, width: '100%' }}>
-                                                <ListItemText primary={item.name} sx={{ textAlign: 'center', py: 1 }} />
+                                                <ListItemText primary={item.name} sx={{ textAlign: 'center', py: 1.5 }} />
                                             </Link>
                                         </ListItem>
                                     ))}
@@ -230,7 +230,7 @@ export default function Navbar() {
                 {!isAdmin && session && (
                     <ListItem disablePadding>
                         <ListItemText sx={{ textAlign: 'center' }}>
-                            <Link href="/user" style={{ textDecoration: 'none', color: goldColor, display: 'block', padding: '10px' }}>
+                            <Link href="/user" style={{ textDecoration: 'none', color: goldColor, display: 'block', padding: '16px 10px' }}>
                                 <Typography variant="button" sx={{ fontWeight: 700 }}>{t('myDashboard')}</Typography>
                             </Link>
                         </ListItemText>

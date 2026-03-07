@@ -24,6 +24,7 @@ export default function EditMarketData() {
     const [saving, setSaving] = useState(false)
     const [history, setHistory] = useState<MarketDataHistory[]>([])
     const [loadingHistory, setLoadingHistory] = useState(false)
+    const [currencies, setCurrencies] = useState<{ code: string, rate: number }[]>([])
 
     const [formData, setFormData] = useState({
         name: '',
@@ -50,11 +51,24 @@ export default function EditMarketData() {
         : 0;
 
     useEffect(() => {
+        fetchCurrencies()
         if (!isNew && id) {
             fetchData()
             fetchHistory() // Always fetch history
         }
     }, [isNew, id])
+
+    const fetchCurrencies = async () => {
+        try {
+            const res = await fetch('/api/currencies')
+            if (res.ok) {
+                const data = await res.json()
+                setCurrencies(data)
+            }
+        } catch (error) {
+            console.error('Failed to fetch currencies', error)
+        }
+    }
 
     const fetchData = async () => {
         try {
@@ -123,7 +137,7 @@ export default function EditMarketData() {
         setSuccessMessage('')
 
         try {
-            const url = isNew ? '/api/admin/market-data' : `/api/admin/market-data/${id}/`
+            const url = isNew ? '/api/admin/market-data' : `/api/admin/market-data/${id}`
             const method = isNew ? 'POST' : 'PUT'
 
             const dataToSend = {
@@ -162,6 +176,21 @@ export default function EditMarketData() {
             ...prev,
             [name]: e.target.type === 'number' ? parseFloat(value) || 0 : value
         }))
+    }
+
+    const handleBasePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = parseFloat(e.target.value) || 0;
+        const getRate = (code: string) => currencies.find(c => c.code === code)?.rate || 1;
+
+        setFormData(prev => ({
+            ...prev,
+            value: val,
+            portSudan: parseFloat((val * getRate('SDG')).toFixed(2)),
+            dmtChina: parseFloat((val * getRate('CNY')).toFixed(2)),
+            dmtUae: parseFloat((val * getRate('AED')).toFixed(2)),
+            dmtIndia: parseFloat((val * getRate('INR')).toFixed(2)),
+            dmtMersing: parseFloat((val * getRate('MYR')).toFixed(2)) // MYR is typical for Malaysia/Mersing
+        }));
     }
 
     if (loading) return (
@@ -247,23 +276,53 @@ export default function EditMarketData() {
                             <div className={styles.grid}>
                                 {/* Base Price Highlighting */}
                                 <div className={styles.premiumField}>
-                                    <label className={styles.label}>Base Price (Main Benchmark)</label>
+                                    <label className={styles.label}>Base Price (Main Benchmark) [USD]</label>
                                     <div className={styles.inputWrapper}>
                                         <span className={styles.inputIcon}>$</span>
-                                        <input type="number" name="value" value={formData.value} onChange={handleChange} step="0.01" className={`${styles.input} ${styles.inputWithIcon} ${styles.fontMono} ${styles.highlightInput}`} />
+                                        <input type="number" name="value" value={formData.value} onChange={handleBasePriceChange} step="0.01" className={`${styles.input} ${styles.inputWithIcon} ${styles.fontMono} ${styles.highlightInput}`} title="Entering a base price will automatically calculate localized prices based on current exchange rates." />
                                     </div>
+                                    <p className={styles.labelHelpText} style={{ marginTop: '0.5rem', color: '#64748b', fontSize: '0.8rem' }}>
+                                        Entering a value here automatically scales localized rates (below). You can manually override them after.
+                                    </p>
                                 </div>
 
                                 <div className={styles.gridCols3}>
-                                    {['portSudan', 'dmtChina', 'dmtUae', 'dmtMersing', 'dmtIndia'].map(field => (
-                                        <div key={field}>
-                                            <label className={styles.label}>{field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</label>
-                                            <div className={styles.inputWrapper}>
-                                                <span className={styles.inputIcon}>$</span>
-                                                <input type="number" name={field} value={formData[field as keyof typeof formData]} onChange={handleChange} step="0.01" className={`${styles.input} ${styles.inputWithIcon} ${styles.fontMono}`} />
-                                            </div>
+                                    {/* Localized Price Inputs */}
+                                    <div>
+                                        <label className={styles.label}>Port Sudan [SDG]</label>
+                                        <div className={styles.inputWrapper}>
+                                            <span className={styles.inputIcon} style={{ fontSize: '0.8rem', padding: '0 8px' }}>SDG</span>
+                                            <input type="number" name="portSudan" value={formData.portSudan} onChange={handleChange} step="0.01" className={`${styles.input} ${styles.inputWithIcon} ${styles.fontMono}`} />
                                         </div>
-                                    ))}
+                                    </div>
+                                    <div>
+                                        <label className={styles.label}>DMT China [CNY]</label>
+                                        <div className={styles.inputWrapper}>
+                                            <span className={styles.inputIcon} style={{ fontSize: '0.8rem', padding: '0 8px' }}>CNY</span>
+                                            <input type="number" name="dmtChina" value={formData.dmtChina} onChange={handleChange} step="0.01" className={`${styles.input} ${styles.inputWithIcon} ${styles.fontMono}`} />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className={styles.label}>DMT UAE [AED]</label>
+                                        <div className={styles.inputWrapper}>
+                                            <span className={styles.inputIcon} style={{ fontSize: '0.8rem', padding: '0 8px' }}>AED</span>
+                                            <input type="number" name="dmtUae" value={formData.dmtUae} onChange={handleChange} step="0.01" className={`${styles.input} ${styles.inputWithIcon} ${styles.fontMono}`} />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className={styles.label}>DMT Mersing [MYR]</label>
+                                        <div className={styles.inputWrapper}>
+                                            <span className={styles.inputIcon} style={{ fontSize: '0.8rem', padding: '0 8px' }}>MYR</span>
+                                            <input type="number" name="dmtMersing" value={formData.dmtMersing} onChange={handleChange} step="0.01" className={`${styles.input} ${styles.inputWithIcon} ${styles.fontMono}`} />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className={styles.label}>DMT India [INR]</label>
+                                        <div className={styles.inputWrapper}>
+                                            <span className={styles.inputIcon} style={{ fontSize: '0.8rem', padding: '0 8px' }}>INR</span>
+                                            <input type="number" name="dmtIndia" value={formData.dmtIndia} onChange={handleChange} step="0.01" className={`${styles.input} ${styles.inputWithIcon} ${styles.fontMono}`} />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </section>

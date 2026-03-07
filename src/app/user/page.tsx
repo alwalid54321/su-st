@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import Link from 'next/link'
 import { FaTachometerAlt, FaUserCircle, FaChartBar, FaBoxOpen, FaEnvelope, FaSignOutAlt } from 'react-icons/fa'
+import HistoricalChart from '@/components/HistoricalChart'
 import styles from './user.module.css'
 
 export default function UserDashboard() {
@@ -148,6 +149,11 @@ export default function UserDashboard() {
                             Contact Support
                         </Link>
                     </div>
+                </div>
+
+                {/* Historical Chart Section */}
+                <div style={{ marginTop: '2rem' }}>
+                    <HistoricalChart />
                 </div>
             </main>
         </div>

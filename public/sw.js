@@ -69,7 +69,7 @@ if (!self.define) {
 }
 define(['./workbox-c008c882'], (function (workbox) { 'use strict';
 
-  importScripts();
+  importScripts("worker-development.js");
   self.skipWaiting();
   workbox.clientsClaim();
 
@@ -80,7 +80,7 @@ define(['./workbox-c008c882'], (function (workbox) { 'use strict';
    */
   workbox.precacheAndRoute([{
     "url": "/_next/app-build-manifest.json",
-    "revision": "e80e5760c23bc1af9ee25f83a5d2c64b"
+    "revision": "54337548ce8256c4be55959a1c17c98d"
   }, {
     "url": "/_next/build-manifest.json",
     "revision": "35f1562458fde1518b2c9808eefc3fc1"
@@ -131,7 +131,7 @@ define(['./workbox-c008c882'], (function (workbox) { 'use strict';
     "revision": "c43c08a50361cda870b515516200c606"
   }, {
     "url": "/_next/static/chunks/app/layout.js",
-    "revision": "a82b409813bcec1825503f85b985e752"
+    "revision": "576e4b655cc013914113b85e8f4b003b"
   }, {
     "url": "/_next/static/chunks/app/not-found.js",
     "revision": "1e3a923553d068b0d4c75bda9717f229"
@@ -146,10 +146,10 @@ define(['./workbox-c008c882'], (function (workbox) { 'use strict';
     "revision": "846118c33b2c0e922d7b3a7676f81f6f"
   }, {
     "url": "/_next/static/chunks/webpack.js",
-    "revision": "11d1296d5b81265540395b00d553d19f"
+    "revision": "4e3ed3f15ba2d1223f776133aef7f678"
   }, {
     "url": "/_next/static/css/app/layout.css",
-    "revision": "2a77e589398a1bbafebfdfbc90820200"
+    "revision": "24f1f0061cb158c4eb0e7c6eb7ac6e76"
   }, {
     "url": "/_next/static/css/app/page.css",
     "revision": "512a2142e2ef56e744330756bdbad9ca"
@@ -160,13 +160,13 @@ define(['./workbox-c008c882'], (function (workbox) { 'use strict';
     "url": "/_next/static/development/_ssgManifest.js",
     "revision": "abee47769bf307639ace4945f9cfd4ff"
   }, {
-    "url": "/_next/static/webpack/0dc84267717f585b.webpack.hot-update.json",
+    "url": "/_next/static/webpack/6f9f34411300fa77.webpack.hot-update.json",
     "revision": "development"
   }, {
-    "url": "/_next/static/webpack/app/layout.0dc84267717f585b.hot-update.js",
+    "url": "/_next/static/webpack/app/layout.6f9f34411300fa77.hot-update.js",
     "revision": "development"
   }, {
-    "url": "/_next/static/webpack/webpack.0dc84267717f585b.hot-update.js",
+    "url": "/_next/static/webpack/webpack.6f9f34411300fa77.hot-update.js",
     "revision": "development"
   }], {
     "ignoreURLParametersMatching": [/ts/]

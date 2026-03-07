@@ -7,7 +7,8 @@ import { Prisma } from '@prisma/client'
 const CurrencySchema = z.object({
     code: z.string().min(2).max(10).toUpperCase(),
     name: z.string().min(1),
-    rate: z.number().positive().default(1.0)
+    rate: z.number().positive().default(1.0),
+    isAutoUpdate: z.boolean().default(false)
 })
 
 // GET - List all currencies (Admin only)

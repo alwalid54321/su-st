@@ -65,7 +65,8 @@ export async function PUT(
             data: {
                 code: body.code,
                 name: body.name,
-                rate: parseFloat(body.rate) || 1.0
+                rate: parseFloat(body.rate) || 1.0,
+                isAutoUpdate: body.isAutoUpdate ?? false
             }
         })
 
