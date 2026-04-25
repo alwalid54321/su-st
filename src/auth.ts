@@ -4,20 +4,32 @@ import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 import { authConfig } from "./auth.config"
 import { checkRateLimit, recordFailedAttempt, clearAttempts } from "@/lib/rate-limit"
+import { PrismaAdapter } from "@auth/prisma-adapter"
+import Google from "next-auth/providers/google"
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
     ...authConfig,
+    adapter: PrismaAdapter(prisma) as any,
     providers: [
+        Google,
         CredentialsProvider({
             name: "Credentials",
             credentials: {
                 email: { label: "Email", type: "email" },
-                password: { label: "Password", type: "password" }
+                password: { label: "Password", type: "password" },
+                otp: { label: "OTP", type: "text" }
             },
             async authorize(credentials): Promise<User | null> {
-                if (!credentials?.email || !credentials?.password) {
-                    console.warn('Auth: Missing email or password');
+                if (!credentials?.email) {
+                    console.warn('Auth: Missing email');
                     return null
+                }
+                
+                const hasPassword = !!credentials?.password;
+                const hasOtp = !!credentials?.otp;
+                
+                if (!hasPassword && !hasOtp) {
+                    return null;
                 }
 
                 const email = (credentials.email as string).toLowerCase()
@@ -46,15 +58,45 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                         throw new Error('Account is disabled. Please contact support.')
                     }
 
-                    const isPasswordValid = await bcrypt.compare(
-                        credentials.password as string,
-                        user.password
-                    )
+                    if (hasOtp) {
+                        // OTP Login Flow
+                        const validOtp = await prisma.emailOTP.findFirst({
+                            where: {
+                                email,
+                                otp: credentials.otp as string,
+                                purpose: 'login',
+                                isUsed: false,
+                                expiresAt: { gt: new Date() }
+                            },
+                            orderBy: { createdAt: 'desc' }
+                        })
 
-                    if (!isPasswordValid) {
-                        console.warn(`Auth: Invalid password for ${email}`);
-                        recordFailedAttempt(rateLimitKey)
-                        return null
+                        if (!validOtp) {
+                            console.warn(`Auth: Invalid OTP for ${email}`);
+                            recordFailedAttempt(rateLimitKey)
+                            throw new Error('Invalid or expired OTP')
+                        }
+
+                        // Mark as used
+                        await prisma.emailOTP.update({
+                            where: { id: validOtp.id },
+                            data: { isUsed: true, verificationAttempts: { increment: 1 } }
+                        })
+                    } else if (hasPassword) {
+                        // Password Login Flow
+                        if (!user.password) {
+                             throw new Error('Please login with a social provider or OTP.')
+                        }
+                        const isPasswordValid = await bcrypt.compare(
+                            credentials.password as string,
+                            user.password
+                        )
+
+                        if (!isPasswordValid) {
+                            console.warn(`Auth: Invalid password for ${email}`);
+                            recordFailedAttempt(rateLimitKey)
+                            throw new Error('Invalid email or password')
+                        }
                     }
 
                     // Clear failed attempts on successful login
@@ -79,4 +121,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             }
         })
     ],
+    events: {
+        async linkAccount({ user }) {
+            // Automatically verify email when linking social accounts
+            await prisma.user.update({
+                where: { id: parseInt(user.id as string) },
+                data: { emailVerified: new Date() }
+            })
+        }
+    }
 })

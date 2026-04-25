@@ -1,5 +1,4 @@
 import type { NextConfig } from "next";
-import withPWA from 'next-pwa';
 
 const config: NextConfig = {
   images: {
@@ -43,6 +42,10 @@ const config: NextConfig = {
           {
             key: 'Referrer-Policy',
             value: 'origin-when-cross-origin'
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; img-src 'self' data: https://* blob:; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; connect-src 'self' https://* ws: wss:; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
           }
         ]
       }
@@ -56,7 +59,7 @@ const config: NextConfig = {
   },
 };
 
-const nextConfig = withPWA({
+const withPWA = require('next-pwa')({
   dest: 'public',
   register: true,
   skipWaiting: true,
@@ -73,7 +76,10 @@ const nextConfig = withPWA({
   sw: 'sw.js',
   exclude: [/middleware-manifest\.json$/],
   maximumFileSizeToCacheInBytes: 10000000,
-})(config);
+});
 
-export default nextConfig;
+import createNextIntlPlugin from 'next-intl/plugin';
+const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
+
+export default withNextIntl(withPWA(config));
 

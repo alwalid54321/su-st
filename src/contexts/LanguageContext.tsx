@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { TranslationQueue } from '@/lib/TranslationQueue';
 
 type Language = 'en' | 'ar';
 type Direction = 'ltr' | 'rtl';
@@ -311,6 +312,7 @@ export const translations = {
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
     const [language, setLanguageState] = useState<Language>('en');
     const [direction, setDirection] = useState<Direction>('ltr');
+    const [dynamicTranslations, setDynamicTranslations] = useState<Record<string, string>>({});
 
     useEffect(() => {
         // Load saved language preference
@@ -332,7 +334,37 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     };
 
     const t = (key: string) => {
-        return translations[language][key as keyof typeof translations['en']] || key;
+        if (!key) return '';
+
+        // 1. Check static dictionary
+        const staticTrans = translations[language]?.[key as keyof typeof translations['en']];
+        if (staticTrans) {
+            return staticTrans;
+        }
+
+        // 2. Check dynamic state
+        const cacheKey = `${key}_${language}`;
+        if (dynamicTranslations[cacheKey]) {
+            return dynamicTranslations[cacheKey];
+        }
+
+        // 3. Fallback to English and request queue
+        if (language !== 'en') {
+            // Check global queue cache to avoid infinite loops on re-renders
+            if (!TranslationQueue.memoryCache[cacheKey]) {
+                // Set temporary placeholder
+                TranslationQueue.memoryCache[cacheKey] = key;
+                TranslationQueue.enqueueTranslation(key, language).then(translated => {
+                    setDynamicTranslations(prev => ({ ...prev, [cacheKey]: translated }));
+                }).catch(err => {
+                    console.error("Queue fallback error:", err);
+                });
+            }
+            // Return from queue memory if possible (in case it was resolved elsewhere)
+            return TranslationQueue.memoryCache[cacheKey] || key;
+        }
+
+        return key;
     };
 
     return (

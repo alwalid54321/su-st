@@ -28,8 +28,7 @@ if (connectionString && connectionString.startsWith('postgres') && isProduction)
         const adapter = new PrismaNeon(pool as any)
 
         prisma = globalForPrisma.prisma ?? new PrismaClient({
-            adapter: adapter as any,
-            datasourceUrl: connectionString
+            adapter: adapter as any
         })
     } catch (e) {
         console.error('[Prisma] Error with adapter, attempting standard client:', e)

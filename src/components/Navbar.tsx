@@ -4,7 +4,8 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSession, signOut } from 'next-auth/react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from '@/i18n/routing';
+import { useTranslations, useLocale } from 'next-intl';
 import {
     AppBar,
     Toolbar,
@@ -38,7 +39,6 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import CampaignIcon from '@mui/icons-material/Campaign';
 import SearchIcon from '@mui/icons-material/Search';
 import LanguageIcon from '@mui/icons-material/Language';
-import { useLanguage } from '@/contexts/LanguageContext';
 
 const goldColor = '#786D3C';
 const textColor = '#1B1464';
@@ -46,7 +46,11 @@ const textColor = '#1B1464';
 
 export default function Navbar() {
     const { data: session } = useSession();
-    const { language, setLanguage, t, direction } = useLanguage();
+    const t = useTranslations();
+    const locale = useLocale();
+    const direction = locale === 'ar' ? 'rtl' : 'ltr';
+    const router = useRouter();
+    const pathname = usePathname();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [productsAnchorEl, setProductsAnchorEl] = useState<null | HTMLElement>(null);
     const [dashboardAnchorEl, setDashboardAnchorEl] = useState<null | HTMLElement>(null);
@@ -54,8 +58,6 @@ export default function Navbar() {
     // Mobile dropdown states
     const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
     const [mobileDashboardOpen, setMobileDashboardOpen] = useState(false);
-
-    const pathname = usePathname();
 
     const [scrollProgress, setScrollProgress] = useState(0);
     const [searchOpen, setSearchOpen] = useState(false);
@@ -118,23 +120,23 @@ export default function Navbar() {
     ];
 
     const productsDropdownItems = [
-        { name: 'All Products', href: '/products', desc: 'View all our products', icon: '📦' },
-        { name: 'Sesame Seeds', href: '/products?category=sesame', desc: 'Premium Sudanese sesame', icon: '🌾' },
-        { name: 'Gum Arabic', href: '/products?category=gum', desc: 'High-grade gum arabic', icon: '🌳' },
-        { name: 'Cotton', href: '/products?category=cotton', desc: 'Quality cotton products', icon: '☁️' },
-        { name: 'Others', href: '/products?category=others', desc: 'Peanuts, Hibiscus & more', icon: '🥜' },
+        { name: t('All Products'), href: '/products', desc: t('View all our products'), icon: '📦' },
+        { name: t('Sesame Seeds'), href: '/products?category=sesame', desc: t('Premium Sudanese sesame'), icon: '🌾' },
+        { name: t('Gum Arabic'), href: '/products?category=gum', desc: t('High-grade gum arabic'), icon: '🌳' },
+        { name: t('Cotton'), href: '/products?category=cotton', desc: t('Quality cotton products'), icon: '☁️' },
+        { name: t('Others'), href: '/products?category=others', desc: t('Peanuts, Hibiscus & more'), icon: '🥜' },
     ];
 
     const dashboardDropdownItems = [
-        { name: 'Overview', href: '', desc: 'Dashboard Home', icon: <DashboardIcon fontSize="small" /> },
-        { name: 'Market Data', href: '/market-data', desc: 'Manage Market Rates', icon: <ShowChartIcon fontSize="small" /> },
-        { name: 'Currencies', href: '/currencies', desc: 'Manage Currencies', icon: <AttachMoneyIcon fontSize="small" /> },
-        { name: 'Product Variat.', href: '/variations', desc: 'Manage Quality Grades', icon: <SettingsIcon fontSize="small" /> },
-        { name: 'Shipping Ports', href: '/ports', desc: 'Manage Ports', icon: <DashboardIcon fontSize="small" /> },
-        { name: 'Gallery', href: '/gallery', desc: 'Manage Images', icon: <CollectionsIcon fontSize="small" /> },
-        { name: 'Announcements', href: '/announcements', desc: 'Manage News', icon: <CampaignIcon fontSize="small" /> },
-        { name: 'Users', href: '/users', desc: 'Manage Users', icon: <PeopleIcon fontSize="small" /> },
-        { name: 'Settings', href: '/settings', desc: 'System Settings', icon: <SettingsIcon fontSize="small" /> },
+        { name: t('Overview'), href: '', desc: t('Dashboard Home'), icon: <DashboardIcon fontSize="small" /> },
+        { name: t('Market Data'), href: '/market-data', desc: t('Manage Market Rates'), icon: <ShowChartIcon fontSize="small" /> },
+        { name: t('Currencies'), href: '/currencies', desc: t('Manage Currencies'), icon: <AttachMoneyIcon fontSize="small" /> },
+        { name: t('Product Variations'), href: '/variations', desc: t('Manage Quality Grades'), icon: <SettingsIcon fontSize="small" /> },
+        { name: t('Shipping Ports'), href: '/ports', desc: t('Manage Ports'), icon: <DashboardIcon fontSize="small" /> },
+        { name: t('Gallery'), href: '/gallery', desc: t('Manage Images'), icon: <CollectionsIcon fontSize="small" /> },
+        { name: t('Announcements'), href: '/announcements', desc: t('Manage News'), icon: <CampaignIcon fontSize="small" /> },
+        { name: t('Users'), href: '/users', desc: t('Manage Users'), icon: <PeopleIcon fontSize="small" /> },
+        { name: t('Settings'), href: '/settings', desc: t('System Settings'), icon: <SettingsIcon fontSize="small" /> },
     ];
 
     // Determine if navbar should be transparent
@@ -400,7 +402,7 @@ export default function Navbar() {
                                 {searchOpen && (
                                     <input
                                         type="text"
-                                        placeholder="Search products..."
+                                        placeholder={t('Search products...')}
                                         autoFocus
                                         suppressHydrationWarning
                                         style={{
@@ -426,7 +428,7 @@ export default function Navbar() {
                             <Button
                                 size="small"
                                 startIcon={<LanguageIcon fontSize="small" />}
-                                onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')}
+                                onClick={() => router.replace(pathname, { locale: locale === 'en' ? 'ar' : 'en' })}
                                 sx={{
                                     color: isTransparent ? '#fff' : textColor,
                                     fontWeight: 700,
@@ -435,7 +437,7 @@ export default function Navbar() {
                                     '&:hover': { bgcolor: 'rgba(120, 109, 60, 0.1)' }
                                 }}
                             >
-                                {language === 'en' ? 'العربية' : 'English'}
+                                {locale === 'en' ? 'العربية' : 'English'}
                             </Button>
 
                             <Divider orientation="vertical" flexItem sx={{ mx: 1, borderColor: isTransparent ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)' }} />
@@ -483,7 +485,7 @@ export default function Navbar() {
                             {session ? (
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                     <Typography variant="body1" sx={{ cursor: 'pointer', color: isTransparent ? '#fff' : textColor, fontWeight: 600 }}>
-                                        Hello, {session.user?.name?.split(' ')[0] || 'User'}
+                                        {t('Hello')}, {session.user?.name?.split(' ')[0] || t('User')}
                                     </Typography>
                                     <Button
                                         onClick={() => signOut()}

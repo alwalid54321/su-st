@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import styles from './PriceAlertModal.module.css'
 import { usePushNotifications } from '@/hooks/usePushNotifications'
-import { useLanguage } from '@/contexts/LanguageContext'
+import { useTranslations, useLocale } from 'next-intl'
 
 interface Props {
     isOpen: boolean
@@ -23,7 +23,9 @@ export default function PriceAlertModal({ isOpen, onClose, productName, productI
     const [success, setSuccess] = useState(false)
     const { permission, subscribeToPush } = usePushNotifications()
 
-    const { t, language } = useLanguage()
+    const t = useTranslations()
+    const locale = useLocale()
+    const language = locale
 
     if (!isOpen) return null
 

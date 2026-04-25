@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useLanguage } from '@/contexts/LanguageContext'
+import { useTranslations, useLocale } from 'next-intl'
 
 interface Announcement {
     id: number
@@ -20,7 +20,9 @@ interface Announcement {
 }
 
 export default function AnnouncementsSection() {
-    const { t, language } = useLanguage()
+    const t = useTranslations()
+    const locale = useLocale()
+    const language = locale
     const [announcements, setAnnouncements] = useState<Announcement[]>([])
     const [loading, setLoading] = useState(true)
 

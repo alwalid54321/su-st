@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
         if (emailOTP.userId) {
             await prisma.user.update({
                 where: { id: emailOTP.userId },
-                data: { emailVerified: true }
+                data: { emailVerified: new Date() }
             })
         }
 

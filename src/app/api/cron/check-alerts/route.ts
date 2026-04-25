@@ -5,6 +5,10 @@ import { sendEmailNotification, sendPushNotification } from '@/lib/notifications
 
 // This would typically be secured by a secret key in headers
 export async function GET(req: NextRequest) {
+    if (req.headers.get('authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     try {
         // 1. Fetch all active alerts with their market data
         const activeAlerts = await prisma.priceAlert.findMany({
@@ -40,7 +44,7 @@ export async function GET(req: NextRequest) {
                 const message = `Price Alert: ${marketData.name} is now ${condition.toLowerCase()} ${targetPrice} SDG. Current Price: ${marketData.value} SDG.`
 
                 // Email
-                if (user.settings?.emailNotifications) {
+                if (user.settings?.emailNotifications !== false) {
                     await sendEmailNotification(user.email, `Price Alert: ${marketData.name}`, message)
                 }
 

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import styles from './PremiumModal.module.css'
-import { useLanguage } from '@/contexts/LanguageContext'
+import { useTranslations, useLocale } from 'next-intl'
 
 interface PremiumModalProps {
     isOpen: boolean
@@ -14,7 +14,9 @@ interface PremiumModalProps {
 export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
     const [isVisible, setIsVisible] = useState(false)
     const [mounted, setMounted] = useState(false)
-    const { t, language } = useLanguage()
+    const t = useTranslations()
+    const locale = useLocale()
+    const language = locale
 
     useEffect(() => {
         setMounted(true)

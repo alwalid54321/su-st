@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
                 isStaff: false,
                 isSuperuser: false,
                 isActive: true, // User can login but might be limited
-                emailVerified: false
+                emailVerified: null
             },
             select: {
                 id: true,

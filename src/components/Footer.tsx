@@ -2,10 +2,12 @@ import Link from 'next/link'
 import styles from './footer.module.css' // Import the CSS module
 import SystemStatus from './SystemStatus'
 import ScrollToTop from './ScrollToTop'
-import { useLanguage } from '@/contexts/LanguageContext'
+import { useTranslations, useLocale } from 'next-intl'
 
 export default function Footer() {
-    const { t, language } = useLanguage()
+    const t = useTranslations()
+    const locale = useLocale()
+    const language = locale
 
     return (
         <footer className={styles.footer} dir={language === 'ar' ? 'rtl' : 'ltr'}>

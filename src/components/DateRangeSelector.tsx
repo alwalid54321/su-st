@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { useLanguage } from '@/contexts/LanguageContext'
+import { useTranslations, useLocale } from 'next-intl'
 import styles from './DateRangeSelector.module.css'
 
 interface DateRangeSelectorProps {
@@ -21,7 +21,10 @@ export default function DateRangeSelector({
     isFilterLocked,
     minDate
 }: DateRangeSelectorProps) {
-    const { t, language, direction } = useLanguage()
+    const t = useTranslations()
+    const locale = useLocale()
+    const language = locale
+    const direction = locale === 'ar' ? 'rtl' : 'ltr'
     const [isOpen, setIsOpen] = useState(false)
     const containerRef = useRef<HTMLDivElement>(null)
 

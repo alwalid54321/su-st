@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
+import { useTranslations } from 'next-intl'
 
 const defaultSlides = [
     '/images/gallery/slide1.svg',
@@ -23,6 +24,7 @@ export default function GallerySlider() {
     const [currentSlide, setCurrentSlide] = useState(0)
     const [images, setImages] = useState<GalleryImage[]>([])
     const [isAutoPlaying, setIsAutoPlaying] = useState(true)
+    const t = useTranslations()
 
     useEffect(() => {
         async function fetchImages() {
@@ -31,7 +33,6 @@ export default function GallerySlider() {
                 if (res.ok) {
                     const data: GalleryImage[] = await res.json()
                     if (data.length > 0) {
-                        // Sanitize paths
                         const sanitizedData = data.map(img => {
                             let url = img.imageUrl || '';
                             url = url.replace(/\\/g, '/');
@@ -42,7 +43,6 @@ export default function GallerySlider() {
                         });
                         setImages(sanitizedData)
                     } else {
-                        // Use default slides if no active images
                         setImages(defaultSlides.map((url, idx) => ({
                             id: idx,
                             imageUrl: url,
@@ -53,7 +53,6 @@ export default function GallerySlider() {
                 }
             } catch (error) {
                 console.error('Failed to fetch gallery images', error)
-                // Fallback to default slides
                 setImages(defaultSlides.map((url, idx) => ({
                     id: idx,
                     imageUrl: url,
@@ -65,12 +64,11 @@ export default function GallerySlider() {
         fetchImages()
     }, [])
 
-    // Auto-play slideshow
     useEffect(() => {
         if (!isAutoPlaying || images.length === 0) return
         const timer = setInterval(() => {
             setCurrentSlide((prev) => (prev + 1) % images.length)
-        }, 5000) // Change slide every 5 seconds
+        }, 5000)
         return () => clearInterval(timer)
     }, [isAutoPlaying, images.length])
 
@@ -113,6 +111,7 @@ export default function GallerySlider() {
                                     src={image.imageUrl}
                                     alt=""
                                     fill
+                                    sizes="100vw"
                                     className="slide-image-blur"
                                     priority={index < 2}
                                     unoptimized={true}
@@ -121,8 +120,9 @@ export default function GallerySlider() {
                                 {/* Main image showing full width/edges */}
                                 <Image
                                     src={image.imageUrl}
-                                    alt={image.title}
+                                    alt={t(image.title)}
                                     fill
+                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                     className="slide-image-main"
                                     priority={index < 2}
                                     unoptimized={true}
@@ -130,9 +130,9 @@ export default function GallerySlider() {
                             </div>
                             <div className="slide-overlay"></div>
                             <div className="slide-content">
-                                <h2 className="slide-title">{image.title}</h2>
+                                <h2 className="slide-title">{t(image.title)}</h2>
                                 {image.description && (
-                                    <p className="slide-description">{image.description}</p>
+                                    <p className="slide-description">{t(image.description)}</p>
                                 )}
                             </div>
                         </div>
@@ -143,14 +143,14 @@ export default function GallerySlider() {
                 <button
                     className="slideshow-nav-btn prev"
                     onClick={prevSlide}
-                    aria-label="Previous slide"
+                    aria-label={t('Previous slide')}
                 >
                     <i className="fas fa-chevron-left"></i>
                 </button>
                 <button
                     className="slideshow-nav-btn next"
                     onClick={nextSlide}
-                    aria-label="Next slide"
+                    aria-label={t('Next slide')}
                 >
                     <i className="fas fa-chevron-right"></i>
                 </button>
@@ -162,7 +162,7 @@ export default function GallerySlider() {
                             key={index}
                             className={`dot ${index === currentSlide ? 'active' : ''}`}
                             onClick={() => goToSlide(index)}
-                            aria-label={`Go to slide ${index + 1}`}
+                            aria-label={`${t('Go to slide')} ${index + 1}`}
                         ></button>
                     ))}
                 </div>
@@ -171,7 +171,7 @@ export default function GallerySlider() {
                 <button
                     className="slideshow-play-pause"
                     onClick={() => setIsAutoPlaying(!isAutoPlaying)}
-                    aria-label={isAutoPlaying ? 'Pause slideshow' : 'Play slideshow'}
+                    aria-label={isAutoPlaying ? t('Pause slideshow') : t('Play slideshow')}
                 >
                     <i className={`fas ${isAutoPlaying ? 'fa-pause' : 'fa-play'}`}></i>
                 </button>

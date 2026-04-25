@@ -3,13 +3,15 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import styles from './PremiumPromoSection.module.css'
-import { useLanguage } from '@/contexts/LanguageContext'
+import { useTranslations, useLocale } from 'next-intl'
 
 export default function PremiumPromoSection() {
     const [isVisible, setIsVisible] = useState(false)
     const [plan, setPlan] = useState('free')
 
-    const { t, language } = useLanguage()
+    const t = useTranslations()
+    const locale = useLocale()
+    const language = locale
 
     useEffect(() => {
         // Only show to users who aren't on high-tier plans

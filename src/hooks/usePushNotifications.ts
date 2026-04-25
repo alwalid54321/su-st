@@ -43,7 +43,16 @@ export function usePushNotifications() {
 
         setLoading(true)
         try {
-            const registration = await navigator.serviceWorker.ready
+            // Register our standalone push service worker
+            let registration = await navigator.serviceWorker.getRegistration('/push-sw.js')
+            if (!registration) {
+                registration = await navigator.serviceWorker.register('/push-sw.js', { scope: '/' })
+                console.log('Registered dedicated push service worker.')
+            }
+
+            // Wait for it to be ready
+            await navigator.serviceWorker.ready
+
             const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
 
             if (!vapidKey) {

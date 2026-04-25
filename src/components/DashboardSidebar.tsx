@@ -4,12 +4,14 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
 import styles from './dashboard-sidebar.module.css'
-import { useLanguage } from '@/contexts/LanguageContext'
+import { useTranslations, useLocale } from 'next-intl'
 
 export default function DashboardSidebar() {
     const pathname = usePathname()
     const { data: session } = useSession()
-    const { t, language } = useLanguage()
+    const t = useTranslations()
+    const locale = useLocale()
+    const language = locale
 
     const navItems = [
         { href: '/dashboard', icon: 'fas fa-home', label: t('dashboard') },
