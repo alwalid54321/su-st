@@ -211,5 +211,7 @@
     "Euro": "Euro",
     "British Pound": "British Pound",
     "Indian Rupee": "Indian Rupee",
-    "Jordanian Dinar": "Jordanian Dinar"
+    "Jordanian Dinar": "Jordanian Dinar",
+    "Dark Mode": "Dark Mode",
+    "Light Mode": "Light Mode"
 }

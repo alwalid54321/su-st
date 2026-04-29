@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SudaStock - Dark Mode Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+  --bg-page: #ffffff; --bg-card: #ffffff; --bg-surface: #f8f9fa; --bg-surface2: #e9ecef;
+  --text-primary: #333333; --text-secondary: #666666; --text-muted: #94a3b8;
+  --primary: #1B1464; --primary-light: #3a3a9e; --accent: #786D3C; --accent-bright: #a39669;
+  --border: rgba(0,0,0,0.08); --shadow: rgba(0,0,0,0.1);
+  --card-glow: rgba(27,20,100,0.15); --success: #16a34a; --danger: #dc2626;
+  --navbar-bg: rgba(255,255,255,0.95); --navbar-text: #1B1464;
+  --ticker-bg: #ffffff; --table-hover: #f8f9fa; --table-border: #eee;
+  --gradient-text-1: #1B1464; --gradient-text-2: #786D3C;
+  --input-bg: #ffffff; --modal-bg: #ffffff;
+}
+[data-theme="dark"] {
+  --bg-page: #0d1117; --bg-card: #161b22; --bg-surface: #1c2333; --bg-surface2: #21293a;
+  --text-primary: #e6edf3; --text-secondary: #8b949e; --text-muted: #6e7681;
+  --primary: #a8b4ff; --primary-light: #7b8fff; --accent: #c9a84c; --accent-bright: #e0c068;
+  --border: rgba(255,255,255,0.08); --shadow: rgba(0,0,0,0.4);
+  --card-glow: rgba(168,180,255,0.08); --success: #3fb950; --danger: #f85149;
+  --navbar-bg: rgba(13,17,23,0.85); --navbar-text: #e6edf3;
+  --ticker-bg: #161b22; --table-hover: #1c2333; --table-border: rgba(255,255,255,0.06);
+  --gradient-text-1: #a8b4ff; --gradient-text-2: #c9a84c;
+  --input-bg: #21293a; --modal-bg: #1c2333;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family:'Inter',sans-serif; background:var(--bg-page); color:var(--text-primary);
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+/* === NAVBAR === */
+.navbar {
+  position:fixed; top:0; width:100%; z-index:1000; padding:0 2rem; height:70px;
+  background:var(--navbar-bg); backdrop-filter:blur(16px); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+  transition: background 0.4s, border-color 0.4s;
+}
+.nav-logo { font-size:1.6rem; font-weight:800; color:var(--accent); text-decoration:none; letter-spacing:1px; }
+.nav-links { display:flex; gap:2rem; align-items:center; }
+.nav-links a { color:var(--text-secondary); text-decoration:none; font-weight:600; font-size:0.9rem;
+  text-transform:uppercase; letter-spacing:0.5px; transition:color 0.2s; }
+.nav-links a:hover, .nav-links a.active { color:var(--accent); }
+.nav-right { display:flex; align-items:center; gap:1rem; }
+.theme-toggle {
+  width:44px; height:44px; border-radius:50%; border:2px solid var(--border); background:var(--bg-surface);
+  color:var(--accent); font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:all 0.3s; position:relative; overflow:hidden;
+}
+.theme-toggle:hover { border-color:var(--accent); transform:scale(1.1); box-shadow:0 0 20px rgba(201,168,76,0.3); }
+.theme-toggle .icon { transition:transform 0.4s, opacity 0.3s; }
+.btn-outline {
+  padding:8px 20px; border-radius:25px; border:2px solid var(--border); background:transparent;
+  color:var(--text-primary); font-weight:700; font-size:0.85rem; cursor:pointer; transition:all 0.3s;
+}
+.btn-outline:hover { border-color:var(--accent); color:var(--accent); }
+.btn-gold {
+  padding:8px 20px; border-radius:25px; border:none; background:var(--accent);
+  color:#fff; font-weight:700; font-size:0.85rem; cursor:pointer; transition:all 0.3s;
+  box-shadow:0 4px 15px rgba(201,168,76,0.3);
+}
+.btn-gold:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(201,168,76,0.4); }
+/* === HERO === */
+.hero {
+  height:100vh; min-height:600px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; position:relative; overflow:hidden;
+  background: linear-gradient(135deg, #0d1117 0%, #1B1464 50%, #0d1117 100%);
+}
+.hero::before {
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(circle at 50% 50%, rgba(201,168,76,0.08) 0%, transparent 70%);
+  animation:breathe 8s ease-in-out infinite;
+}
+@keyframes breathe { 0%,100%{transform:scale(1);opacity:0.5} 50%{transform:scale(1.15);opacity:0.8} }
+.hero-brand { font-size:4rem; font-weight:300; color:#fff; letter-spacing:8px; text-transform:uppercase;
+  text-shadow:0 2px 20px rgba(0,0,0,0.3); z-index:2; }
+.hero-arabic { font-size:3rem; color:#fff; margin:1rem 0 2rem; z-index:2; opacity:0.9; }
+.hero-actions { display:flex; gap:1.5rem; z-index:2; }
+.hero-btn-primary {
+  padding:14px 36px; border-radius:50px; font-weight:700; text-transform:uppercase; letter-spacing:1px;
+  background:var(--accent); color:#fff; border:2px solid var(--accent); cursor:pointer; font-size:1rem;
+  transition:all 0.3s; box-shadow:0 4px 20px rgba(201,168,76,0.4);
+}
+.hero-btn-primary:hover { background:transparent; transform:translateY(-3px); }
+.hero-btn-secondary {
+  padding:14px 36px; border-radius:50px; font-weight:700; text-transform:uppercase; letter-spacing:1px;
+  background:transparent; color:#fff; border:2px solid #fff; cursor:pointer; font-size:1rem; transition:all 0.3s;
+}
+.hero-btn-secondary:hover { background:#fff; color:var(--primary); transform:translateY(-3px); }
+/* === TICKER === */
+.ticker {
+  background:var(--ticker-bg); border-bottom:1px solid var(--border); padding:14px 0;
+  display:flex; align-items:center; overflow:hidden; transition:background 0.4s, border-color 0.4s;
+}
+.ticker-label {
+  background:var(--bg-surface2); color:var(--accent); padding:8px 20px; font-weight:800; font-size:0.75rem;
+  letter-spacing:1.5px; display:flex; align-items:center; gap:8px; white-space:nowrap;
+}
+.pulse-dot { width:8px; height:8px; background:var(--accent); border-radius:50%; animation:pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.5);opacity:0.5} }
+.ticker-track { display:flex; gap:50px; animation:scroll 30s linear infinite; padding:0 30px; }
+@keyframes scroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+.ticker-item { display:flex; align-items:center; gap:12px; white-space:nowrap; }
+.ticker-name { color:var(--accent); font-weight:800; font-size:0.85rem; text-transform:uppercase; }
+.ticker-price { color:var(--text-primary); font-weight:700; }
+.ticker-trend { padding:3px 8px; border-radius:4px; font-size:0.75rem; font-weight:700; }
+.ticker-trend.up { background:rgba(63,185,80,0.1); color:var(--success); }
+.ticker-trend.down { background:rgba(248,81,73,0.1); color:var(--danger); }
+/* === SECTIONS === */
+.section { padding:80px 20px; transition:background 0.4s; }
+.section-alt { background:var(--bg-surface); }
+.section-title {
+  font-size:2.5rem; font-weight:800; text-align:center; margin-bottom:0.5rem;
+  background:linear-gradient(135deg, var(--gradient-text-1), var(--gradient-text-2));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.section-subtitle { text-align:center; color:var(--text-secondary); font-size:1rem; margin-bottom:3rem; }
+/* === CURRENCY CARDS === */
+.cards-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:24px; max-width:1100px; margin:0 auto; }
+.card {
+  background:var(--bg-card); border-radius:16px; padding:1.5rem; position:relative;
+  border:1px solid var(--border); transition:all 0.4s; overflow:hidden;
+}
+.card::before {
+  content:''; position:absolute; inset:-1px; border-radius:17px; z-index:-1; opacity:0;
+  background:linear-gradient(135deg, var(--primary), var(--accent));
+  transition:opacity 0.4s;
+}
+.card:hover { transform:translateY(-6px); border-color:transparent; }
+.card:hover::before { opacity:1; }
+.card-header { display:flex; align-items:center; gap:1rem; margin-bottom:1.25rem; }
+.card-flag {
+  width:48px; height:48px; border-radius:50%; background:var(--bg-surface2);
+  display:flex; align-items:center; justify-content:center; font-size:1.5rem;
+  box-shadow:0 4px 8px var(--shadow);
+}
+.card-code { font-size:1.4rem; font-weight:800; color:var(--text-primary); }
+.card-name { font-size:0.85rem; color:var(--text-secondary); }
+.card-rate {
+  background:var(--bg-surface); border-radius:12px; padding:1.25rem; margin-bottom:1rem;
+  border:1px solid var(--border); transition:background 0.4s, border-color 0.4s;
+}
+.rate-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:0.75rem; }
+.rate-label { color:var(--text-secondary); font-weight:600; font-size:0.9rem; }
+.rate-value {
+  font-size:1.75rem; font-weight:800;
+  background:linear-gradient(135deg, var(--gradient-text-1), var(--gradient-text-2));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.trend-badge { padding:4px 12px; border-radius:20px; font-size:0.8rem; font-weight:700; display:inline-block; }
+.trend-badge.up { background:rgba(63,185,80,0.12); color:var(--success); }
+.trend-badge.down { background:rgba(248,81,73,0.12); color:var(--danger); }
+.trend-badge.stable { background:var(--bg-surface2); color:var(--text-secondary); }
+/* === MARKET TABLE === */
+.table-container {
+  max-width:1100px; margin:0 auto; border-radius:12px; overflow:hidden;
+  border:1px solid var(--border); background:var(--bg-card); transition:all 0.4s;
+}
+table { width:100%; border-collapse:collapse; }
+thead { background:var(--bg-surface2); }
+th { padding:14px 20px; text-align:left; font-size:0.8rem; text-transform:uppercase;
+  letter-spacing:0.05em; color:var(--text-secondary); font-weight:700; }
+td { padding:14px 20px; border-bottom:1px solid var(--table-border); color:var(--text-primary); font-weight:600; transition:background 0.2s; }
+tr:hover td { background:var(--table-hover); }
+tr:last-child td { border-bottom:none; }
+/* === ANNOUNCEMENTS === */
+.ann-card {
+  background:var(--bg-card); border-radius:16px; overflow:hidden; border:1px solid var(--border);
+  transition:all 0.4s;
+}
+.ann-card:hover { transform:translateY(-6px); border-color:var(--accent); box-shadow:0 12px 30px var(--shadow); }
+.ann-img { height:180px; background:var(--bg-surface2); position:relative; overflow:hidden; }
+.ann-img img { width:100%; height:100%; object-fit:cover; }
+.ann-body { padding:1.5rem; }
+.ann-badge {
+  display:inline-block; padding:4px 12px; border-radius:20px; font-size:0.7rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:0.5px; margin-bottom:0.75rem;
+}
+.ann-badge.news { background:rgba(30,64,175,0.15); color:#6d8fff; }
+.ann-badge.alert { background:rgba(248,81,73,0.12); color:var(--danger); }
+.ann-badge.update { background:rgba(63,185,80,0.12); color:var(--success); }
+.ann-title { font-size:1.2rem; font-weight:700; color:var(--text-primary); margin-bottom:0.5rem; }
+.ann-desc { color:var(--text-secondary); font-size:0.9rem; line-height:1.6; margin-bottom:1rem; }
+.ann-link { color:var(--accent); font-weight:700; text-decoration:none; font-size:0.85rem; }
+.ann-link:hover { text-decoration:underline; }
+/* === FOOTER === */
+.footer-demo {
+  background:var(--bg-surface); border-top:1px solid var(--border); padding:3rem 2rem 1.5rem;
+  text-align:center; color:var(--text-secondary); font-size:0.9rem; transition:all 0.4s;
+}
+.footer-demo .footer-brand { color:var(--accent); font-weight:800; font-size:1.2rem; margin-bottom:1rem; }
+/* === DEMO BANNER === */
+.demo-banner {
+  position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:9999;
+  background:var(--accent); color:#fff; padding:12px 28px; border-radius:30px;
+  font-weight:700; font-size:0.9rem; box-shadow:0 8px 30px rgba(0,0,0,0.3);
+  display:flex; align-items:center; gap:10px;
+}
+@media(max-width:768px) {
+  .nav-links { display:none; }
+  .hero-brand { font-size:2.5rem; }
+  .hero-arabic { font-size:2rem; }
+  .cards-grid { grid-template-columns:1fr; }
+  .section-title { font-size:1.8rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- DEMO BANNER -->
+<div class="demo-banner">
+  <i class="fas fa-palette"></i> Dark Mode Preview — Click the moon icon to toggle
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="#" class="nav-logo">SUDASTOCK</a>
+  <div class="nav-links">
+    <a href="#" class="active">Home</a>
+    <a href="#">About</a>
+    <a href="#">Data</a>
+    <a href="#">Products</a>
+    <a href="#">Contact</a>
+  </div>
+  <div class="nav-right">
+    <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn" title="Toggle Dark Mode">
+      <span class="icon" id="themeIcon"><i class="fas fa-moon"></i></span>
+    </button>
+    <button class="btn-outline">Login</button>
+    <button class="btn-gold">Register</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-brand">SUDASTOCK</div>
+  <div class="hero-arabic">سوداستوك</div>
+  <div class="hero-actions">
+    <button class="hero-btn-primary">Begin Trading</button>
+    <button class="hero-btn-secondary">Explore Data</button>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-label"><span class="pulse-dot"></span> LIVE MARKET</div>
+  <div class="ticker-track">
+    <div class="ticker-item"><span class="ticker-name">Sesame HPS</span><span class="ticker-price">$1,450</span><span class="ticker-trend up">▲ 2.3%</span></div>
+    <div class="ticker-item"><span class="ticker-name">Gum Arabic</span><span class="ticker-price">$2,100</span><span class="ticker-trend up">▲ 1.1%</span></div>
+    <div class="ticker-item"><span class="ticker-name">Peanuts</span><span class="ticker-price">$890</span><span class="ticker-trend down">▼ 0.8%</span></div>
+    <div class="ticker-item"><span class="ticker-name">Cotton</span><span class="ticker-price">$1,200</span><span class="ticker-trend up">▲ 0.5%</span></div>
+    <div class="ticker-item"><span class="ticker-name">Hibiscus</span><span class="ticker-price">$3,400</span><span class="ticker-trend down">▼ 1.2%</span></div>
+    <div class="ticker-item"><span class="ticker-name">Sesame HPS</span><span class="ticker-price">$1,450</span><span class="ticker-trend up">▲ 2.3%</span></div>
+    <div class="ticker-item"><span class="ticker-name">Gum Arabic</span><span class="ticker-price">$2,100</span><span class="ticker-trend up">▲ 1.1%</span></div>
+    <div class="ticker-item"><span class="ticker-name">Peanuts</span><span class="ticker-price">$890</span><span class="ticker-trend down">▼ 0.8%</span></div>
+    <div class="ticker-item"><span class="ticker-name">Cotton</span><span class="ticker-price">$1,200</span><span class="ticker-trend up">▲ 0.5%</span></div>
+    <div class="ticker-item"><span class="ticker-name">Hibiscus</span><span class="ticker-price">$3,400</span><span class="ticker-trend down">▼ 1.2%</span></div>
+  </div>
+</div>
+
+<!-- CURRENCY CARDS -->
+<section class="section section-alt">
+  <h2 class="section-title">Global Exchange Rates</h2>
+  <p class="section-subtitle">Live currency rates against the Sudanese Pound (SDG)</p>
+  <div class="cards-grid">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-flag">🇦🇪</div>
+        <div><div class="card-code">AED</div><div class="card-name">UAE Dirham</div></div>
+      </div>
+      <div class="card-rate">
+        <div class="rate-row"><span class="rate-label">1 AED →</span><span style="color:var(--accent);font-size:1.2rem">⇄</span></div>
+        <div class="rate-row"><span class="rate-label">SDG</span><span class="rate-value">163.50</span></div>
+      </div>
+      <div style="text-align:center"><span class="trend-badge up">▲ +0.8%</span></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-flag">🇺🇸</div>
+        <div><div class="card-code">USD</div><div class="card-name">US Dollar</div></div>
+      </div>
+      <div class="card-rate">
+        <div class="rate-row"><span class="rate-label">1 USD →</span><span style="color:var(--accent);font-size:1.2rem">⇄</span></div>
+        <div class="rate-row"><span class="rate-label">SDG</span><span class="rate-value">601.00</span></div>
+      </div>
+      <div style="text-align:center"><span class="trend-badge stable">— 0.0%</span></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-flag">🇪🇺</div>
+        <div><div class="card-code">EUR</div><div class="card-name">Euro</div></div>
+      </div>
+      <div class="card-rate">
+        <div class="rate-row"><span class="rate-label">1 EUR →</span><span style="color:var(--accent);font-size:1.2rem">⇄</span></div>
+        <div class="rate-row"><span class="rate-label">SDG</span><span class="rate-value">652.30</span></div>
+      </div>
+      <div style="text-align:center"><span class="trend-badge down">▼ -0.3%</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- MARKET TABLE -->
+<section class="section">
+  <h2 class="section-title">Market Data</h2>
+  <p class="section-subtitle">Track Sudanese commodity prices in real-time</p>
+  <div class="table-container">
+    <table>
+      <thead><tr><th>Product</th><th>Port Sudan</th><th>CNF China</th><th>CNF UAE</th><th>Status</th><th>Trend</th></tr></thead>
+      <tbody>
+        <tr><td style="font-weight:800">Sesame HPS</td><td>$1,450</td><td>$1,520</td><td>$1,490</td><td><span class="trend-badge up">Active</span></td><td><span class="trend-badge up">▲ 2.3%</span></td></tr>
+        <tr><td style="font-weight:800">Gum Arabic Grade 1</td><td>$2,100</td><td>$2,250</td><td>$2,180</td><td><span class="trend-badge up">Active</span></td><td><span class="trend-badge up">▲ 1.1%</span></td></tr>
+        <tr><td style="font-weight:800">Peanuts 40/50</td><td>$890</td><td>$950</td><td>$920</td><td><span class="trend-badge up">Active</span></td><td><span class="trend-badge down">▼ 0.8%</span></td></tr>
+        <tr><td style="font-weight:800">Cotton Lint</td><td>$1,200</td><td>$1,280</td><td>$1,250</td><td><span class="trend-badge stable">Limited</span></td><td><span class="trend-badge up">▲ 0.5%</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ANNOUNCEMENTS -->
+<section class="section section-alt">
+  <h2 class="section-title">Announcements</h2>
+  <p class="section-subtitle">Latest platform news and market updates</p>
+  <div class="cards-grid">
+    <div class="ann-card">
+      <div class="ann-img" style="background:linear-gradient(135deg,#1B1464,#786D3C);display:flex;align-items:center;justify-content:center;color:#fff;font-size:2rem"><i class="fas fa-chart-line"></i></div>
+      <div class="ann-body">
+        <span class="ann-badge news">News</span>
+        <div class="ann-title">Q2 Sesame Export Report Released</div>
+        <div class="ann-desc">Sudan's sesame exports reached a record high in Q2, driven by strong demand from China and UAE markets.</div>
+        <a href="#" class="ann-link">Read More →</a>
+      </div>
+    </div>
+    <div class="ann-card">
+      <div class="ann-img" style="background:linear-gradient(135deg,#dc2626,#1B1464);display:flex;align-items:center;justify-content:center;color:#fff;font-size:2rem"><i class="fas fa-bell"></i></div>
+      <div class="ann-body">
+        <span class="ann-badge alert">Alert</span>
+        <div class="ann-title">Port Sudan Operations Update</div>
+        <div class="ann-desc">Temporary delays expected at Port Sudan due to maintenance. Estimated resolution within 48 hours.</div>
+        <a href="#" class="ann-link">Read More →</a>
+      </div>
+    </div>
+    <div class="ann-card">
+      <div class="ann-img" style="background:linear-gradient(135deg,#16a34a,#1B1464);display:flex;align-items:center;justify-content:center;color:#fff;font-size:2rem"><i class="fas fa-rocket"></i></div>
+      <div class="ann-body">
+        <span class="ann-badge update">Update</span>
+        <div class="ann-title">New Premium Plan Features</div>
+        <div class="ann-desc">Premium users now get access to 1-year historical data, priority alerts, and unlimited CSV exports.</div>
+        <a href="#" class="ann-link">Read More →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<div class="footer-demo">
+  <div class="footer-brand">SUDASTOCK</div>
+  <p>© 2026 SudaStock. All rights reserved. | Pure Agri Foodstuff Trading LLC</p>
+</div>
+
+<script>
+function toggleTheme() {
+  const html = document.documentElement;
+  const icon = document.getElementById('themeIcon');
+  if (html.getAttribute('data-theme') === 'dark') {
+    html.setAttribute('data-theme', 'light');
+    icon.innerHTML = '<i class="fas fa-moon"></i>';
+  } else {
+    html.setAttribute('data-theme', 'dark');
+    icon.innerHTML = '<i class="fas fa-sun"></i>';
+  }
+}
+</script>
+</body>
+</html>

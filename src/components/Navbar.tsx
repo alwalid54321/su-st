@@ -39,6 +39,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import CampaignIcon from '@mui/icons-material/Campaign';
 import SearchIcon from '@mui/icons-material/Search';
 import LanguageIcon from '@mui/icons-material/Language';
+import ThemeToggle from './ThemeToggle';
 
 const goldColor = '#786D3C';
 const textColor = '#1B1464';
@@ -440,6 +441,7 @@ export default function Navbar() {
                                 {locale === 'en' ? 'العربية' : 'English'}
                             </Button>
 
+                            <ThemeToggle />
                             <Divider orientation="vertical" flexItem sx={{ mx: 1, borderColor: isTransparent ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)' }} />
 
                             {isAdmin ? (

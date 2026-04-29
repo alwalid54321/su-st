@@ -211,5 +211,7 @@
     "Euro": "يورو",
     "British Pound": "جنيه إسترليني",
     "Indian Rupee": "روبية هندية",
-    "Jordanian Dinar": "دينار أردني"
+    "Jordanian Dinar": "دينار أردني",
+    "Dark Mode": "الوضع الداكن",
+    "Light Mode": "الوضع الفاتح"
 }
